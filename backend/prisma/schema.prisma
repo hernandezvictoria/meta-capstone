@@ -16,8 +16,8 @@ datasource db {
 
 model User{
   id Int @id @default(autoincrement())
-  username String
-  hashed_password String
+  username String @unique
+  password String
   concerns String?
   skin_type String?
   loved_products String? @default("")
@@ -33,7 +33,8 @@ model Ingredient{
 }
 
 model ProductInfo{
-  id Int @id @default(autoincrement())
+  id Int @id @default(autoincrement()) //id in the database
+  product_id Int // id in the API
   concerns String
   skin_type String
 }
