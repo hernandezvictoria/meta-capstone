@@ -15,14 +15,14 @@ const { ValidationError } = require('./middleware/CustomErrors')
 
 // Configure CORS to allow requests from your frontend's origin and include credentials
 app.use(cors({
-    origin: 'http://localhost:5174', // frontend's origin
+    origin: 'http://localhost:5173', // frontend's origin
     credentials: true
 }))
 
 app.use(express.json())
 
 app.use(session({
-    secret: 'codepath-adoptapet',
+    secret: 'capstone',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1-hour session
