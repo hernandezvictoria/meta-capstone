@@ -28,7 +28,9 @@ model Ingredient{
 
 model ProductInfo{
   id Int @id @default(autoincrement()) //id in the database
-  product_id Int // id in the API
+  brand String
+  name String
+  ingredients Json
   concerns Json?
   skin_type Json?
   loved_by_user User[] @relation("loved")

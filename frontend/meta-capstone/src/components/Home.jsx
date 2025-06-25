@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from '../contexts/UserContext';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import '../styles/Home.css';
 import WithAuth from './WithAuth'
+import ProductContainer from './home_components/ProductContainer'
 
 const Home = () => {
     const { user, setUser } = useUser();
     const navigate = useNavigate();
+    const [data, setData] = useState([]);
 
     const handleLogout = async () => {
         try {
@@ -28,9 +30,9 @@ const Home = () => {
 
     return (
         <>
-
             <p>This is the Home Page</p>
             <p>Hello {user.username}</p>
+            <ProductContainer data={data} setData={setData}/>
             <button type="button" onClick={handleLogout}>log out</button>
         </>
 

@@ -14,6 +14,7 @@ app.get('/', (req, res) => {
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user-info');
+const productRoutes = require('./routes/products');
 
 const { ValidationError } = require('./middleware/CustomErrors')
 
@@ -34,6 +35,8 @@ app.use(session({
 
 app.use(authRoutes);
 app.use(userRoutes);
+app.use(productRoutes);
+
 
 app.use((err, req, res, next) => {
     if (err instanceof ValidationError) {
