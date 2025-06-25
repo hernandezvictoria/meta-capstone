@@ -3,6 +3,9 @@ const app = express()
 const cors = require('cors')
 const session = require('express-session')
 
+const { SkinTypes, SkinConcerns } = require('./enums');
+
+
 const PORT = 3000
 
 app.get('/', (req, res) => {
