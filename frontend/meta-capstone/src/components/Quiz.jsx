@@ -1,4 +1,5 @@
-import {SkinTypes, SkinConcerns} from "../../../enums.js";
+import { SkinTypes, SkinConcerns } from '../enums';
+
 
 import { useState } from "react";
 import { useUser } from '../contexts/UserContext';
@@ -12,10 +13,9 @@ const Quiz = () => {
 
     return (
         <>
-
+            <h2>tell us about your skinterests</h2>
             <p>This is the Quiz Page</p>
             <p>Hello {user.username}</p>
-            <button type="button" onClick={handleLogout}>log out</button>
         </>
 
     );

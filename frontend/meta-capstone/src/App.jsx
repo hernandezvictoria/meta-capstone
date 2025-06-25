@@ -5,10 +5,12 @@ import LoginForm from './components/LoginForm'
 import Home from './components/Home'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import WithAuth from './components/WithAuth';
+import Quiz from './components/Quiz';
 
 function App() {
 
   const ProtectedHome = WithAuth(Home);
+  const ProtectedQuiz = WithAuth(Quiz);
 
   return (
     <Router>
@@ -17,6 +19,7 @@ function App() {
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/home" element={<ProtectedHome />}/>
+          <Route path="/quiz" element={<ProtectedQuiz/>}/>
         </Routes>
     </Router>
 

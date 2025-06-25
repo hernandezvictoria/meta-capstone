@@ -16,4 +16,4 @@ const SkinConcerns = Object.freeze({
     DRYNESS: "dryness"
 })
 
-export default { SkinTypes, SkinConcerns };
+export { SkinTypes, SkinConcerns };

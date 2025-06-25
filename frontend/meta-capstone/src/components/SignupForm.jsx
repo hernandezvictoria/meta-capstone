@@ -58,7 +58,7 @@ const SignupForm = () => {
             if (response.ok) {
                 setMessage({ type: "success", text: "login successful!" });
                 setUser(data); // Set the user in context with id and username
-                navigate("/home"); // Redirect to the homepage
+                navigate("/quiz"); // Redirect to the quiz page
             } else {
                 setMessage({ type: "error", text: data.error || "login failed" });
             }
