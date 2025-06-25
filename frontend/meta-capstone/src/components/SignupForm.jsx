@@ -22,8 +22,7 @@ const SignupForm = () => {
 
     // Handle form submission
     const handleSubmit = async (event) => {
-        event.preventDefault(); // Prevents page refresh
-        console.log("User Input:", formData); // Logs user input
+        event.preventDefault(); 
 
         try {
             const response = await fetch("http://localhost:3000/signup", {

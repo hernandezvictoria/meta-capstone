@@ -20,8 +20,8 @@ model User{
   password String
   concerns String?
   skin_type String?
-  loved_products String? @default("")
-  saved_products String? @default("")
+  loved_products ProductInfo[] @relation("loved")
+  saved_products ProductInfo[] @relation("saved")
 }
 
 model Ingredient{
@@ -37,4 +37,6 @@ model ProductInfo{
   product_id Int // id in the API
   concerns String
   skin_type String
+  loved_by_user User[] @relation("loved")
+  saved_by_user User[] @relation("saved")
 }
