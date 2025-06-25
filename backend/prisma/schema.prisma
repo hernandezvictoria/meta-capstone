@@ -12,8 +12,8 @@ model User{
   id Int @id @default(autoincrement())
   username String @unique
   password String
-  concerns String?
-  skin_type String?
+  concerns Json?
+  skin_type Json?
   loved_products ProductInfo[] @relation("loved")
   saved_products ProductInfo[] @relation("saved")
 }
@@ -22,15 +22,15 @@ model Ingredient{
   id Int @id @default(autoincrement())
   name String
   ingredient_type String
-  purpose String
+  concern String
   skin_type String
 }
 
 model ProductInfo{
   id Int @id @default(autoincrement()) //id in the database
   product_id Int // id in the API
-  concerns String
-  skin_type String
+  concerns Json?
+  skin_type Json?
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
 }

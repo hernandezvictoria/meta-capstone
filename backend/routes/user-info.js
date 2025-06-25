@@ -8,7 +8,7 @@ const router = express.Router()
 
 // http://localhost:3000/change-skin-type
 router.put('/change-skin-type', async (req, res) => {
-    const { skin_type } = req.body
+    const skin_type = req.body
 
     const id = req.session.userId;
     if (!id) {
@@ -41,7 +41,7 @@ router.put('/change-skin-type', async (req, res) => {
 
 // http://localhost:3000/change-skin-concerns
 router.put('/change-skin-concerns', async (req, res) => {
-    const { concerns } = req.body
+    const concerns = req.body
 
     const id = req.session.userId;
     if (!id) {
