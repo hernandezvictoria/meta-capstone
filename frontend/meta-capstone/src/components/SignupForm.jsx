@@ -22,7 +22,7 @@ const SignupForm = () => {
 
     // Handle form submission
     const handleSubmit = async (event) => {
-        event.preventDefault(); 
+        event.preventDefault();
 
         try {
             const response = await fetch("http://localhost:3000/signup", {
@@ -33,6 +33,7 @@ const SignupForm = () => {
 
             const data = await response.json()
 
+    
             if (response.ok) {
                 setMessage({ type: "success", text: "signup successful!" })
                 setUser(data); // Set the user in context with id and username
