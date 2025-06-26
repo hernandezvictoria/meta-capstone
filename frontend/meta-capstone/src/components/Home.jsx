@@ -3,7 +3,7 @@ import { useUser } from '../contexts/UserContext';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import '../styles/Home.css';
 import WithAuth from './WithAuth'
-import ProductContainer from './home_components/ProductContainer'
+import ProductContainer from './home_components/ProductList'
 
 const Home = () => {
     const { user, setUser } = useUser();

@@ -7,11 +7,10 @@ const router = express.Router()
 // http://localhost:3000/products
 router.get('/products', async (req, res) => {
 
+    //TODO: PAGINATION
     if (!req.session.userId) {
         return res.status(401).json({ error: "you must be logged in to perform this action" })
     }
-
-
 
     try {
         const allProducts = await prisma.productInfo.findMany();
@@ -51,6 +50,5 @@ router.put('/change-product-image/:productId', async (req, res) => {
         res.status(500).send({ message: "an error occurred while updating the product's image" });
     }
 })
-
 
 module.exports = router;
