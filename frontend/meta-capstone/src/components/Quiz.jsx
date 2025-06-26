@@ -1,9 +1,9 @@
 import { SkinTypes, SkinConcerns } from '../enums';
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from '../contexts/UserContext';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, Form } from 'react-router-dom';
 import '../styles/Quiz.css';
 import WithAuth from './WithAuth'
 
@@ -11,6 +11,7 @@ const Quiz = () => {
     const { user, setUser } = useUser();
     const navigate = useNavigate();
     const [message, setMessage] = useState({ type: "none", text: "" });
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -32,6 +33,7 @@ const Quiz = () => {
             setMessage({ type: "error", text: "you must select at least one of each" });
         } else {
             setMessage({ type: "success", text: "form submitted successfully!" });
+            // setFormSubmitted(true);
 
             // convert to JSON
             const skinTypesJson = JSON.stringify(selectedSkinTypes);
@@ -57,6 +59,9 @@ const Quiz = () => {
             if (!response.ok) {
                 setMessage({ type: "error", text: data.error || "form process failed" });
             }
+            else{
+                setMessage({type:"success", text:"updated skin type"})
+            }
         } catch (error) {
             setMessage({ type: "error", text: "network error, please try again" });
         }
@@ -75,15 +80,22 @@ const Quiz = () => {
             if (!response.ok) {
                 setMessage({ type: "error", text: data.error || "form process failed" });
             }
+            else{
+                setMessage({type:"success", text:"updated concern"})
+            }
         } catch (error) {
             setMessage({ type: "error", text: "network error, please try again" });
         }
 
-        if(message.type !== "error"){
-            navigate("/home"); // Redirect to the homepage upon success
-        }
+        setFormSubmitted(true);
     }
 
+    useEffect(() => {
+        if(formSubmitted && message.type !== "error"){
+            navigate("/home");
+        }
+
+    }, [formSubmitted, message]);
 
     return (
         <>
