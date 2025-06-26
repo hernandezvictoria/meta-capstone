@@ -30,7 +30,9 @@ model ProductInfo{
   id Int @id @default(autoincrement()) //id in the database
   brand String
   name String
-  ingredients Json
+  product_type String?
+  price String?
+  ingredients Json?
   concerns Json?
   skin_type Json?
   loved_by_user User[] @relation("loved")
