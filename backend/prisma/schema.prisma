@@ -30,6 +30,7 @@ model ProductInfo{
   id Int @id @default(autoincrement()) //id in the database
   brand String
   name String
+  image String?
   product_type String?
   price String?
   ingredients Json?

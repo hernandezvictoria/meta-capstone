@@ -4,10 +4,10 @@ const { PrismaClient } = require('../generated/prisma/index.js');
 const prisma = new PrismaClient();
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
-fs.createReadStream('AB1.csv')
+fs.createReadStream('file2.csv')
   .pipe(parse({ columns: true, trim: true }))
   .on('data', async (row) => {
-    
+
     const getConcernsArray = (str) => {
       let concerns = str.toLowerCase();
       let concernsArray = [];

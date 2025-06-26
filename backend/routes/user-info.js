@@ -25,7 +25,7 @@ router.put('/change-skin-type', async (req, res) => {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // toggle the pinned status
+        // update the user's skin type
         const updatedUser = await prisma.user.update({
             where: { id: id },
             data: {
@@ -58,7 +58,7 @@ router.put('/change-skin-concerns', async (req, res) => {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // toggle the pinned status
+        // update the user's skin concern
         const updatedUser = await prisma.user.update({
             where: { id: id },
             data: {
@@ -71,5 +71,6 @@ router.put('/change-skin-concerns', async (req, res) => {
         res.status(500).send({ message: "an error occurred while updating the user's skin concern" });
     }
 })
+
 
 module.exports = router;
