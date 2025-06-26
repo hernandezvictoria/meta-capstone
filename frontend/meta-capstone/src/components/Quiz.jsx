@@ -1,4 +1,4 @@
-import { SkinTypes, SkinConcerns } from '../enums';
+import { SkinTypes, SkinConcerns} from '../enums';
 
 
 import { useState, useEffect } from "react";
@@ -107,8 +107,6 @@ const Quiz = () => {
                 <label>{SkinTypes.OILY}</label><br></br>
                 <input type="checkbox" name="type" id={SkinTypes.DRY} value={SkinTypes.DRY}/>
                 <label>{SkinTypes.DRY}</label><br></br>
-                <input type="checkbox" name="type" id={SkinTypes.SENSITIVE} value={SkinTypes.SENSITIVE}/>
-                <label>{SkinTypes.SENSITIVE}</label><br></br>
                 <input type="checkbox" name="type" id={SkinTypes.COMBINATION} value={SkinTypes.COMBINATION}/>
                 <label>{SkinTypes.COMBINATION}</label><br></br>
                 <input type="checkbox" name="type" id={SkinTypes.NORMAL} value={SkinTypes.NORMAL}/>

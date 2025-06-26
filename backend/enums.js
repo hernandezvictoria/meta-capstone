@@ -1,7 +1,6 @@
 const SkinTypes = Object.freeze({
     OILY: "oily",
     DRY: "dry",
-    SENSITIVE: "sensitive",
     COMBINATION: "combination",
     NORMAL: "normal"
 });
