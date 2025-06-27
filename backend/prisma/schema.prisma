@@ -31,11 +31,11 @@ model ProductInfo{
   brand String
   name String
   image String?
-  product_type String?
-  price String?
-  ingredients Json?
-  concerns Json?
-  skin_type Json?
+  product_type String
+  price Decimal
+  ingredients Json
+  concerns Json
+  skin_type Json
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
 }
