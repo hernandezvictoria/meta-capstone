@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from 'react'
 import Product from "./Product.jsx";
-import "../../styles/ProductContainer.css";
+import "../../styles/ProductList.css";
 // import {parseDataForCard} from "../utils/helper-functions.js";
 
 function ProductContainer({data, setData}) {
@@ -9,7 +9,7 @@ function ProductContainer({data, setData}) {
   const [error, setError] = useState(null);
 
   // TODO: LOADING STATE
-  
+
   const fetchAllData = async () => {
       fetch("http://localhost:3000/products", { credentials: "include" })
       .then((response) => response.json())

@@ -32,7 +32,6 @@ const Quiz = () => {
         if (selectedSkinTypes.length === 0 || selectedConcerns.length === 0) {
             setMessage({ type: "error", text: "you must select at least one of each" });
         } else {
-            setMessage({ type: "success", text: "form submitted successfully!" });
             // setFormSubmitted(true);
 
             // convert to JSON
@@ -103,31 +102,21 @@ const Quiz = () => {
 
             <form onSubmit={handleSubmit}>
                 <h3>skin type(s) </h3>
-                <input type="checkbox" name="type" id={SkinTypes.OILY} value={SkinTypes.OILY}/>
-                <label>{SkinTypes.OILY}</label><br></br>
-                <input type="checkbox" name="type" id={SkinTypes.DRY} value={SkinTypes.DRY}/>
-                <label>{SkinTypes.DRY}</label><br></br>
-                <input type="checkbox" name="type" id={SkinTypes.COMBINATION} value={SkinTypes.COMBINATION}/>
-                <label>{SkinTypes.COMBINATION}</label><br></br>
-                <input type="checkbox" name="type" id={SkinTypes.NORMAL} value={SkinTypes.NORMAL}/>
-                <label>{SkinTypes.NORMAL}</label><br></br>
+                {Object.values(SkinTypes).map((skinType) => (
+                    <div key={skinType}>
+                        <input type="checkbox" name="type" id={skinType} value={skinType}/>
+                        <label>{skinType}</label><br></br>
+                    </div>
+                ))}
 
 
                 <h3>concern(s)</h3>
-                <input type="checkbox" name="concern" id={SkinConcerns.WRINKLES} value={SkinConcerns.WRINKLES}/>
-                <label>{SkinConcerns.WRINKLES}</label><br></br>
-                <input type="checkbox" name="concern" id={SkinConcerns.TEXTURE} value={SkinConcerns.TEXTURE}/>
-                <label>{SkinConcerns.TEXTURE}</label><br></br>
-                <input type="checkbox" name="concern" id={SkinConcerns.HYPERPIGMENTATION} value={SkinConcerns.HYPERPIGMENTATION}/>
-                <label>{SkinConcerns.HYPERPIGMENTATION}</label><br></br>
-                <input type="checkbox" name="concern" id={SkinConcerns.REDNESS} value={SkinConcerns.REDNESS}/>
-                <label>{SkinConcerns.REDNESS}</label><br></br>
-                <input type="checkbox" name="concern" id={SkinConcerns.ACNE} value={SkinConcerns.ACNE}/>
-                <label>{SkinConcerns.ACNE}</label><br></br>
-                <input type="checkbox" name="concern" id={SkinConcerns.DULLNESS} value={SkinConcerns.DULLNESS}/>
-                <label>{SkinConcerns.DULLNESS}</label><br></br>
-                <input type="checkbox" name="concern" id={SkinConcerns.DRYNESS} value={SkinConcerns.DRYNESS}/>
-                <label>{SkinConcerns.DRYNESS}</label><br></br>
+                {Object.values(SkinConcerns).map((concern) => (
+                    <div key={concern}>
+                        <input type="checkbox" name="concern" id={concern} value={concern}/>
+                        <label>{concern}</label><br></br>
+                    </div>
+                ))}
 
                 {message && (
                 <p className={`message ${message.type}`}>{message.text}</p>
