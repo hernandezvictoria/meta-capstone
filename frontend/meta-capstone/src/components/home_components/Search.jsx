@@ -2,17 +2,34 @@ import React, { useRef } from "react";
 import "../../styles/Search.css";
 
 
-function Search({setError, setIsSearching, setData}) {
-
+function Search({setError, setIsSearching, setData, setMaxPages, pageNum, data, setPageNum}) {
     const inputRef = useRef(null);
+    const limit = 10;
 
     const handleSearch = (event) => {
         event.preventDefault();
         setIsSearching(true);
         const query = inputRef.current.value;
-        fetch(`http://localhost:3000/search/${query}`)
+        fetch(`http://localhost:3000/search/${query}?page=${pageNum}&limit=${limit}`)
         .then((response) => {return response.json()})
-        .then((data) => setData(data.products))
+        .then((res) => {
+            if(res.products.length === 0){ //if no more products to display
+                setMaxPages(true);
+            }
+            if(pageNum === 1){
+                if(res.products.length === 0){
+                    setError("no products match your search")
+                } else{
+                    setData(res.products)
+                    if(res.products.length < limit){
+                        setMaxPages(true);
+                    }
+                }
+            }
+            else{
+                setData([...data, ...res.products])
+            }
+        })
         .catch(error => setError("error searching for products"));
     };
 
@@ -20,6 +37,8 @@ function Search({setError, setIsSearching, setData}) {
         event.preventDefault();
         inputRef.current.value = ""; // clear the input field too
         setIsSearching(false);
+        setPageNum(1);
+        setMaxPages(false);
     };
 
     return (

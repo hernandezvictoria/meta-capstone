@@ -4,16 +4,33 @@ import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
 // import {parseDataForCard} from "../utils/helper-functions.js";
 
-function ProductList({error, setError, isSearching, data, setData}) {
+function ProductList({error, setError, isSearching, data, setData, pageNum, setPageNum}) {
 
   // TODO: CUSTOM LOADING STATE
 
-
+  const limit = 10;
 
   const fetchAllData = async () => {
-      fetch("http://localhost:3000/products", { credentials: "include" })
+      fetch(`http://localhost:3000/products?page={pageNum}&limit=${limit}`, { credentials: "include" })
       .then((response) => response.json())
-      .then((res) => { setData(res.products)})
+      .then((res) => {
+        if(res.products.length === 0){ //if no more products to display
+          setMaxPages(true);
+        }
+        if(pageNum === 1){
+            if(res.products.length === 0){
+                setError("no products to load")
+            } else{
+                setData(res.products)
+                if(res.products.length < limit){
+                    setMaxPages(true);
+                }
+            }
+        }
+        else{
+            setData([...data, ...res.products])
+        }
+      })
       .catch(() => {
         setError("unable to fetch products");
       });
@@ -34,7 +51,7 @@ function ProductList({error, setError, isSearching, data, setData}) {
   }, [data]);
 
   const handleLoadMore = () => {
-    
+    setPageNum(pageNum + 1);
   }
 
   if(error){
