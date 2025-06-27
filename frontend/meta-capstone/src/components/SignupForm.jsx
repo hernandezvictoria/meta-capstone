@@ -22,7 +22,7 @@ const SignupForm = () => {
 
     // Handle form submission
     const handleSubmit = async (event) => {
-        event.preventDefault(); 
+        event.preventDefault();
 
         try {
             const response = await fetch("http://localhost:3000/signup", {
@@ -34,15 +34,36 @@ const SignupForm = () => {
             const data = await response.json()
 
             if (response.ok) {
-                setMessage({ type: "success", text: "signup successful!" })
-                setUser(data); // Set the user in context with id and username
-                navigate("/home"); // Redirect to the homepage
+                login();
 
             } else {
                 setMessage({ type: "error", text: data.error || "signup failed." })
             }
         } catch (error) {
             setMessage({ type: "error", text: "network error, please try again." })
+        }
+    }
+
+    const login = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+                credentials: "include",
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setMessage({ type: "success", text: "login successful!" });
+                setUser(data); // Set the user in context with id and username
+                navigate("/quiz"); // Redirect to the quiz page
+            } else {
+                setMessage({ type: "error", text: data.error || "login failed" });
+            }
+        } catch (error) {
+            setMessage({ type: "error", text: "network error, please try again" });
         }
     }
 

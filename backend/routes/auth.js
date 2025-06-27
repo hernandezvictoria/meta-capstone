@@ -40,7 +40,7 @@ router.post('/signup', async (req, res) => {
             }
         })
 
-        res.status(201).json({ message: "signup successful!" })
+        res.status(201).json({ username: username})
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: "something went wrong during signup" })
@@ -111,4 +111,4 @@ router.post('/logout', (req, res) => {
   });
 });
 
-module.exports = router
+module.exports = router;

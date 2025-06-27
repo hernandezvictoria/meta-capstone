@@ -3,13 +3,18 @@ const app = express()
 const cors = require('cors')
 const session = require('express-session')
 
+const { SkinTypes, SkinConcerns } = require('./enums');
+
+
 const PORT = 3000
 
 app.get('/', (req, res) => {
     res.send('Welcome to my app!')
   })
 
-const authRoutes = require('./routes/auth')
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user-info');
+const productRoutes = require('./routes/products');
 
 const { ValidationError } = require('./middleware/CustomErrors')
 
@@ -19,7 +24,7 @@ app.use(cors({
     credentials: true
 }))
 
-app.use(express.json())
+app.use(express.json());
 
 app.use(session({
     secret: 'capstone',
@@ -28,7 +33,10 @@ app.use(session({
     cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1-hour session
 }))
 
-app.use(authRoutes)
+app.use(authRoutes);
+app.use(userRoutes);
+app.use(productRoutes);
+
 
 app.use((err, req, res, next) => {
     if (err instanceof ValidationError) {
