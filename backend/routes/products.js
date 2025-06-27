@@ -7,15 +7,23 @@ const router = express.Router()
 
 // http://localhost:3000/products
 router.get('/products', async (req, res) => {
+    const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
+    const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
+    const offset = (page - 1) * limit;
 
-    //TODO: PAGINATION
     if (!req.session.userId) {
         return res.status(401).json({ error: "you must be logged in to perform this action" })
     }
 
     try {
-        const allProducts = await prisma.productInfo.findMany();
-        res.status(200).json(allProducts);
+        const products = await prisma.productInfo.findMany({
+            skip: offset,
+            take: limit
+        });
+        //RES NOW HAS TWO ELEMENTS IN JSON
+        res.status(200).json({
+            totalProducts: products.length,
+            products});
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "error fetching user products" })
@@ -57,6 +65,10 @@ router.get('/search/:query', async (req, res) => {
     const query = req.params.query;
     const queryArray = query.split(" ");
     let foundProducts = [];
+
+    if (!req.session.userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" })
+    }
 
     try {
         foundProducts = await prisma.productInfo.findMany({

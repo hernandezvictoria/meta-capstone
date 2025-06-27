@@ -13,7 +13,7 @@ function ProductList({error, setError, isSearching, data, setData}) {
   const fetchAllData = async () => {
       fetch("http://localhost:3000/products", { credentials: "include" })
       .then((response) => response.json())
-      .then((res) => { setData(res)})
+      .then((res) => { setData(res.products)})
       .catch(() => {
         setError("unable to fetch products");
       });
