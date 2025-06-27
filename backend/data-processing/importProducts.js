@@ -4,7 +4,7 @@ const { PrismaClient } = require('../generated/prisma/index.js');
 const prisma = new PrismaClient();
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
-fs.createReadStream('file2.csv')
+fs.createReadStream('AB1.csv')
   .pipe(parse({ columns: true, trim: true }))
   .on('data', async (row) => {
 
@@ -65,11 +65,11 @@ fs.createReadStream('file2.csv')
         data: {
           brand: row.brand,
           name: row.name,
-          product_type: row.product_type || null,
+          product_type: row.product_type === "eye cream" ? "eye_cream" : row.product_type,
           price: row.price || null,
-          ingredients: ingredientsArray.length ? ingredientsArray : null,
-          concerns: concernsArray.length ? concernsArray : null,
-          skin_type: skinTypeArray.length ? skinTypeArray : null,
+          ingredients: ingredientsArray,
+          concerns: concernsArray,
+          skin_type: skinTypeArray,
         },
       });
     } catch (err) {

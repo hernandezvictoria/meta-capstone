@@ -1,3 +1,14 @@
+enum product_type_enum {
+    serum
+    toner
+    sunscreen
+    moisturizer
+    retinol
+    mask
+    cleanser
+    eye_cream
+}
+
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -31,11 +42,11 @@ model ProductInfo{
   brand String
   name String
   image String?
-  product_type String?
-  price String?
-  ingredients Json?
-  concerns Json?
-  skin_type Json?
+  product_type product_type_enum ?
+  price String
+  ingredients String[]
+  concerns String[]
+  skin_type String[]
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
 }

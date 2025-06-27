@@ -1,10 +1,10 @@
 brand,name,product_type,price,concerns,skin_type,ingredients
-Dermalogica,Daily Microfoliant,exfoliant,$45.00,"texture, dullness","normal, combination","Rice Bran, Alpha-Hydroxy Acids, Beta-Hydroxy Acids"
+Dermalogica,Daily Microfoliant,toner,$45.00,"texture, dullness","normal, combination","Rice Bran, Alpha-Hydroxy Acids, Beta-Hydroxy Acids"
 La Roche-Posay,Toleriane Ultra Fluid Face Moisturizer,moisturizer,$30.00,"dryness, redness & irritation","normal, dry","Ceramide-3, Niacinamide, Glycerin"
 The Ordinary,Azelaic Acid Suspension 10%,serum,$12.00,"acne & blemishes, hyperpigmentation (dark spots)","oily, combination","Azelaic Acid, Glycerin, Salicylic Acid"
 Drunk Elephant,Protini Polypeptide Cream,moisturizer,$68.00,"fine lines & wrinkles, dryness","normal, combination","Peptides, Pygmy Waterlily, Amino Acids"
 Glow Recipe,Watermelon Glow PHA+BHA Pore-Tight Toner,toner,$34.00,"texture, dullness","oily, combination","Watermelon Extract, PHA, BHA, Hyaluronic Acid"
-Kiehl's,Calendula Foaming Face Wash,cleaner,$22.00,"all skin types","normal, dry","Calendula Extract, Glycerin, Coconut Oil"
+Kiehl's,Calendula Foaming Face Wash,cleanser,$22.00,"all skin types","normal, dry","Calendula Extract, Glycerin, Coconut Oil"
 Murad,Retinol Youth Renewal Serum,retinol,$89.00,"fine lines & wrinkles, texture","normal, combination","Retinol, Swertia Flower Extract, Hyaluronic Acid"
 Neutrogena,Hydro Boost Water Gel,moisturizer,$25.00,"dryness, dullness","dry, normal","Water, Glycerin, Dimethicone, Sodium Hyaluronate"
 Olay,Regenerist Retinol 24 Night Eye Cream,eye cream,$29.00,"fine lines & wrinkles, dryness","normal, dry","Retinol, Niacinamide, Glycerin"
@@ -14,4 +14,3 @@ Shiseido,Essential Energy Hydrating Cream,moisturizer,$48.00,"dryness, dullness"
 Supergoop!,Unseen Sunscreen SPF 40,sunscreen,$36.00,"dullness","combination, oily","Avobenzone, Homosalate, Octisalate, Tocopherol"
 Tatcha,The Water Cream,moisturizer,$68.00,"dullness, texture","combination, oily","Japanese Wild Rose, Leopard Lily, Green Tea, Rice, Algae"
 The Inkey List,Niacinamide Oil Control Serum,serum,$7.00,"acne & blemishes, redness & irritation","oily, combination","Niacinamide, Hyaluronic Acid, Squalane"
-
