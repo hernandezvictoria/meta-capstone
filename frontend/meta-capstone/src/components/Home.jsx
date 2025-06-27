@@ -38,7 +38,7 @@ const Home = () => {
             <p>This is the Home Page</p>
             <p>Hello {user.username}</p>
             <Search setError={setError} setIsSearching={setIsSearching} setData={setData} data={data} setMaxPages={setMaxPages} pageNum={pageNum} setPageNum={setPageNum}/>
-            <ProductList error={error} setError={setError} isSearching={isSearching} data={data} setData={setData} pageNum={pageNum} setPageNum={setPageNum}/>
+            <ProductList error={error} setError={setError} isSearching={isSearching} data={data} setData={setData} pageNum={pageNum} setPageNum={setPageNum} maxPages={maxPages} setMaxPages={setMaxPages}/>
             <button type="button" onClick={handleLogout}>log out</button>
         </>
 

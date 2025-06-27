@@ -4,14 +4,14 @@ import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
 // import {parseDataForCard} from "../utils/helper-functions.js";
 
-function ProductList({error, setError, isSearching, data, setData, pageNum, setPageNum}) {
+function ProductList({error, setError, isSearching, data, setData, pageNum, setPageNum, maxPages, setMaxPages}) {
 
   // TODO: CUSTOM LOADING STATE
 
   const limit = 10;
 
   const fetchAllData = async () => {
-      fetch(`http://localhost:3000/products?page={pageNum}&limit=${limit}`, { credentials: "include" })
+      fetch(`http://localhost:3000/products?page=${pageNum}&limit=${limit}`, { credentials: "include" })
       .then((response) => response.json())
       .then((res) => {
         if(res.products.length === 0){ //if no more products to display
@@ -40,7 +40,7 @@ function ProductList({error, setError, isSearching, data, setData, pageNum, setP
     if(!isSearching){
       fetchAllData();
     }
-  }, [isSearching])
+  }, [isSearching, pageNum])
 
   useEffect(() => {
     if (data.length === 0) {
@@ -51,6 +51,7 @@ function ProductList({error, setError, isSearching, data, setData, pageNum, setP
   }, [data]);
 
   const handleLoadMore = () => {
+    console.log("handling load more");
     setPageNum(pageNum + 1);
   }
 
@@ -79,10 +80,11 @@ function ProductList({error, setError, isSearching, data, setData, pageNum, setP
             })
           }
           </div>
-
-          <div className="load-more">
-            <button onClick={handleLoadMore} className="load-more-button">Load More</button>
-          </div>
+          { !maxPages &&
+            <div className="load-more">
+              <button onClick={handleLoadMore} className="load-more-button">Load More</button>
+            </div>
+          }
         </>
 
       );

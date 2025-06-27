@@ -7,15 +7,19 @@ function Search({setError, setIsSearching, setData, setMaxPages, pageNum, data, 
     const limit = 10;
 
     const handleSearch = (event) => {
+        console.log("searching");
         event.preventDefault();
         setIsSearching(true);
         const query = inputRef.current.value;
+        console.log(query);
+        console.log(`http://localhost:3000/search/${query}?page=${pageNum}&limit=${limit}`)
         fetch(`http://localhost:3000/search/${query}?page=${pageNum}&limit=${limit}`)
         .then((response) => {return response.json()})
         .then((res) => {
             if(res.products.length === 0){ //if no more products to display
                 setMaxPages(true);
             }
+            console.log(res.products)
             if(pageNum === 1){
                 if(res.products.length === 0){
                     setError("no products match your search")
