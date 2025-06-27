@@ -4,51 +4,57 @@ import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
 // import {parseDataForCard} from "../utils/helper-functions.js";
 
-function ProductList({error, setError, isSearching, data, setData, pageNum, setPageNum, maxPages, setMaxPages}) {
+function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPages, setMaxPages, searchTerm}) {
 
   // TODO: CUSTOM LOADING STATE
 
   const limit = 10;
 
   const fetchAllData = async () => {
-      fetch(`http://localhost:3000/products?page=${pageNum}&limit=${limit}`, { credentials: "include" })
+    console.log(`http://localhost:3000/products?page=${pageNum}&limit=${limit}`)
+    console.log(JSON.stringify({searchTerm : searchTerm}))
+      fetch(`http://localhost:3000/products?page=${pageNum}&limit=${limit}&searchTerm=${searchTerm}`,
+        {credentials: "include"})
       .then((response) => response.json())
       .then((res) => {
+        console.log(res.products)
         if(res.products.length === 0){ //if no more products to display
           setMaxPages(true);
         }
         if(pageNum === 1){
             if(res.products.length === 0){
-                setError("no products to load")
-            } else{
-                setData(res.products)
-                if(res.products.length < limit){
-                    setMaxPages(true);
-                }
+              if(searchTerm === ""){
+                setError("unable to load products")
+              }
+              else{
+                setError("no products match your search")
+              }
+              return;
+            }
+            else{
+              setData(res.products)
+              if(res.products.length < limit){
+                  setMaxPages(true);
+                  return;
+              }
             }
         }
         else{
-            setData([...data, ...res.products])
+          setData([...data, ...res.products])
+          if(res.products.length < limit){
+            setMaxPages(true);
+          }
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(error);
         setError("unable to fetch products");
       });
   }
 
   useEffect(() => {
-    if(!isSearching){
-      fetchAllData();
-    }
-  }, [isSearching, pageNum])
-
-  useEffect(() => {
-    if (data.length === 0) {
-      setError("no products found");
-    } else {
-      setError(null); // Clear error if data is found
-    }
-  }, [data]);
+    fetchAllData();
+  }, [searchTerm, pageNum])
 
   const handleLoadMore = () => {
     console.log("handling load more");
