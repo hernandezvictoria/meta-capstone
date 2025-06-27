@@ -1,5 +1,6 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
+const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -80,6 +81,40 @@ router.put('/change-product-image/:productId', async (req, res) => {
 //     res.status(200).json(uniqueFoundProducts);
 // })
 
+// router.get('/search/:query', async (req, res) => {
+//     const query = req.params.query;
+//     const queryArray = query.split(" ");
+//     let foundProducts = [];
+
+//     try {
+//         foundProducts = await prisma.productInfo.findMany({
+//             where: {
+//                 // have to use and so that every term in the search query must match at least one of the conditions in the or
+//                 // can get rid of and to have more general search results, will think about with search algorithm
+//                 AND: queryArray.map(q => ({
+//                     OR: [
+//                         { brand: { contains: q, mode: 'insensitive' } },
+//                         { name: { contains: q, mode: 'insensitive' } },
+//                         { product_type: { contains: q, mode: 'insensitive' } },
+//                         { concerns: { contains: q, mode: 'insensitive' } },
+//                         { skin_type: { contains: q, mode: 'insensitive' } }
+//                     ]
+//                 }))
+//             }
+//         });
+
+//         // remove duplicates based on product ID
+//         const uniqueFoundProducts = foundProducts.filter((product, index, self) =>
+//             index === self.findIndex((p) => p.id === product.id)
+//         );
+
+//         res.status(200).json(uniqueFoundProducts);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: "error fetching queried products" });
+//     }
+// });
+
 router.get('/search/:query', async (req, res) => {
     const query = req.params.query;
     const queryArray = query.split(" ");
@@ -88,21 +123,25 @@ router.get('/search/:query', async (req, res) => {
     try {
         foundProducts = await prisma.productInfo.findMany({
             where: {
-                // have to use and so that every term in the search query must match at least one of the conditions in the or
-                // can get rid of and to have more general search results, will think about with search algorithm
                 AND: queryArray.map(q => ({
                     OR: [
                         { brand: { contains: q, mode: 'insensitive' } },
                         { name: { contains: q, mode: 'insensitive' } },
-                        { product_type: { contains: q, mode: 'insensitive' } },
-                        { concerns: { contains: q, mode: 'insensitive' } },
-                        { skin_type: { contains: q, mode: 'insensitive' } }
+                        { product_type: { equals: ProductTypes[q.toLowerCase()] } },
+                        { concerns: { has: q } }, // Use has for exact match in array
+                        { skin_type: { has: q } } // Use has for exact match in array
+
+                        //NEED HELP DEBUGGING THIS, CANNOT GET PARTIAL MATCH
+                        // { concerns: { some: { contains: q, mode: 'insensitive' } } }, // Use some with contains for partial match
+                        // { skin_type: { some: { contains: q, mode: 'insensitive' } } }  // Use some with contains for partial match
+                        // {concerns : {some: (concern) => concern.includes(q)}},
+                        // {skin_type : {some: (type) => type.includes(q)}}
                     ]
                 }))
             }
         });
 
-        // remove duplicates based on product ID
+        // Remove duplicates based on product ID
         const uniqueFoundProducts = foundProducts.filter((product, index, self) =>
             index === self.findIndex((p) => p.id === product.id)
         );
@@ -113,6 +152,7 @@ router.get('/search/:query', async (req, res) => {
         res.status(500).json({ error: "error fetching queried products" });
     }
 });
+
 
 
 module.exports = router;
