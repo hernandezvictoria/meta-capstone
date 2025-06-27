@@ -60,6 +60,7 @@ fs.createReadStream('file2.csv')
     const concernsArray = getConcernsArray(row.concerns);
     const skinTypeArray = getSkinTypesArray(row.skin_type);
 
+    //TODO: handle edge cases for prices input wrongly
     let price = row.price;
     price = price.slice(1);
     const priceDecimal = parseFloat(price);

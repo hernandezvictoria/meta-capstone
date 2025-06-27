@@ -3,12 +3,15 @@ import { useUser } from '../contexts/UserContext';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import '../styles/Home.css';
 import WithAuth from './WithAuth'
-import ProductContainer from './home_components/ProductList'
+import ProductList from './home_components/ProductList'
+import Search from './home_components/Search'
 
 const Home = () => {
     const { user, setUser } = useUser();
     const navigate = useNavigate();
     const [data, setData] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [error, setError] = useState(null);
 
     const handleLogout = async () => {
         try {
@@ -32,7 +35,8 @@ const Home = () => {
         <>
             <p>This is the Home Page</p>
             <p>Hello {user.username}</p>
-            <ProductContainer data={data} setData={setData}/>
+            <Search setError={setError} setIsSearching={setIsSearching} setData={setData}/>
+            <ProductList error={error} setError={setError} isSearching={isSearching} data={data} setData={setData}/>
             <button type="button" onClick={handleLogout}>log out</button>
         </>
 

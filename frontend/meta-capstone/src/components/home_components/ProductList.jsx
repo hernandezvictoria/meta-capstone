@@ -4,9 +4,9 @@ import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
 // import {parseDataForCard} from "../utils/helper-functions.js";
 
-function ProductContainer({data, setData}) {
+function ProductList({error, setError, isSearching, data, setData}) {
 
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
 
   // TODO: LOADING STATE
 
@@ -20,8 +20,10 @@ function ProductContainer({data, setData}) {
   }
 
   useEffect(() => {
+    if(!isSearching){
       fetchAllData();
-  }, [])
+    }
+  }, [isSearching])
 
   useEffect(() => {
     if (data.length === 0) {
@@ -60,4 +62,4 @@ function ProductContainer({data, setData}) {
   }
 
 
-export default ProductContainer;
+export default ProductList;
