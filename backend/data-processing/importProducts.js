@@ -1,10 +1,11 @@
+
 const fs = require('fs');
 const parse = require('csv-parse').parse;
 const { PrismaClient } = require('../generated/prisma/index.js');
 const prisma = new PrismaClient();
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
-fs.createReadStream('AB1.csv')
+fs.createReadStream('file2.csv')
   .pipe(parse({ columns: true, trim: true }))
   .on('data', async (row) => {
 
@@ -59,6 +60,10 @@ fs.createReadStream('AB1.csv')
     const concernsArray = getConcernsArray(row.concerns);
     const skinTypeArray = getSkinTypesArray(row.skin_type);
 
+    let price = row.price;
+    price = price.slice(1);
+    const priceDecimal = parseFloat(price);
+
     // Insert into database
     try {
       await prisma.productInfo.create({
@@ -66,7 +71,7 @@ fs.createReadStream('AB1.csv')
           brand: row.brand,
           name: row.name,
           product_type: row.product_type === "eye cream" ? "eye_cream" : row.product_type,
-          price: row.price || null,
+          price: priceDecimal,
           ingredients: ingredientsArray,
           concerns: concernsArray,
           skin_type: skinTypeArray,

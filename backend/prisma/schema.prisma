@@ -43,7 +43,7 @@ model ProductInfo{
   name String
   image String?
   product_type product_type_enum ?
-  price String
+  price Decimal
   ingredients String[]
   concerns String[]
   skin_type String[]
