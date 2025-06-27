@@ -6,9 +6,9 @@ import "../../styles/ProductList.css";
 
 function ProductList({error, setError, isSearching, data, setData}) {
 
-  // const [error, setError] = useState(null);
+  // TODO: CUSTOM LOADING STATE
 
-  // TODO: LOADING STATE
+
 
   const fetchAllData = async () => {
       fetch("http://localhost:3000/products", { credentials: "include" })
@@ -33,30 +33,41 @@ function ProductList({error, setError, isSearching, data, setData}) {
     }
   }, [data]);
 
-    if(error){
-      return(<p>{error}</p>);
-    }
+  const handleLoadMore = () => {
+    
+  }
+
+  if(error){
+    return(<p>{error}</p>);
+  }
 
     else{
       return (
-        <div className="product-container">
-        {
-          data.map(obj => {
-            return(<Product
-              setError={setError}
-              key={obj.id}
-              id={obj.id}
-              brand={obj.brand}
-              name={obj.name}
-              product_type={obj.product_type}
-              price={obj.price}
-              ingredients={obj.ingredients}
-              concerns={obj.concerns}
-              skin_type={obj.skin_type}
-              image={obj.image}/>);
-          })
-        }
-        </div>
+        <>
+          <div className="product-container">
+          {
+            data.map(obj => {
+              return(<Product
+                setError={setError}
+                key={obj.id}
+                id={obj.id}
+                brand={obj.brand}
+                name={obj.name}
+                product_type={obj.product_type}
+                price={obj.price}
+                ingredients={obj.ingredients}
+                concerns={obj.concerns}
+                skin_type={obj.skin_type}
+                image={obj.image}/>);
+            })
+          }
+          </div>
+
+          <div className="load-more">
+            <button onClick={handleLoadMore} className="load-more-button">Load More</button>
+          </div>
+        </>
+
       );
     }
   }

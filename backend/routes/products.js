@@ -61,14 +61,20 @@ router.put('/change-product-image/:productId', async (req, res) => {
 })
 
 // http://localhost:3000/search/:query
-router.get('/search/:query', async (req, res) => {
-    const query = req.params.query;
-    const queryArray = query.split(" ");
+router.get('/search/:searchTerm', async (req, res) => {
+
+    const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
+    const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
+    const offset = (page - 1) * limit;
+
+    //TODO: make hm of term to related enums in db and pre-process query
+    const searchTerm = req.params.searchTerm;
+    const queryArray = searchTerm.split(" ");
     let foundProducts = [];
 
-    if (!req.session.userId) {
-        return res.status(401).json({ error: "you must be logged in to perform this action" })
-    }
+    // if (!req.session.userId) {
+    //     return res.status(401).json({ error: "you must be logged in to perform this action" })
+    // }
 
     try {
         foundProducts = await prisma.productInfo.findMany({
@@ -88,7 +94,9 @@ router.get('/search/:query', async (req, res) => {
                         // {skin_type : {some: (type) => type.includes(q)}}
                     ]
                 }))
-            }
+            },
+            skip: offset,
+            take: limit
         });
 
         // Remove duplicates based on product ID
@@ -96,7 +104,10 @@ router.get('/search/:query', async (req, res) => {
             index === self.findIndex((p) => p.id === product.id)
         );
 
-        res.status(200).json(uniqueFoundProducts);
+        res.status(200).json({
+            totalProducts: uniqueFoundProducts.length,
+            products: uniqueFoundProducts
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "error fetching queried products" });

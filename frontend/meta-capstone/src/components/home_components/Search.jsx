@@ -12,7 +12,7 @@ function Search({setError, setIsSearching, setData}) {
         const query = inputRef.current.value;
         fetch(`http://localhost:3000/search/${query}`)
         .then((response) => {return response.json()})
-        .then((data) => setData(data))
+        .then((data) => setData(data.products))
         .catch(error => setError("error searching for products"));
     };
 
