@@ -32,16 +32,11 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
       } catch (error) {
         setDisplayImage("https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg");
       }
+      updateImageInDb();
     }
   }
 
-  useEffect(() => {
-    loadImage();
-      }, [])
-
   const updateImageInDb = async() => {
-    console.log("updating image in db");
-    console.log(`http://localhost:3000/change-product-image/${id}`);
     try {
       const response = await fetch(`http://localhost:3000/change-product-image/${id}`, {
           method: "PUT",
@@ -60,18 +55,17 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
     }
   }
 
-  useEffect(() =>{
-    if (displayImage !== image) { // Only update if the image has changed
-      updateImageInDb();
-    }
-  }, [displayImage])
+  useEffect(() => {
+    loadImage();
+      }, [])
 
   const openModal = () => {
     setModalOpen(true);
   }
 
+  //TODO: fix modal bug, modal not closing
   const closeModal = () => {
-    console.log("closing modal");
+    console.log("closing modal"); // leaving in these console logs for future debugging
     setModalOpen(false);
     console.log(modalOpen);
   }
