@@ -6,6 +6,7 @@ import "../../styles/Product.css";
 function Product({ setError, id, image, brand, name, product_type, price, ingredients, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const loadImage = async () => {
     // if image is not in DB
@@ -62,8 +63,51 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
     }
   }, [displayImage])
 
+  const openModal = () => {
+    setModalOpen(true);
+  }
+
+  const closeModal = () => {
+    console.log("closing modal");
+    setModalOpen(false);
+    console.log(modalOpen);
+  }
+
+  useEffect(() => {
+    console.log("Modal open state changed:", modalOpen);
+  }, [modalOpen]);
+
+  const modal = (
+    <div className="modal-overlay" onClick={(event) => closeModal(event)}>
+        <div className="modal" onClick={(event) => event.stopPropagation()}>
+        <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
+        <section className="product-info">
+          <p className="product-name">{name}</p>
+          <p className="product-brand">{brand}</p>
+          <p className="product-type">{product_type}</p>
+          <p className="product-price">{price}</p>
+          <section className="skin_type">
+            {skin_type.map(type => {
+              return(<p key={type} className="type_box">{type}</p>)
+              })
+            }
+          </section>
+
+          <section className="concerns">
+            {concerns.map(concern => {
+                return(<p key={concern} className="concern_box">{concern}</p>)
+                })
+            }
+          </section>
+          <p className="product-ingredients">highlighted ingredients: {ingredients.join(", ")}</p>
+        </section>
+        </div>
+    </div>);
+
   return (
-    <div className="product">
+    <div className="product" onClick={openModal}>
+      {modalOpen && modal}
+
       <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
       <section className="product-info">
         <p className="product-name">{name}</p>

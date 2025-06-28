@@ -11,13 +11,10 @@ function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPa
   const limit = 10;
 
   const fetchAllData = async () => {
-    console.log(`http://localhost:3000/products?page=${pageNum}&limit=${limit}`)
-    console.log(JSON.stringify({searchTerm : searchTerm}))
       fetch(`http://localhost:3000/products?page=${pageNum}&limit=${limit}&searchTerm=${searchTerm}`,
         {credentials: "include"})
       .then((response) => response.json())
       .then((res) => {
-        console.log(res.products)
         if(res.products.length === 0){ //if no more products to display
           setMaxPages(true);
         }
@@ -47,7 +44,6 @@ function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPa
         }
       })
       .catch((error) => {
-        console.log(error);
         setError("unable to fetch products");
       });
   }
@@ -57,7 +53,6 @@ function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPa
   }, [searchTerm, pageNum])
 
   const handleLoadMore = () => {
-    console.log("handling load more");
     setPageNum(pageNum + 1);
   }
 
