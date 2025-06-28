@@ -24,6 +24,9 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
         const response = await fetch(url, options);
         const result = await response.json();
         const products_list = result.data.products;
+        if(products_list.length === 0){
+          throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
+        }
         const fetchedImage = products_list[0].heroImage;
         setDisplayImage(fetchedImage);
       } catch (error) {
