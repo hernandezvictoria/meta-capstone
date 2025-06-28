@@ -6,6 +6,37 @@ const prisma = new PrismaClient()
 const router = express.Router()
 
 
+const termToEnum = {}; // hm to store related terms to skin types and concerns
+
+// Add key-value pairs
+termToEnum['combo'] = SkinTypes.COMBINATION;
+termToEnum['wrinkles'] = SkinConcerns.WRINKLES;
+termToEnum['fine'] = SkinConcerns.WRINKLES;
+termToEnum['lines'] = SkinConcerns.WRINKLES;
+termToEnum['line'] = SkinConcerns.WRINKLES;
+termToEnum['rough'] = SkinConcerns.TEXTURE;
+termToEnum['smooth'] = SkinConcerns.TEXTURE;
+termToEnum['dark'] = SkinConcerns.HYPERPIGMENTATION;
+termToEnum['spots'] = SkinConcerns.HYPERPIGMENTATION;
+termToEnum['hyperpigmentation'] = SkinConcerns.HYPERPIGMENTATION;
+termToEnum['redness'] = SkinConcerns.REDNESS;
+termToEnum['irritation'] = SkinConcerns.REDNESS;
+termToEnum['damaged'] = SkinConcerns.REDNESS;
+termToEnum['red'] = SkinConcerns.REDNESS;
+termToEnum['acne'] = SkinConcerns.ACNE;
+termToEnum['blemish'] = SkinConcerns.ACNE;
+termToEnum['blemishes'] = SkinConcerns.ACNE;
+termToEnum['pimple'] = SkinConcerns.ACNE;
+termToEnum['pimples'] = SkinConcerns.ACNE;
+termToEnum['dull'] = SkinConcerns.DULLNESS;
+termToEnum['dry'] = SkinConcerns.DRYNESS;
+termToEnum['lotion'] = ProductTypes.moisturizer;
+termToEnum['eye'] = ProductTypes.eye_cream; // not a great soln for eye cream rn
+termToEnum['cream'] = ProductTypes.moisturizer;
+termToEnum['wash'] = ProductTypes.cleanser;
+termToEnum['retinoid'] = ProductTypes.retinol;
+
+
 // http://localhost:3000/products
 router.get('/products', async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
@@ -34,8 +65,11 @@ router.get('/products', async (req, res) => {
     }
     else{
         //TODO: make hm of term to related enums in db and pre-process query
-        const queryArray = searchTerm.split(" ");
+
         let foundProducts = [];
+        const queryArray = searchTerm.split(" ")
+            .filter(q => (q !== "and" && q !== "for" && q !== "skin" && q !== "face")) // remove filler words from query, can add more later
+            .map(q => (q in termToEnum) ? termToEnum[q] : q); // map terms to enums
 
         try {
             foundProducts = await prisma.productInfo.findMany({
