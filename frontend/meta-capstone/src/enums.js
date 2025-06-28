@@ -1,7 +1,6 @@
 const SkinTypes = Object.freeze({
     OILY: "oily",
     DRY: "dry",
-    SENSITIVE: "sensitive",
     COMBINATION: "combination",
     NORMAL: "normal"
 });
@@ -16,4 +15,15 @@ const SkinConcerns = Object.freeze({
     DRYNESS: "dryness"
 })
 
-export { SkinTypes, SkinConcerns };
+const ProductTypes = Object.freeze({
+    SERUM: "serum",
+    TONER: "toner",
+    SUNSCREEN: "sunscreen",
+    MOISTURIZER: "moisturizer",
+    RETINOL: "retinol",
+    MASK: "mask",
+    CLEANSER: "cleanser",
+    EYE: "eye cream"
+})
+
+export { SkinTypes, SkinConcerns, ProductTypes };

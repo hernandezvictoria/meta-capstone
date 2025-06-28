@@ -5,3 +5,7 @@
 .product-image{
     width:20%;
 }
+
+.product-info{
+    display:flex;
+}
