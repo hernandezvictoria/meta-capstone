@@ -8,6 +8,9 @@ function Search({setError, setMaxPages, setPageNum, setSearchTerm}) {
 
     const handleSearch = (event) => {
         event.preventDefault();
+        setPageNum(1);
+        setMaxPages(false);
+        setError(null);
         setSearchTerm(inputRef.current.value);
     };
 
