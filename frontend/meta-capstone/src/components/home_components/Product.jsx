@@ -29,23 +29,22 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
         const fetchedImage = products_list[0].heroImage;
         //TODO: FIX THIS, PASS IN IMAGE TO UPDATEIMAGEINDB
         setDisplayImage(fetchedImage);
+        updateImageInDb(fetchedImage);
       } catch (error) {
         setDisplayImage("https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg");
+        updateImageInDb("https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg");
       }
-      updateImageInDb();
     }
   }
 
-  const updateImageInDb = async() => {
+  const updateImageInDb = async(image) => {
     try {
       const response = await fetch(`http://localhost:3000/change-product-image/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({image: displayImage}),
+          body: JSON.stringify({image: image}),
           credentials: "include",
       });
-
-      const data = await response.json();
 
       if (!response.ok) {
           setError("unable to process image in database");
