@@ -1,12 +1,11 @@
 import React from "react";
 import {useState, useEffect} from 'react';
-import { useNavigate } from "react-router-dom";
 import "../../styles/Product.css";
 
-function Product({ setError, id, image, brand, name, product_type, price, ingredients, concerns, skin_type}) {
+function Product({ setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
-  const [modalOpen, setModalOpen] = useState(false);
+
 
   const loadImage = async () => {
     // if image is not in DB
@@ -61,43 +60,11 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
       }, [])
 
   const openModal = () => {
-    setModalOpen(true);
+    setModalProductId(id);
   }
-
-  const closeModal = (event) => {
-    setModalOpen(false);
-  }
-
-  const modal = (
-    <div className="modal-overlay" onClick={(event) => closeModal(event)}>
-        <div className="modal" onClick={(event) => event.stopPropagation()}>
-        <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
-        <section className="product-info">
-          <p className="product-name">{name}</p>
-          <p className="product-brand">{brand}</p>
-          <p className="product-type">{product_type}</p>
-          <p className="product-price">{price}</p>
-          <section className="skin_type">
-            {skin_type.map(type => {
-              return(<p key={type} className="type_box">{type}</p>)
-              })
-            }
-          </section>
-
-          <section className="concerns">
-            {concerns.map(concern => {
-                return(<p key={concern} className="concern_box">{concern}</p>)
-                })
-            }
-          </section>
-          <p className="product-ingredients">highlighted ingredients: {ingredients.join(", ")}</p>
-        </section>
-        </div>
-    </div>);
 
   return (
     <>
-    {modalOpen && modal}
     <div className="product" onClick={openModal}>
 
       <img className="product-image" alt={name} aria-label={name} src={displayImage}/>

@@ -2,12 +2,13 @@ import React from "react";
 import { useState, useEffect } from 'react'
 import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
+import Modal from "./Modal.jsx";
 // import {parseDataForCard} from "../utils/helper-functions.js";
 
 function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPages, setMaxPages, searchTerm}) {
 
   // TODO: CUSTOM LOADING STATE
-
+  const [modalProductId, setModalProductId] = useState(null);
   const limit = 10;
 
   const fetchAllData = async () => {
@@ -63,21 +64,26 @@ function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPa
     else{
       return (
         <>
+          {modalProductId &&
+          <Modal
+            data={data}
+            modalProductId={modalProductId}
+            setError={setError}
+            setModalProductId={setModalProductId}/>
+          }
           <div className="product-container">
           {
-            data.map(obj => {
+            data.map(prod => {
               return(<Product
+                setModalProductId={setModalProductId}
                 setError={setError}
-                key={obj.id}
-                id={obj.id}
-                brand={obj.brand}
-                name={obj.name}
-                product_type={obj.product_type}
-                price={obj.price}
-                ingredients={obj.ingredients}
-                concerns={obj.concerns}
-                skin_type={obj.skin_type}
-                image={obj.image}/>);
+                key={prod.id}
+                id={prod.id}
+                brand={prod.brand}
+                name={prod.name}
+                concerns={prod.concerns}
+                skin_type={prod.skin_type}
+                image={prod.image}/>);
             })
           }
           </div>
@@ -87,10 +93,8 @@ function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPa
             </div>
           }
         </>
-
       );
     }
   }
-
 
 export default ProductList;
