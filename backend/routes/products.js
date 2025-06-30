@@ -64,24 +64,28 @@ router.get('/products', async (req, res) => {
         }
     }
     else{
-        //TODO: make hm of term to related enums in db and pre-process query
 
+        stopWords = ["skin", "and", "for", "face"]
         let foundProducts = [];
-        const queryArray = searchTerm.split(" ")
-            .filter(q => (q !== "and" && q !== "for" && q !== "skin" && q !== "face")) // remove filler words from query, can add more later
-            .map(q => (q in termToEnum) ? termToEnum[q] : q); // map terms to enums
-
-        //TODO: make everything lowercase, clean hyphens and plus signs
-        // delegate logic elsewhere
+        let cleanedSearchTerm = searchTerm.replace(/-/g, " ")
+        const queryArray = cleanedSearchTerm.split(" ")
+            .filter((q) => {
+                if(!stopWords.includes(q)){
+                    return q;
+                }
+            }) // remove filler words from query, can add more later
+            .map(q => (q in termToEnum) ? termToEnum[q] : q) // map terms to enums
+            .map(q => q.toLowerCase());
+        //TODO: make everything lowercase, clean hyphens and plus signs, delegate logic elsewhere
 
         try {
             foundProducts = await prisma.productInfo.findMany({
                 where: {
                     AND: queryArray.map(q => ({
                         OR: [
-                            { brand: { contains: q, mode: 'insensitive' } },
-                            { name: { contains: q, mode: 'insensitive' } },
-                            { product_type: { equals: ProductTypes[q.toLowerCase()] } },
+                            { brand: { contains: q} },
+                            { name: { contains: q} },
+                            { product_type: { equals: ProductTypes[q] } },
                             { concerns: { has: q } }, // Use has for exact match in array
                             { skin_type: { has: q } } // Use has for exact match in array
                         ]

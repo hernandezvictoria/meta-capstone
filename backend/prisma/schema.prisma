@@ -1,4 +1,4 @@
-enum product_type_enum {
+enum ProductType {
     serum
     toner
     sunscreen
@@ -42,7 +42,7 @@ model ProductInfo{
   brand String
   name String
   image String?
-  product_type product_type_enum
+  product_type ProductType
   price Decimal
   ingredients String[]
   concerns String[]
