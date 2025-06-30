@@ -71,6 +71,9 @@ router.get('/products', async (req, res) => {
             .filter(q => (q !== "and" && q !== "for" && q !== "skin" && q !== "face")) // remove filler words from query, can add more later
             .map(q => (q in termToEnum) ? termToEnum[q] : q); // map terms to enums
 
+        //TODO: make everything lowercase, clean hyphens and plus signs
+        // delegate logic elsewhere
+
         try {
             foundProducts = await prisma.productInfo.findMany({
                 where: {

@@ -28,6 +28,7 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
           throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
         }
         const fetchedImage = products_list[0].heroImage;
+        //TODO: FIX THIS, PASS IN IMAGE TO UPDATEIMAGEINDB
         setDisplayImage(fetchedImage);
       } catch (error) {
         setDisplayImage("https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg");
@@ -63,16 +64,9 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
     setModalOpen(true);
   }
 
-  //TODO: fix modal bug, modal not closing
-  const closeModal = () => {
-    console.log("closing modal"); // leaving in these console logs for future debugging
+  const closeModal = (event) => {
     setModalOpen(false);
-    console.log(modalOpen);
   }
-
-  useEffect(() => {
-    console.log("Modal open state changed:", modalOpen);
-  }, [modalOpen]);
 
   const modal = (
     <div className="modal-overlay" onClick={(event) => closeModal(event)}>
@@ -102,8 +96,9 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
     </div>);
 
   return (
+    <>
+    {modalOpen && modal}
     <div className="product" onClick={openModal}>
-      {modalOpen && modal}
 
       <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
       <section className="product-info">
@@ -124,6 +119,7 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
         </section>
       </section>
     </div>
+    </>
   );
 }
 
