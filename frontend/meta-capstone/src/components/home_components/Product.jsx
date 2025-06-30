@@ -5,6 +5,25 @@ import "../../styles/Product.css";
 function Product({ setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const loadLikedAndSaved = async () =>{
+    fetch(`http://localhost:3000/get-liked-and-saved-status/${id}`,
+      {credentials: "include"})
+    .then((response) => response.json())
+    .then((res) => {
+      setIsLiked(res.isLiked);
+      setIsSaved(res.isSaved);
+    })
+    .catch((error) => {
+      setError("unable to fetch product info");
+    });
+  }
+
+  useEffect(() =>{
+    loadLikedAndSaved();
+  }, []);
 
 
   const loadImage = async () => {
@@ -27,7 +46,6 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
           throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
         }
         const fetchedImage = products_list[0].heroImage;
-        //TODO: FIX THIS, PASS IN IMAGE TO UPDATEIMAGEINDB
         setDisplayImage(fetchedImage);
         updateImageInDb(fetchedImage);
       } catch (error) {
@@ -62,6 +80,40 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
     setModalProductId(id);
   }
 
+  const toggleLike = async(event) => {
+    event.stopPropagation();
+    try {
+      const response = await fetch(`http://localhost:3000/toggle-like/${id}`, {
+          method: "PUT",
+          credentials: "include",
+      });
+
+      if (!response.ok) {
+          setError("unable to like or unlike product");
+      }
+    } catch (error) {
+        setError("network error, please try again");
+    }
+    setIsLiked(!isLiked);
+  }
+
+  const toggleSave = async(event) => {
+    event.stopPropagation();
+    try {
+      const response = await fetch(`http://localhost:3000/toggle-save/${id}`, {
+          method: "PUT",
+          credentials: "include",
+      });
+
+      if (!response.ok) {
+          setError("unable to save or unsave product");
+      }
+    } catch (error) {
+        setError("network error, please try again");
+    }
+    setIsSaved(!isSaved);
+  }
+
   return (
     <>
     <div className="product" onClick={openModal}>
@@ -83,6 +135,10 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
               })
           }
         </section>
+      </section>
+      <section className="like-and-save">
+          <button onClick={toggleLike}>{isLiked ? 'unlike' : 'like'}</button>
+          <button onClick={toggleSave}>{isSaved ? 'unsave' : 'save'}</button>
       </section>
     </div>
     </>

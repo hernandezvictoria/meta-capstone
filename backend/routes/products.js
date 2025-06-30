@@ -140,4 +140,145 @@ router.put('/change-product-image/:productId', async (req, res) => {
     }
 })
 
+// like/unlike products
+router.put('/toggle-like/:productId', async (req, res) => {
+    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try {
+        // Retrieve the current product
+        const product = await prisma.productInfo.findUnique({
+            where: { id: productId }
+        });
+
+        if (!product) {
+            return res.status(404).send({ message: "product not found" });
+        }
+
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { loved_products: true } // Include loved products to check if already liked
+        });
+
+        if (!user) {
+            return res.status(404).send({ message: "user not found" });
+        }
+
+        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
+        const isLiked = user.loved_products.some(p => p.id === productId);
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                loved_products: isLiked
+                    ? { disconnect: { id: productId } } // Remove the product if already liked
+                    : { connect: { id: productId } } // Add the product if not liked
+            }
+        });
+
+        res.status(200).json(updatedUser);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while toggling the like status." });
+    }
+});
+
+// save/unsave products
+router.put('/toggle-save/:productId', async (req, res) => {
+    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try {
+        // Retrieve the current product
+        const product = await prisma.productInfo.findUnique({
+            where: { id: productId }
+        });
+
+        if (!product) {
+            return res.status(404).send({ message: "product not found" });
+        }
+
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { saved_products: true } // Include loved products to check if already liked
+        });
+
+        if (!user) {
+            return res.status(404).send({ message: "user not found" });
+        }
+
+        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
+        const isSaved = user.saved_products.some(p => p.id === productId);
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                saved_products: isSaved
+                    ? { disconnect: { id: productId } } // Remove the product if already saved
+                    : { connect: { id: productId } } // Add the product if not saved
+            }
+        });
+
+        res.status(200).json(updatedUser);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while toggling the like status." });
+    }
+});
+
+// get liked and saved status of product
+router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
+    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try {
+        // Retrieve the current product
+        const product = await prisma.productInfo.findUnique({
+            where: { id: productId }
+        });
+
+        if (!product) {
+            return res.status(404).send({ message: "product not found" });
+        }
+
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { saved_products: true,
+                    loved_products: true }
+        });
+
+        if (!user) {
+            return res.status(404).send({ message: "user not found" });
+        }
+
+        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
+        const isSaved = user.saved_products.some(p => p.id === productId);
+        const isLiked = user.loved_products.some(p => p.id === productId);
+
+        res.status(200).json({isSaved, isLiked});
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while fetching the liked and saved status" });
+    }
+});
+
+
 module.exports = router;
