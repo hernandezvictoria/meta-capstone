@@ -6,6 +6,7 @@ import "../../styles/Product.css";
 function Product({ setError, id, image, brand, name, product_type, price, ingredients, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const loadImage = async () => {
     // if image is not in DB
@@ -23,21 +24,20 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
         const response = await fetch(url, options);
         const result = await response.json();
         const products_list = result.data.products;
+        if(products_list.length === 0){
+          throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
+        }
         const fetchedImage = products_list[0].heroImage;
+        //TODO: FIX THIS, PASS IN IMAGE TO UPDATEIMAGEINDB
         setDisplayImage(fetchedImage);
       } catch (error) {
         setDisplayImage("https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg");
       }
+      updateImageInDb();
     }
   }
 
-  useEffect(() => {
-    loadImage();
-      }, [])
-
   const updateImageInDb = async() => {
-    console.log("updating image in db");
-    console.log(`http://localhost:3000/change-product-image/${id}`);
     try {
       const response = await fetch(`http://localhost:3000/change-product-image/${id}`, {
           method: "PUT",
@@ -56,14 +56,50 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
     }
   }
 
-  useEffect(() =>{
-    if (displayImage !== image) { // Only update if the image has changed
-      updateImageInDb();
-    }
-  }, [displayImage])
+  useEffect(() => {
+    loadImage();
+      }, [])
+
+  const openModal = () => {
+    setModalOpen(true);
+  }
+
+  const closeModal = (event) => {
+    setModalOpen(false);
+  }
+
+  const modal = (
+    <div className="modal-overlay" onClick={(event) => closeModal(event)}>
+        <div className="modal" onClick={(event) => event.stopPropagation()}>
+        <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
+        <section className="product-info">
+          <p className="product-name">{name}</p>
+          <p className="product-brand">{brand}</p>
+          <p className="product-type">{product_type}</p>
+          <p className="product-price">{price}</p>
+          <section className="skin_type">
+            {skin_type.map(type => {
+              return(<p key={type} className="type_box">{type}</p>)
+              })
+            }
+          </section>
+
+          <section className="concerns">
+            {concerns.map(concern => {
+                return(<p key={concern} className="concern_box">{concern}</p>)
+                })
+            }
+          </section>
+          <p className="product-ingredients">highlighted ingredients: {ingredients.join(", ")}</p>
+        </section>
+        </div>
+    </div>);
 
   return (
-    <div className="product">
+    <>
+    {modalOpen && modal}
+    <div className="product" onClick={openModal}>
+
       <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
       <section className="product-info">
         <p className="product-name">{name}</p>
@@ -83,6 +119,7 @@ function Product({ setError, id, image, brand, name, product_type, price, ingred
         </section>
       </section>
     </div>
+    </>
   );
 }
 

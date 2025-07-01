@@ -16,14 +16,14 @@ const SkinConcerns = Object.freeze({
 })
 
 const ProductTypes = Object.freeze({
-    SERUM: "serum",
-    TONER: "toner",
-    SUNSCREEN: "sunscreen",
-    MOISTURIZER: "moisturizer",
-    RETINOL: "retinol",
-    MASK: "mask",
-    CLEANSER: "cleanser",
-    EYE: "eye cream"
+    serum: "serum",
+    toner: "toner",
+    sunscreen: "sunscreen",
+    moisturizer: "moisturizer",
+    retinol: "retinol",
+    mask: "mask",
+    cleanser: "cleanser",
+    eye_cream: "eye_cream"
 })
 
 module.exports = { SkinTypes, SkinConcerns, ProductTypes };

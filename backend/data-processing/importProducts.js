@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const parse = require('csv-parse').parse;
 const { PrismaClient } = require('../generated/prisma/index.js');
@@ -62,13 +63,19 @@ fs.createReadStream('AB1.csv')
     price = price.slice(1);
     const priceDecimal = parseFloat(price);
 
+    //TODO: handle edge cases for prices input wrongly
+    let price = row.price;
+    price = price.slice(1);
+    const priceDecimal = parseFloat(price);
+
     // Insert into database
     try {
       await prisma.productInfo.create({
         data: {
           brand: row.brand,
           name: row.name,
-          product_type: row.product_type,
+          product_type: row.product_type === "eye cream" ? "eye_cream" : row.product_type,
+
           price: priceDecimal,
           ingredients: ingredientsArray,
           concerns: concernsArray,
