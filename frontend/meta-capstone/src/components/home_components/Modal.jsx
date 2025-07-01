@@ -2,19 +2,18 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Modal.css";
 
-function Modal ({fetchAllData, data, modalProductId, setError, setModalProductId}){
+function Modal ({data, modalProductId, setError, setModalProductId}){
 
     //TODO: fix minor bug where if the product is first open, the modal has null value for image still
-    const product_array = data.filter(prod => prod.id === modalProductId);
-    if(product_array.length === 0){
+
+    const product = data.find(prod => prod.id === modalProductId);
+    if(!product){
         setError("unable to fetch product data, please reload the page")
     }
-    const product = product_array[0];
 
     const closeModal = () => {
         setModalProductId(null);
     }
-
 
     return (
     <div className="modal-overlay" onClick={closeModal}>

@@ -2,29 +2,11 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
 
-function Product({ setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
+function Product({ isLikedInit, isSavedInit, setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-
-  const loadLikedAndSaved = async () =>{
-    fetch(`http://localhost:3000/get-liked-and-saved-status/${id}`,
-      {credentials: "include"})
-    .then((response) => response.json())
-    .then((res) => {
-      setIsLiked(res.isLiked);
-      setIsSaved(res.isSaved);
-    })
-    .catch((error) => {
-      setError("unable to fetch product info");
-    });
-  }
-
-  useEffect(() =>{
-    loadLikedAndSaved();
-  }, []);
-
+  const [isLiked, setIsLiked] = useState(isLikedInit);
+  const [isSaved, setIsSaved] = useState(isSavedInit);
 
   const loadImage = async () => {
     // if image is not in DB

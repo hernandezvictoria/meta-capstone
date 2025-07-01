@@ -92,7 +92,12 @@ const Profile = () => {
                 ) : isProfileShowing ? (
                     <UserInfo username={username} concerns={concerns} skinType={skinType}/>
                 ) : (
-                    <ProfileProductList data={isLovedShowing ? lovedProducts : savedProducts} isLovedShowing={isLovedShowing} setError={setError}/>
+                    <ProfileProductList
+                        data={isLovedShowing ? lovedProducts : savedProducts}
+                        isLovedShowing={isLovedShowing}
+                        setError={setError}
+                        lovedProducts={lovedProducts}
+                        savedProducts={savedProducts}/>
                 )}
             </div>
         </>

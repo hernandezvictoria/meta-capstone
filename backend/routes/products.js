@@ -77,7 +77,8 @@ router.get('/products', async (req, res) => {
             .map(q => (q in termToEnum) ? termToEnum[q] : q) // map terms to enums
             .map(q => q.toLowerCase());
         //TODO: make everything lowercase, clean hyphens and plus signs, delegate logic elsewhere
-
+        //TODO: fix search
+        
         try {
             foundProducts = await prisma.productInfo.findMany({
                 where: {
@@ -87,7 +88,7 @@ router.get('/products', async (req, res) => {
                             { name: { contains: q} },
                             { product_type: { equals: ProductTypes[q] } },
                             { concerns: { has: q } }, // Use has for exact match in array
-                            { skin_type: { has: q } } // Use has for exact match in array
+                            { skin_type: { has : (SkinTypes[q] ? SkinTypes[q] : null) } } // Use has for exact match in array
                         ]
                     }))
                 },
@@ -238,6 +239,7 @@ router.put('/toggle-save/:productId', async (req, res) => {
     }
 });
 
+//TODO: get liked and saved status of every product
 // get liked and saved status of product
 router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
     const productId = parseInt(req.params.productId); // Corrected from postId to productId
@@ -279,6 +281,30 @@ router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
         res.status(500).send({ message: "An error occurred while fetching the liked and saved status" });
     }
 });
+
+router.get('/user-liked-and-saved', async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try{
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { saved_products: true,
+                    loved_products: true }
+        });
+        res.status(200).json({
+            saved_products: user.saved_products,
+            loved_products: user.loved_products});
+    } catch(error){
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while fetching the liked and saved status" });
+    }
+})
+
 
 
 module.exports = router;

@@ -15,7 +15,6 @@ const Home = () => {
     const [maxPages, setMaxPages] = useState(false); //boolean indicating whether or not there are more pages to load
     const [searchTerm, setSearchTerm] = useState("");
 
-
     return (
         <>
             <NavBar/>
@@ -23,12 +22,23 @@ const Home = () => {
                 <h1>skinterest</h1>
                 <p>This is the Home Page</p>
                 <p>hello, {user.username}</p>
-                <Search setError={setError} setMaxPages={setMaxPages} setPageNum={setPageNum} setSearchTerm={setSearchTerm}/>
-                <ProductList error={error} setError={setError} data={data} setData={setData} pageNum={pageNum} setPageNum={setPageNum} maxPages={maxPages} setMaxPages={setMaxPages} searchTerm={searchTerm}/>
-
+                <Search
+                    setError={setError}
+                    setMaxPages={setMaxPages}
+                    setPageNum={setPageNum}
+                    setSearchTerm={setSearchTerm}/>
+                <ProductList
+                    error={error}
+                    setError={setError}
+                    data={data}
+                    setData={setData}
+                    pageNum={pageNum}
+                    setPageNum={setPageNum}
+                    maxPages={maxPages}
+                    setMaxPages={setMaxPages}
+                    searchTerm={searchTerm}/>
             </div>
         </>
-
     );
 };
 
