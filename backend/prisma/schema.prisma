@@ -1,4 +1,4 @@
-enum product_type_enum {
+enum ProductType {
     serum
     toner
     sunscreen
@@ -7,6 +7,13 @@ enum product_type_enum {
     mask
     cleanser
     eye_cream
+}
+
+enum SkinType{
+  normal
+  dry
+  combination
+  oily
 }
 
 generator client {
@@ -24,7 +31,7 @@ model User{
   username String @unique
   password String
   concerns String[] @default([])
-  skin_type String[] @default([])
+  skin_type SkinType[] @default([])
   loved_products ProductInfo[] @relation("loved")
   saved_products ProductInfo[] @relation("saved")
 }
@@ -34,7 +41,7 @@ model Ingredient{
   name String
   ingredient_type String
   concern String
-  skin_type String
+  skin_type SkinType[]
 }
 
 model ProductInfo{
@@ -42,12 +49,11 @@ model ProductInfo{
   brand String
   name String
   image String?
-  product_type product_type_enum
+  product_type ProductType
   price Decimal
   ingredients String[]
   concerns String[]
-  skin_type String[]
-
+  skin_type SkinType[]
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
 }
