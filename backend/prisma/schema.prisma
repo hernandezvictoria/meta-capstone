@@ -40,8 +40,9 @@ model Ingredient{
   id Int @id @default(autoincrement())
   name String
   ingredient_type String
-  concern String
-  skin_type SkinType[]
+  purpose String
+  skin_type SkinType[] @default([])
+  concerns String[] @default([])
 }
 
 model ProductInfo{
