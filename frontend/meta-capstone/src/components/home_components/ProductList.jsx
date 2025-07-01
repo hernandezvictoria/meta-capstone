@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
 import Modal from "./Modal.jsx";
-// import {parseDataForCard} from "../utils/helper-functions.js";
 
 function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPages, setMaxPages, searchTerm}) {
 

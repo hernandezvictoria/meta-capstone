@@ -39,6 +39,34 @@ router.put('/change-skin-type', async (req, res) => {
     }
 })
 
+router.get('/user-info', async(req, res) => {
+    const id = req.session.userId;
+
+    if (!id) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" })
+    }
+
+    // Retrieve the user
+    const user = await prisma.user.findUnique({
+        where: { id: id },
+        include: { saved_products: true,
+                   loved_products: true }
+    });
+
+    if (!user) {
+        return res.status(404).send({ message: "user not found" });
+    }
+
+    // do not include user id or user hashed password
+    res.status(200).json({
+        username: user.username,
+        concerns: user.concerns,
+        skin_type: user.skin_type,
+        loved_products: user.loved_products,
+        saved_products: user.saved_products
+    })
+})
+
 // http://localhost:3000/change-skin-concerns
 router.put('/change-skin-concerns', async (req, res) => {
     const concerns = req.body
