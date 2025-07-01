@@ -4,7 +4,7 @@ import Product from "../home_components/Product.jsx";
 import "../../styles/ProductList.css";
 import Modal from "../home_components/Modal.jsx";
 
-function ProfileProductList({setError, data, isLovedShowing, lovedProducts, savedProducts}) {
+function ProfileProductList({setError, data, isLovedShowing}) {
 
     const [modalProductId, setModalProductId] = useState(null);
 
@@ -26,8 +26,6 @@ function ProfileProductList({setError, data, isLovedShowing, lovedProducts, save
                 {
                 data.map(prod => {
                     return(<Product
-                    isLikedInit={(lovedProducts.find(p => p.id === prod.id)) ? true : false}
-                    isSavedInit={(savedProducts.find(p => p.id === prod.id)) ? true : false}
                     setModalProductId={setModalProductId}
                     setError={setError}
                     key={prod.id}

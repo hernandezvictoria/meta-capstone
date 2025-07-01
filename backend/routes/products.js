@@ -48,6 +48,7 @@ router.get('/products', async (req, res) => {
         return res.status(401).json({ error: "you must be logged in to perform this action" })
     }
 
+    
     if(searchTerm === ""){
         try {
             const products = await prisma.productInfo.findMany({
@@ -78,7 +79,7 @@ router.get('/products', async (req, res) => {
             .map(q => q.toLowerCase());
         //TODO: make everything lowercase, clean hyphens and plus signs, delegate logic elsewhere
         //TODO: fix search
-        
+
         try {
             foundProducts = await prisma.productInfo.findMany({
                 where: {

@@ -2,11 +2,29 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
 
-function Product({ productType, isLikedInit, isSavedInit, setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
+function Product({ setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
-  const [isLiked, setIsLiked] = useState(isLikedInit); // cannot wrap a use state
-  const [isSaved, setIsSaved] = useState(isSavedInit);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
+  const loadLikedAndSaved = async () =>{
+    fetch(`http://localhost:3000/get-liked-and-saved-status/${id}`,
+      {credentials: "include"})
+    .then((response) => response.json())
+    .then((res) => {
+      setIsLiked(res.isLiked);
+      setIsSaved(res.isSaved);
+    })
+    .catch((error) => {
+      setError("unable to fetch product info");
+    });
+  }
+
+  useEffect(() =>{
+    loadLikedAndSaved();
+  }, []);
+
 
   const loadImage = async () => {
     // if image is not in DB
@@ -97,27 +115,24 @@ function Product({ productType, isLikedInit, isSavedInit, setModalProductId, set
   }
 
   return (
-    <>
-    <div className="product" id={productType} onClick={openModal}>
+    <div className="product" onClick={openModal}>
 
       <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
       <section className="product-info">
-        <p className="product-brand">{brand}</p>
         <p className="product-name">{name}</p>
-        <section className="concerns-and-type">
-          <section className="skin-type">
-            {skin_type.map(type => {
-              return(<p key={type} id={type} className="type_box">{type}</p>)
-              })
-            }
-          </section>
+        <p className="product-brand">{brand}</p>
+        <section className="skin_type">
+          {skin_type.map(type => {
+            return(<p key={type} className="type_box">{type}</p>)
+            })
+          }
+        </section>
 
-          <section className="concerns">
-            {concerns.map(concern => {
-                return(<p key={concern} id={concern} className="concern_box">{concern}</p>)
-                })
-            }
-          </section>
+        <section className="concerns">
+          {concerns.map(concern => {
+              return(<p key={concern} className="concern_box">{concern}</p>)
+              })
+          }
         </section>
       </section>
       <section className="like-and-save">
@@ -125,7 +140,6 @@ function Product({ productType, isLikedInit, isSavedInit, setModalProductId, set
           <button onClick={toggleSave}>{isSaved ? 'unsave' : 'save'}</button>
       </section>
     </div>
-    </>
   );
 }
 
