@@ -47,6 +47,7 @@ model ProductInfo{
   ingredients String[]
   concerns String[]
   skin_type String[]
+
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
 }
