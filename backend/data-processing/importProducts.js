@@ -5,7 +5,9 @@ const { PrismaClient } = require('../generated/prisma/index.js');
 const prisma = new PrismaClient();
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
+
 fs.createReadStream('seed.csv')
+
   .pipe(parse({ columns: true, trim: true }))
   .on('data', async (row) => {
 
@@ -59,6 +61,9 @@ fs.createReadStream('seed.csv')
 
     const concernsArray = getConcernsArray(row.concerns);
     const skinTypeArray = getSkinTypesArray(row.skin_type);
+    let price = row.price;
+    price = price.slice(1);
+    const priceDecimal = parseFloat(price);
 
     //TODO: handle edge cases for prices input wrongly
     let price = row.price;
@@ -72,6 +77,7 @@ fs.createReadStream('seed.csv')
           brand: row.brand,
           name: row.name,
           product_type: row.product_type === "eye cream" ? "eye_cream" : row.product_type,
+
           price: priceDecimal,
           ingredients: ingredientsArray,
           concerns: concernsArray,
