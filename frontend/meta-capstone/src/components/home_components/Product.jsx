@@ -2,10 +2,10 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
 
-function Product({ isLikedInit, isSavedInit, setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
+function Product({ productType, isLikedInit, isSavedInit, setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
-  const [isLiked, setIsLiked] = useState(isLikedInit);
+  const [isLiked, setIsLiked] = useState(isLikedInit); // cannot wrap a use state
   const [isSaved, setIsSaved] = useState(isSavedInit);
 
   const loadImage = async () => {
@@ -98,24 +98,26 @@ function Product({ isLikedInit, isSavedInit, setModalProductId, setError, id, im
 
   return (
     <>
-    <div className="product" onClick={openModal}>
+    <div className="product" id={productType} onClick={openModal}>
 
       <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
       <section className="product-info">
-        <p className="product-name">{name}</p>
         <p className="product-brand">{brand}</p>
-        <section className="skin_type">
-          {skin_type.map(type => {
-            return(<p key={type} className="type_box">{type}</p>)
-            })
-          }
-        </section>
-
-        <section className="concerns">
-          {concerns.map(concern => {
-              return(<p key={concern} className="concern_box">{concern}</p>)
+        <p className="product-name">{name}</p>
+        <section className="concerns-and-type">
+          <section className="skin-type">
+            {skin_type.map(type => {
+              return(<p key={type} id={type} className="type_box">{type}</p>)
               })
-          }
+            }
+          </section>
+
+          <section className="concerns">
+            {concerns.map(concern => {
+                return(<p key={concern} id={concern} className="concern_box">{concern}</p>)
+                })
+            }
+          </section>
         </section>
       </section>
       <section className="like-and-save">

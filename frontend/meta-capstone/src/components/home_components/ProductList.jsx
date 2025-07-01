@@ -41,10 +41,10 @@ function ProductList({ error, setError, data, setData, pageNum, setPageNum, maxP
       setLikedProducts(userData.loved_products);
       setSavedProducts(userData.saved_products);
 
-      setLoading(false); // set loading to false once data is fetched
+      // setLoading(false); // set loading to false once data is fetched
     } catch (error) {
       setError("unable to fetch products");
-      setLoading(false); // ensure loading is false even on error
+      // setLoading(false); // ensure loading is false even on error
     }
   };
 
@@ -56,9 +56,9 @@ function ProductList({ error, setError, data, setData, pageNum, setPageNum, maxP
     setPageNum(pageNum + 1);
   };
 
-  if (loading) {
-    return <p>Loading...</p>; // TODO: UPDATE LOADING STATE
-  }
+  // if (loading) {
+  //   return <p>Loading...</p>; // TODO: UPDATE LOADING STATE
+  // }
 
   if (error) {
     return <p>{error}</p>;
@@ -77,6 +77,7 @@ function ProductList({ error, setError, data, setData, pageNum, setPageNum, maxP
       <div className="product-container">
         {data.map(prod => (
           <Product
+            productType={prod.product_type}
             isLikedInit={likedProducts.some(p => p.id === prod.id)}
             isSavedInit={savedProducts.some(p => p.id === prod.id)}
             setModalProductId={setModalProductId}
