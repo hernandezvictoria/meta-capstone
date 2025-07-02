@@ -64,15 +64,25 @@ fs.createReadStream('ingredients.csv')
 
     // Insert into database
     try {
-      await prisma.ingredient.create({
-        data: {
+      // Check if the ingredient already exists
+      const existingIngredient = await prisma.ingredient.findUnique({
+        where: {
           name: row.Ingredient.toLowerCase(),
-          ingredient_type: row.Type.toLowerCase(),
-          purpose: row.Purpose.toLowerCase(),
-          skin_type: skinTypeArray,
-          concerns: concernsArray
         },
       });
+
+      // If the ingredient does not exist, insert it
+      if (!existingIngredient) {
+        await prisma.ingredient.create({
+          data: {
+            name: row.Ingredient.toLowerCase(),
+            ingredient_type: row.Type.toLowerCase(),
+            purpose: row.Purpose.toLowerCase(),
+            skin_type: skinTypeArray,
+            concerns: concernsArray,
+          },
+        });
+      }
     } catch (err) {
       console.error('Error inserting row:', row, err);
     }
