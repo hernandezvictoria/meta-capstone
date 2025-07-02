@@ -184,7 +184,7 @@ router.put('/toggle-like/:productId', async (req, res) => {
             }
         });
 
-        res.status(200).json(updatedUser);
+        res.status(200).json({removedLike: isLiked});
 
     } catch (error) {
         console.error(error);
@@ -233,7 +233,7 @@ router.put('/toggle-save/:productId', async (req, res) => {
             }
         });
 
-        res.status(200).json(updatedUser);
+        res.status(200).json({removedSave: isSaved});
 
     } catch (error) {
         console.error(error);
@@ -241,7 +241,56 @@ router.put('/toggle-save/:productId', async (req, res) => {
     }
 });
 
-//TODO: get liked and saved status of every product
+// dislike products
+router.put('/toggle-dislike/:productId', async (req, res) => {
+    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try {
+        // Retrieve the current product
+        const product = await prisma.productInfo.findUnique({
+            where: { id: productId }
+        });
+
+        if (!product) {
+            return res.status(404).send({ message: "product not found" });
+        }
+
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { disliked_products: true } // Include loved products to check if already liked
+        });
+
+        if (!user) {
+            return res.status(404).send({ message: "user not found" });
+        }
+
+        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
+        const isDisliked = user.disliked_products.some(p => p.id === productId);
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                disliked_products: isDisliked
+                    ? { disconnect: { id: productId } } // Remove the product if already disliked
+                    : { connect: { id: productId } } // Add the product if not disliked
+            }
+        });
+
+        res.status(200).json({removedDislike: isDisliked});
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while toggling the dislike status." });
+    }
+});
+
+
 // get liked and saved status of product
 router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
     const productId = parseInt(req.params.productId); // Corrected from postId to productId
@@ -283,30 +332,5 @@ router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
         res.status(500).send({ message: "An error occurred while fetching the liked and saved status" });
     }
 });
-
-router.get('/user-liked-and-saved', async (req, res) => {
-    const userId = req.session.userId;
-
-    if (!userId) {
-        return res.status(401).json({ error: "you must be logged in to perform this action" });
-    }
-
-    try{
-        // Retrieve the current user
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { saved_products: true,
-                    loved_products: true }
-        });
-        res.status(200).json({
-            saved_products: user.saved_products,
-            loved_products: user.loved_products});
-    } catch(error){
-        console.error(error);
-        res.status(500).send({ message: "An error occurred while fetching the liked and saved status" });
-    }
-})
-
-
 
 module.exports = router;

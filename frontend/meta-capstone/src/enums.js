@@ -26,4 +26,11 @@ const ProductTypes = Object.freeze({
     EYE: "eye cream"
 })
 
-export { SkinTypes, SkinConcerns, ProductTypes };
+const ProfileFilters = Object.freeze({
+    USERINFO: "user info",
+    LIKED: "liked",
+    SAVED: "saved",
+    DISLIKED: "disliked"
+})
+
+export { SkinTypes, SkinConcerns, ProductTypes, ProfileFilters};
