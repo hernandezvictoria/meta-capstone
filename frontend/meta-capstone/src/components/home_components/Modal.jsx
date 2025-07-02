@@ -2,27 +2,26 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Modal.css";
 
-function Modal ({fetchAllData, data, modalProductId, setError, setModalProductId}){
+function Modal ({data, modalProductId, setError, setModalProductId}){
 
     //TODO: fix minor bug where if the product is first open, the modal has null value for image still
-    const product_array = data.filter(prod => prod.id === modalProductId);
-    if(product_array.length === 0){
+
+    const product = data.find(prod => prod.id === modalProductId);
+    if(!product){
         setError("unable to fetch product data, please reload the page")
     }
-    const product = product_array[0];
 
     const closeModal = () => {
         setModalProductId(null);
     }
-
 
     return (
     <div className="modal-overlay" onClick={closeModal}>
         <div className="modal" onClick={(event) => event.stopPropagation()}>
         <img className="product-image" alt={product.name} aria-label={product.name} src={product.image}/>
         <section className="product-info">
-          <p className="product-name">{product.name}</p>
           <p className="product-brand">{product.brand}</p>
+          <p className="product-name">{product.name}</p>
           <p className="product-type">{product.product_type}</p>
           <p className="product-price">{product.price}</p>
           <section className="skin_type">
@@ -38,7 +37,17 @@ function Modal ({fetchAllData, data, modalProductId, setError, setModalProductId
                 })
             }
           </section>
-          <p className="product-ingredients">highlighted ingredients: {product.ingredients.join(", ")}</p>
+          {product.ingredients?.length > 0 && //if there are ingredients to display
+          <p className="highlighted-ingredients">highlighted ingredients:</p>}
+          {product.ingredients?.map(ingredient => {
+            return(
+            <div key={ingredient.name} className="ingredient">
+              <p className="ingredient-name">{ingredient.name}</p>
+              <p data-text={ingredient.purpose} className="ingredient-tooltip">⍰</p>
+            </div>
+            )
+          })
+          }
         </section>
         </div>
     </div>);

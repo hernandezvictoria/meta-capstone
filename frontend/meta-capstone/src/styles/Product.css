@@ -1,15 +1,36 @@
 .product{
-    display:flex;
-    border:2px solid red;
+    break-inside: avoid;
+    margin-bottom: 16px;
+    border-radius:14px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.product:hover{
+    filter: brightness(0.8);
+    cursor:pointer;
 }
 
 .product-image{
-    width:20%;
+    margin: 0;
+    position: relative;
+    width: 100%;
+    border-radius: 14px;
 }
 
-.product-info{
+.product-brand{
+    font-size: 90%;
+    color: #676767;
+}
+
+.concerns-and-type{
     display:flex;
 }
+
+.product-name{
+    font-size:110%;
+}
+
+
 
 .modal-overlay {
     position: fixed;

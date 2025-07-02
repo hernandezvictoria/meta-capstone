@@ -38,10 +38,12 @@ model User{
 
 model Ingredient{
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
   ingredient_type String
-  concern String
-  skin_type SkinType[]
+  purpose String
+  skin_type SkinType[] @default([])
+  concerns String[] @default([])
+  products ProductInfo[] @relation("ingredients")
 }
 
 model ProductInfo{
@@ -51,7 +53,7 @@ model ProductInfo{
   image String?
   product_type ProductType
   price Decimal
-  ingredients String[]
+  ingredients Ingredient[] @relation("ingredients")
   concerns String[]
   skin_type SkinType[]
   loved_by_user User[] @relation("loved")

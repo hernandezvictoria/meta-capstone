@@ -15,10 +15,7 @@ function App() {
   const ProtectedProfile = WithAuth(Profile)
 
   return (
-    <>
-
       <Router>
-
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <Route path="/signup" element={<SignupForm />} />
@@ -28,9 +25,6 @@ function App() {
           <Route path="/profile" element={<ProtectedProfile/>}/>
         </Routes>
       </Router>
-    </>
-
-
   )
 }
 

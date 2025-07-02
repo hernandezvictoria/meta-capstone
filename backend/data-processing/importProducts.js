@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const parse = require('csv-parse').parse;
 const { PrismaClient } = require('../generated/prisma/index.js');
@@ -56,8 +55,8 @@ fs.createReadStream('seed.csv')
       return typesArray;
     };
 
-    let ingredientsArray = row.ingredients.split(',').map(i => i.trim());
-    ingredientsArray = ingredientsArray.map(i => i.toLowerCase());
+    let ingredientsArray = row.ingredients.split(',').map(i => i.trim().toLowerCase());
+    // ingredientsArray = ingredientsArray.map(i => i.toLowerCase());
 
     const concernsArray = getConcernsArray(row.concerns);
     const skinTypeArray = getSkinTypesArray(row.skin_type);
@@ -72,6 +71,13 @@ fs.createReadStream('seed.csv')
 
     // Insert into database
     try {
+      // Fetch ingredients from the database
+      const ingredientRecords = await prisma.ingredient.findMany({
+        where: {
+          name: { in: ingredientsArray }
+        }
+      });
+
       await prisma.productInfo.create({
         data: {
           brand: row.brand,
@@ -79,7 +85,9 @@ fs.createReadStream('seed.csv')
           product_type: row.product_type === "eye cream" ? "eye_cream" : row.product_type,
 
           price: priceDecimal,
-          ingredients: ingredientsArray,
+          ingredients: {
+            connect: ingredientRecords.map(ingredient => ({ id: ingredient.id }))
+          },
           concerns: concernsArray,
           skin_type: skinTypeArray,
         },

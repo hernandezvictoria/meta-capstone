@@ -49,8 +49,18 @@ router.get('/user-info', async(req, res) => {
     // Retrieve the user
     const user = await prisma.user.findUnique({
         where: { id: id },
-        include: { saved_products: true,
-                   loved_products: true }
+        include: {
+            saved_products: {
+                include: {
+                    ingredients: true, // Include ingredients for saved products
+                },
+            },
+            loved_products: {
+                include: {
+                    ingredients: true, // Include ingredients for loved products
+                },
+            },
+        }
     });
 
     if (!user) {
