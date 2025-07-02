@@ -7,6 +7,7 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
   const [displayImage, setDisplayImage] = useState(image);
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
 
   const loadLikedAndSaved = async () =>{
     fetch(`http://localhost:3000/get-liked-and-saved-status/${id}`,
@@ -114,6 +115,23 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
     setIsSaved(!isSaved);
   }
 
+  const toggleDislike = async(event) => {
+    event.stopPropagation();
+    try {
+      const response = await fetch(`http://localhost:3000/toggle-dislike/${id}`, {
+          method: "PUT",
+          credentials: "include",
+      });
+
+      if (!response.ok) {
+          setError("unable to dislike or un-dislike product");
+      }
+    } catch (error) {
+        setError("network error, please try again");
+    }
+    setIsDisliked(!isDisliked);
+  }
+
   return (
     <div className="product" onClick={openModal}>
 
@@ -136,8 +154,9 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
         </section>
       </section>
       <section className="like-and-save">
-          <button onClick={toggleLike}>{isLiked ? 'unlike' : 'like'}</button>
+          <button onClick={toggleLike}>{isLiked ? '♥️' : '♡'}</button>
           <button onClick={toggleSave}>{isSaved ? 'unsave' : 'save'}</button>
+          <button onClick={toggleDislike}>{isDisliked ? 'un-dislike' : 'dislike'}</button>
       </section>
     </div>
   );

@@ -26,6 +26,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Ingredient{
+  id Int @id @default(autoincrement())
+  name String @unique
+  ingredient_type String
+  purpose String
+  skin_type SkinType[] @default([])
+  concerns String[] @default([])
+  products ProductInfo[] @relation("ingredients")
+}
+
 model User{
   id Int @id @default(autoincrement())
   username String @unique
@@ -35,16 +45,6 @@ model User{
   loved_products ProductInfo[] @relation("loved")
   saved_products ProductInfo[] @relation("saved")
   disliked_products ProductInfo[] @relation("disliked")
-}
-
-model Ingredient{
-  id Int @id @default(autoincrement())
-  name String @unique
-  ingredient_type String
-  purpose String
-  skin_type SkinType[] @default([])
-  concerns String[] @default([])
-  products ProductInfo[] @relation("ingredients")
 }
 
 model ProductInfo{
