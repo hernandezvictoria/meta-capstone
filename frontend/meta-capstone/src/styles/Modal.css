@@ -20,3 +20,51 @@
     border-radius: 15px;
     animation: fadeIn 0.3s ease-out;
 }
+
+.ingredient{
+    display:flex;
+}
+.ingredient-tooltip {
+    position:relative;
+}
+
+/* TODO: UPDATE TOOLTIP STYLING */
+.ingredient-tooltip:before {
+    content: attr(data-text);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 100%;
+    margin-left: 10px;
+    width: 150px; /* Increased width for better readability */
+    padding: 8px; /* Adjusted padding */
+    border-radius: 5px; /* More rounded corners */
+    background: #333; /* Darker background color for better contrast */
+    color: #fff;
+    text-align: center;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Added box shadow */
+    transition: opacity 0.3s ease; /* Smooth transition */
+    opacity: 0; /* Start with opacity 0 */
+}
+
+.ingredient-tooltip:hover:before {
+    display: block;
+    opacity: 1; /* Fade in the tooltip */
+}
+
+.ingredient-tooltip:after {
+    content: "";
+    position: absolute;
+    left: 100%;
+    margin-left: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent; /* Adjusted arrow size */
+    border-color: transparent #333 transparent transparent; /* Match the tooltip background */
+    display: none;
+}
+
+.ingredient-tooltip:hover:after {
+    display: block;
+}

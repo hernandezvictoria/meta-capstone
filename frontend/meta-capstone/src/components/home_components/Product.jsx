@@ -119,8 +119,8 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
 
       <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
       <section className="product-info">
-        <p className="product-name">{name}</p>
         <p className="product-brand">{brand}</p>
+        <p className="product-name">{name}</p>
         <section className="skin_type">
           {skin_type.map(type => {
             return(<p key={type} className="type_box">{type}</p>)

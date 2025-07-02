@@ -48,12 +48,13 @@ router.get('/products', async (req, res) => {
         return res.status(401).json({ error: "you must be logged in to perform this action" })
     }
 
-    
+
     if(searchTerm === ""){
         try {
             const products = await prisma.productInfo.findMany({
                 skip: offset,
-                take: limit
+                take: limit,
+                include: { ingredients: true }
             });
             //RES NOW HAS TWO ELEMENTS IN JSON
             res.status(200).json({
@@ -91,10 +92,10 @@ router.get('/products', async (req, res) => {
                             { concerns: { has: q } }, // Use has for exact match in array
                             { skin_type: { has : (SkinTypes[q] ? SkinTypes[q] : null) } } // Use has for exact match in array
                         ]
-                    }))
-                },
+                    }))},
                 skip: offset,
-                take: limit
+                take: limit,
+                include: { ingredients: true }
             });
 
             // Remove duplicates based on product ID
