@@ -34,6 +34,7 @@ model User{
   skin_type SkinType[] @default([])
   loved_products ProductInfo[] @relation("loved")
   saved_products ProductInfo[] @relation("saved")
+  disliked_products ProductInfo[] @relation("disliked")
 }
 
 model Ingredient{
@@ -58,4 +59,5 @@ model ProductInfo{
   skin_type SkinType[]
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
+  disliked_by_user User[] @relation("disliked")
 }
