@@ -10,6 +10,9 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
   const [modalProductId, setModalProductId] = useState(null);
   const [data, setData] = useState([]);
   const limit = 10;
+  const [likedProducts, setLikedProducts] = useState([]);
+  const [savedProducts, setSavedProducts] = useState([]);
+  const [dislikedProducts, setDislikedProducts] = useState([]);
 
   const fetchAllData = async () => {
       fetch(`http://localhost:3000/products?page=${pageNum}&limit=${limit}&searchTerm=${searchTerm}`,
@@ -53,6 +56,24 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
     fetchAllData();
   }, [searchTerm, pageNum])
 
+  const fetchLikedSavedDisliked = async () => {
+    fetch(`http://localhost:3000/user-liked-saved-disliked`,
+      {credentials: "include"})
+    .then((response) => response.json())
+    .then((res) => {
+      setLikedProducts(res.loved_products);
+      setSavedProducts(res.saved_products);
+      setDislikedProducts(res.disliked_products);
+    })
+    .catch((error) => {
+      setError("unable to fetch products");
+    });
+  }
+
+  useEffect(() => {
+    fetchLikedSavedDisliked();
+  }, [])
+
   const handleLoadMore = () => {
     setPageNum(pageNum + 1);
   }
@@ -75,6 +96,12 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
           {
             data.map(prod => {
               return(<Product
+                likedProducts={likedProducts}
+                setLikedProducts={setLikedProducts}
+                savedProducts={savedProducts}
+                setSavedProducts={setSavedProducts}
+                dislikedProducts={dislikedProducts}
+                setDislikedProducts={setDislikedProducts}
                 setModalProductId={setModalProductId}
                 setError={setError}
                 key={prod.id}

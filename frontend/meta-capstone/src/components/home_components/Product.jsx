@@ -2,30 +2,9 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
 
-function Product({ setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
+function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
 
   const [displayImage, setDisplayImage] = useState(image);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const [isDisliked, setIsDisliked] = useState(false);
-
-  const loadLikedAndSaved = async () =>{
-    fetch(`http://localhost:3000/get-liked-and-saved-status/${id}`,
-      {credentials: "include"})
-    .then((response) => response.json())
-    .then((res) => {
-      setIsLiked(res.isLiked);
-      setIsSaved(res.isSaved);
-    })
-    .catch((error) => {
-      setError("unable to fetch product info");
-    });
-  }
-
-  useEffect(() =>{
-    loadLikedAndSaved();
-  }, []);
-
 
   const loadImage = async () => {
     // if image is not in DB
@@ -83,53 +62,61 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
 
   const toggleLike = async(event) => {
     event.stopPropagation();
-    try {
-      const response = await fetch(`http://localhost:3000/toggle-like/${id}`, {
-          method: "PUT",
-          credentials: "include",
-      });
 
-      if (!response.ok) {
-          setError("unable to like or unlike product");
+    fetch(`http://localhost:3000/toggle-like/${id}`,
+      {method: "PUT",
+      credentials: "include"})
+    .then((response) => response.json())
+    .then((res) => {
+      const removedLike = res.removedLike;
+
+      if(removedLike){
+        setLikedProducts(likedProducts.filter(p => p.id !== id));
       }
-    } catch (error) {
-        setError("network error, please try again");
-    }
-    setIsLiked(!isLiked);
+      else{
+        // Add the product to the array (only adding ID here bc don't have all necessary info to create product obj, will get updated when re-fetched)
+        setLikedProducts([...likedProducts, { id: id }]);
+      }
+    })
+    .catch((error) => setError("error while toggling like"));
   }
 
   const toggleSave = async(event) => {
     event.stopPropagation();
-    try {
-      const response = await fetch(`http://localhost:3000/toggle-save/${id}`, {
-          method: "PUT",
-          credentials: "include",
-      });
+    fetch(`http://localhost:3000/toggle-save/${id}`,
+      {method: "PUT",
+      credentials: "include"})
+    .then((response) => response.json())
+    .then((res) => {
+      const removedSave = res.removedSave;
 
-      if (!response.ok) {
-          setError("unable to save or unsave product");
+      if(removedSave){
+        setSavedProducts(savedProducts.filter(p => p.id !== id));
       }
-    } catch (error) {
-        setError("network error, please try again");
-    }
-    setIsSaved(!isSaved);
+      else{
+        setSavedProducts([...savedProducts, { id: id }]);
+      }
+    })
+    .catch((error) => setError("error while toggling save"));
   }
 
   const toggleDislike = async(event) => {
     event.stopPropagation();
-    try {
-      const response = await fetch(`http://localhost:3000/toggle-dislike/${id}`, {
-          method: "PUT",
-          credentials: "include",
-      });
+    fetch(`http://localhost:3000/toggle-dislike/${id}`,
+      {method: "PUT",
+      credentials: "include"})
+    .then((response) => response.json())
+    .then((res) => {
+      const removedDislike = res.removedDislike;
 
-      if (!response.ok) {
-          setError("unable to dislike or un-dislike product");
+      if(removedDislike){
+        setDislikedProducts(dislikedProducts.filter(p => p.id !== id));
       }
-    } catch (error) {
-        setError("network error, please try again");
-    }
-    setIsDisliked(!isDisliked);
+      else{
+        setDislikedProducts([...dislikedProducts, { id: id }]);
+      }
+    })
+    .catch((error) => setError("error while toggling dislike"));
   }
 
   return (
@@ -154,9 +141,9 @@ function Product({ setModalProductId, setError, id, image, brand, name, concerns
         </section>
       </section>
       <section className="like-and-save">
-          <button onClick={toggleLike}>{isLiked ? '♥️' : '♡'}</button>
-          <button onClick={toggleSave}>{isSaved ? 'unsave' : 'save'}</button>
-          <button onClick={toggleDislike}>{isDisliked ? 'un-dislike' : 'dislike'}</button>
+          <button onClick={toggleLike}>{likedProducts.some(p => p.id === id) ? '♥️' : '♡'}</button>
+          <button onClick={toggleSave}>{savedProducts.some(p => p.id === id) ? 'unsave' : 'save'}</button>
+          <button onClick={toggleDislike}>{dislikedProducts.some(p => p.id === id) ? 'un-dislike' : 'dislike'}</button>
       </section>
     </div>
   );

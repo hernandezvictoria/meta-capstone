@@ -110,5 +110,29 @@ router.put('/change-skin-concerns', async (req, res) => {
     }
 })
 
+router.get('/user-liked-saved-disliked', async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try{
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { saved_products: true,
+                    loved_products: true,
+                    disliked_products: true }
+        });
+        res.status(200).json({
+            saved_products: user.saved_products,
+            loved_products: user.loved_products,
+            disliked_products: user.disliked_products});
+    } catch(error){
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while fetching user's liked, saved, and disliked products" });
+    }
+})
 
 module.exports = router;

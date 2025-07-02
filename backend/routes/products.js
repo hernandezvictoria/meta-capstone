@@ -184,7 +184,7 @@ router.put('/toggle-like/:productId', async (req, res) => {
             }
         });
 
-        res.status(200).json(updatedUser);
+        res.status(200).json({removedLike: isLiked});
 
     } catch (error) {
         console.error(error);
@@ -233,7 +233,7 @@ router.put('/toggle-save/:productId', async (req, res) => {
             }
         });
 
-        res.status(200).json(updatedUser);
+        res.status(200).json({removedSave: isSaved});
 
     } catch (error) {
         console.error(error);
@@ -282,7 +282,7 @@ router.put('/toggle-dislike/:productId', async (req, res) => {
             }
         });
 
-        res.status(200).json(updatedUser);
+        res.status(200).json({removedDislike: isDisliked});
 
     } catch (error) {
         console.error(error);
@@ -290,7 +290,7 @@ router.put('/toggle-dislike/:productId', async (req, res) => {
     }
 });
 
-//TODO: get liked and saved status of every product
+
 // get liked and saved status of product
 router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
     const productId = parseInt(req.params.productId); // Corrected from postId to productId
@@ -332,30 +332,5 @@ router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
         res.status(500).send({ message: "An error occurred while fetching the liked and saved status" });
     }
 });
-
-router.get('/user-liked-and-saved', async (req, res) => {
-    const userId = req.session.userId;
-
-    if (!userId) {
-        return res.status(401).json({ error: "you must be logged in to perform this action" });
-    }
-
-    try{
-        // Retrieve the current user
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { saved_products: true,
-                    loved_products: true }
-        });
-        res.status(200).json({
-            saved_products: user.saved_products,
-            loved_products: user.loved_products});
-    } catch(error){
-        console.error(error);
-        res.status(500).send({ message: "An error occurred while fetching the liked and saved status" });
-    }
-})
-
-
 
 module.exports = router;
