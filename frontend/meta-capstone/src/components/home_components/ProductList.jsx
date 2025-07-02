@@ -2,12 +2,13 @@ import React from "react";
 import { useState, useEffect } from 'react'
 import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
-import Modal from "./Modal.jsx";
+import ProductModal from "./ProductModal.jsx";
 
-function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPages, setMaxPages, searchTerm}) {
+function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages, searchTerm}) {
 
   // TODO: CUSTOM LOADING STATE
   const [modalProductId, setModalProductId] = useState(null);
+  const [data, setData] = useState([]);
   const limit = 10;
 
   const fetchAllData = async () => {
@@ -64,7 +65,7 @@ function ProductList({error, setError, data, setData, pageNum, setPageNum, maxPa
       return (
         <>
           {modalProductId &&
-          <Modal
+          <ProductModal
             data={data}
             modalProductId={modalProductId}
             setError={setError}

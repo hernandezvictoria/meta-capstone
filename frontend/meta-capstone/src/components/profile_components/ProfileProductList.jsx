@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from 'react'
 import Product from "../home_components/Product.jsx";
 import "../../styles/ProductList.css";
-import Modal from "../home_components/Modal.jsx";
+import ProductModal from "../home_components/ProductModal.jsx";
 
 function ProfileProductList({setError, data, isLovedShowing}) {
 
@@ -16,7 +16,7 @@ function ProfileProductList({setError, data, isLovedShowing}) {
         return (
             <>
                 {modalProductId &&
-                <Modal
+                <ProductModal
                 data={data}
                 modalProductId={modalProductId}
                 setError={setError}

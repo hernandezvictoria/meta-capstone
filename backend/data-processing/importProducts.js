@@ -54,7 +54,6 @@ fs.createReadStream('seed.csv')
     };
 
     let ingredientsArray = row.ingredients.split(',').map(i => i.trim().toLowerCase());
-    // ingredientsArray = ingredientsArray.map(i => i.toLowerCase());
 
     const concernsArray = getConcernsArray(row.concerns);
     const skinTypeArray = getSkinTypesArray(row.skin_type);

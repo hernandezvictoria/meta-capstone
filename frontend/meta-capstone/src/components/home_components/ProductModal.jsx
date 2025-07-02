@@ -1,8 +1,8 @@
 import React from "react";
 import {useState, useEffect} from 'react';
-import "../../styles/Modal.css";
+import "../../styles/ProductModal.css";
 
-function Modal ({data, modalProductId, setError, setModalProductId}){
+function ProductModal ({data, modalProductId, setError, setModalProductId}){
 
     //TODO: fix minor bug where if the product is first open, the modal has null value for image still
 
@@ -53,4 +53,4 @@ function Modal ({data, modalProductId, setError, setModalProductId}){
     </div>);
 }
 
-export default Modal;
+export default ProductModal;

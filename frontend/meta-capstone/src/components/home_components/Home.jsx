@@ -9,7 +9,6 @@ import NavBar from '../NavBar';
 
 const Home = () => {
     const { user, setUser } = useUser();
-    const [data, setData] = useState([]);
     const [error, setError] = useState(null);
     const [pageNum, setPageNum] = useState(1);
     const [maxPages, setMaxPages] = useState(false); //boolean indicating whether or not there are more pages to load
@@ -30,8 +29,6 @@ const Home = () => {
                 <ProductList
                     error={error}
                     setError={setError}
-                    data={data}
-                    setData={setData}
                     pageNum={pageNum}
                     setPageNum={setPageNum}
                     maxPages={maxPages}
