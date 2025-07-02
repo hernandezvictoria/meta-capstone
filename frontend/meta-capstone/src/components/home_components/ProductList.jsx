@@ -3,18 +3,22 @@ import { useState, useEffect } from 'react'
 import Product from "./Product.jsx";
 import "../../styles/ProductList.css";
 import ProductModal from "./ProductModal.jsx";
+import Loading from './Loading';
 
 function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages, searchTerm}) {
 
   // TODO: CUSTOM LOADING STATE
   const [modalProductId, setModalProductId] = useState(null);
   const [data, setData] = useState([]);
-  const limit = 10;
+  const limit = 10; // can change limit later
   const [likedProducts, setLikedProducts] = useState([]);
   const [savedProducts, setSavedProducts] = useState([]);
   const [dislikedProducts, setDislikedProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
 
   const fetchAllData = async () => {
+      setIsLoading(true);
       fetch(`http://localhost:3000/products?page=${pageNum}&limit=${limit}&searchTerm=${searchTerm}`,
         {credentials: "include"})
       .then((response) => response.json())
@@ -49,7 +53,10 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
       })
       .catch((error) => {
         setError("unable to fetch products");
-      });
+      })
+      .finally(() => {
+        setTimeout(() => setIsLoading(false), 500); // 500ms so that it is on the screen for a long enough time
+      })
   }
 
   useEffect(() => {
@@ -82,46 +89,50 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
     return(<p>{error}</p>);
   }
 
-    else{
-      return (
-        <>
-          {modalProductId &&
-          <ProductModal
-            data={data}
-            modalProductId={modalProductId}
-            setError={setError}
-            setModalProductId={setModalProductId}/>
-          }
-          <div className="product-container">
-          {
-            data.map(prod => {
-              return(<Product
-                likedProducts={likedProducts}
-                setLikedProducts={setLikedProducts}
-                savedProducts={savedProducts}
-                setSavedProducts={setSavedProducts}
-                dislikedProducts={dislikedProducts}
-                setDislikedProducts={setDislikedProducts}
-                setModalProductId={setModalProductId}
-                setError={setError}
-                key={prod.id}
-                id={prod.id}
-                brand={prod.brand}
-                name={prod.name}
-                concerns={prod.concerns}
-                skin_type={prod.skin_type}
-                image={prod.image}/>);
-            })
-          }
+  else if(isLoading){
+    return(<Loading/>);
+  }
+
+  else{
+    return (
+      <>
+        {modalProductId &&
+        <ProductModal
+          data={data}
+          modalProductId={modalProductId}
+          setError={setError}
+          setModalProductId={setModalProductId}/>
+        }
+        <div className="product-container">
+        {
+          data.map(prod => {
+            return(<Product
+              likedProducts={likedProducts}
+              setLikedProducts={setLikedProducts}
+              savedProducts={savedProducts}
+              setSavedProducts={setSavedProducts}
+              dislikedProducts={dislikedProducts}
+              setDislikedProducts={setDislikedProducts}
+              setModalProductId={setModalProductId}
+              setError={setError}
+              key={prod.id}
+              id={prod.id}
+              brand={prod.brand}
+              name={prod.name}
+              concerns={prod.concerns}
+              skin_type={prod.skin_type}
+              image={prod.image}/>);
+          })
+        }
+        </div>
+        { !maxPages &&
+          <div className="load-more">
+            <button onClick={handleLoadMore} className="load-more-button">Load More</button>
           </div>
-          { !maxPages &&
-            <div className="load-more">
-              <button onClick={handleLoadMore} className="load-more-button">Load More</button>
-            </div>
-          }
-        </>
-      );
-    }
+        }
+      </>
+    );
+  }
   }
 
 export default ProductList;

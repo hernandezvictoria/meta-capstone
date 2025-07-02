@@ -2,6 +2,7 @@ import ProfileProductList from "./ProfileProductList.jsx";
 import UserInfo from "./UserInfo.jsx"
 import {ProfileFilters} from '../../enums.js'
 import { useEffect, useState } from "react";
+import Loading from '../home_components/Loading';
 
 const FilterProfilePage = () => {
     const [error, setError] = useState(null);
@@ -12,18 +13,23 @@ const FilterProfilePage = () => {
     const [likedProducts, setLikedProducts] = useState([]);
     const [savedProducts, setSavedProducts] = useState([]);
     const [dislikedProducts, setDislikedProducts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const loadUserInfo = async () => {
+        setIsLoading(true);
         fetch(`http://localhost:3000/user-info`, { credentials: "include" })
-            .then((response) => response.json())
-            .then((res) => {
-                setUsername(res.username);
-                setConcerns(res.concerns);
-                setSkinType(res.skin_type);
-            })
-            .catch((error) => {
-                setError("unable to fetch user info");
-            });
+        .then((response) => response.json())
+        .then((res) => {
+            setUsername(res.username);
+            setConcerns(res.concerns);
+            setSkinType(res.skin_type);
+        })
+        .catch((error) => {
+            setError("unable to fetch user info");
+        })
+        .finally(() => {
+            setTimeout(() => setIsLoading(false), 500);
+        });
     }
 
     useEffect(() => {
@@ -31,6 +37,7 @@ const FilterProfilePage = () => {
     }, []);
 
     const fetchLikedSavedDisliked = async () => {
+        setIsLoading(true);
         fetch(`http://localhost:3000/user-liked-saved-disliked`,
             {credentials: "include"})
         .then((response) => response.json())
@@ -41,6 +48,9 @@ const FilterProfilePage = () => {
         })
         .catch((error) => {
             setError("unable to fetch products");
+        })
+        .finally(() => {
+            setTimeout(() => setIsLoading(false), 500);
         });
     }
 
@@ -61,21 +71,22 @@ const FilterProfilePage = () => {
             <button aria-label="show disliked products" id={ProfileFilters.DISLIKED} className="filter-button" onClick={onFilterClick}>disliked</button>
             <button aria-label="show user info" id={ProfileFilters.USERINFO} className="filter-button" onClick={onFilterClick}>view profile</button>
         </section>
-        {error ? (
-            <p>{error}</p>
-        ) : selectedFilter === ProfileFilters.USERINFO ? (
-            <UserInfo username={username} concerns={concerns} skinType={skinType}/>
-        ) : (
-            <ProfileProductList
-                filter={selectedFilter}
-                setError={setError}
-                likedProducts={likedProducts}
-                setLikedProducts={setLikedProducts}
-                savedProducts={savedProducts}
-                setSavedProducts={setSavedProducts}
-                dislikedProducts={dislikedProducts}
-                setDislikedProducts={setDislikedProducts}/>
-        )}
+        { isLoading
+            ? (<Loading/>)
+            : error
+                ? ( <p>{error}</p>)
+                : selectedFilter === ProfileFilters.USERINFO
+                    ? ( <UserInfo username={username} concerns={concerns} skinType={skinType}/> )
+                    : ( <ProfileProductList
+                        filter={selectedFilter}
+                        setError={setError}
+                        likedProducts={likedProducts}
+                        setLikedProducts={setLikedProducts}
+                        savedProducts={savedProducts}
+                        setSavedProducts={setSavedProducts}
+                        dislikedProducts={dislikedProducts}
+                        setDislikedProducts={setDislikedProducts}/>)
+        }
         </>
     )
 }

@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useUser } from '../../contexts/UserContext';
-import { Link, useParams, useNavigate } from 'react-router-dom';
 import '../../styles/Home.css';
 import WithAuth from '../WithAuth'
 import ProductList from './ProductList'
 import Search from './Search'
 import NavBar from '../NavBar';
+
 
 const Home = () => {
     const { user, setUser } = useUser();
