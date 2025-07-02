@@ -8,6 +8,7 @@ import WithAuth from '../WithAuth'
 import NavBar from '../NavBar'
 import ProfileProductList from "./ProfileProductList";
 import UserInfo from "./UserInfo"
+import {ProfileFilters} from '../../enums.js'
 
 const Profile = () => {
     const { user, setUser } = useUser();
@@ -20,6 +21,7 @@ const Profile = () => {
     const [username, setUsername] = useState("");
     const [concerns, setConcerns] = useState([]);
     const [skinType, setSkinType] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState(ProfileFilters.LIKED);
 
     const loadUserInfo = async () => {
         fetch(`http://localhost:3000/user-info`, { credentials: "include" })
@@ -40,21 +42,26 @@ const Profile = () => {
         loadUserInfo();
     }, []);
 
-    const onLovedClick = () => {
-        setIsLovedShowing(true);
-        setIsProfileShowing(false);
-        setError(null);
-    }
+    // const onLovedClick = () => {
+    //     setIsLovedShowing(true);
+    //     setIsProfileShowing(false);
+    //     setError(null);
+    // }
 
-    const onSavedClick = () => {
-        setIsLovedShowing(false);
-        setIsProfileShowing(false);
-        setError(null);
-    }
+    // const onSavedClick = () => {
+    //     setIsLovedShowing(false);
+    //     setIsProfileShowing(false);
+    //     setError(null);
+    // }
 
-    const onViewProfileClick = () => {
-        setIsProfileShowing(true);
+    // const onViewProfileClick = () => {
+    //     setIsProfileShowing(true);
+    //     setError(null);
+    // }
+
+    const onFilterClick = (event) => {
         setError(null);
+        setSelectedFilter(event.target.id);
     }
 
     const handleLogout = async () => {
@@ -83,21 +90,19 @@ const Profile = () => {
                 <p>this is the profile page</p>
                 <button type="button" onClick={handleLogout}>log out</button>
                 <section className="profile-nav">
-                    <button aria-label="show loved products" id="loved-products" className="filter-button" onClick={onLovedClick}>loved</button>
-                    <button aria-label="show saved products" id="saved-products" className="filter-button" onClick={onSavedClick}>saved</button>
-                    <button aria-label="show user info" id="user-info" className="filter-button" onClick={onViewProfileClick}>view profile</button>
+                    <button aria-label="show liked products" id={ProfileFilters.LIKED} className="filter-button" onClick={onFilterClick}>loved</button>
+                    <button aria-label="show saved products" id={ProfileFilters.SAVED} className="filter-button" onClick={onFilterClick}>saved</button>
+                    <button aria-label="show disliked products" id={ProfileFilters.DISLIKED} className="filter-button" onClick={onFilterClick}>disliked</button>
+                    <button aria-label="show user info" id={ProfileFilters.USERINFO} className="filter-button" onClick={onFilterClick}>view profile</button>
                 </section>
                 {error ? (
                     <p>{error}</p>
-                ) : isProfileShowing ? (
+                ) : selectedFilter === ProfileFilters.USERINFO ? (
                     <UserInfo username={username} concerns={concerns} skinType={skinType}/>
                 ) : (
                     <ProfileProductList
-                        data={isLovedShowing ? lovedProducts : savedProducts}
-                        isLovedShowing={isLovedShowing}
-                        setError={setError}
-                        lovedProducts={lovedProducts}
-                        savedProducts={savedProducts}/>
+                        filter={selectedFilter}
+                        setError={setError}/>
                 )}
             </div>
         </>

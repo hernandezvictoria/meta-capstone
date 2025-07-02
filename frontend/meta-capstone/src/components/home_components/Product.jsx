@@ -74,8 +74,8 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
         setLikedProducts(likedProducts.filter(p => p.id !== id));
       }
       else{
-        // Add the product to the array (only adding ID here bc don't have all necessary info to create product obj, will get updated when re-fetched)
-        setLikedProducts([...likedProducts, { id: id }]);
+        setLikedProducts([...likedProducts,
+          { id, image, brand, name, concerns, skin_type}]);
       }
     })
     .catch((error) => setError("error while toggling like"));
@@ -94,7 +94,8 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
         setSavedProducts(savedProducts.filter(p => p.id !== id));
       }
       else{
-        setSavedProducts([...savedProducts, { id: id }]);
+        setSavedProducts([...savedProducts,
+          { id, image, brand, name, concerns, skin_type}]);
       }
     })
     .catch((error) => setError("error while toggling save"));
@@ -113,7 +114,8 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
         setDislikedProducts(dislikedProducts.filter(p => p.id !== id));
       }
       else{
-        setDislikedProducts([...dislikedProducts, { id: id }]);
+        setDislikedProducts([...dislikedProducts,
+          { id, image, brand, name, concerns, skin_type}]);
       }
     })
     .catch((error) => setError("error while toggling dislike"));

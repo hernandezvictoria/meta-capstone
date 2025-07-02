@@ -121,9 +121,22 @@ router.get('/user-liked-saved-disliked', async (req, res) => {
         // Retrieve the current user
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            include: { saved_products: true,
-                    loved_products: true,
-                    disliked_products: true }
+            include: {
+                saved_products: {
+                    include: {
+                        ingredients: true 
+                    },
+                },
+                loved_products: {
+                    include: {
+                        ingredients: true
+                    },
+                },
+                disliked_products: {
+                    include: {
+                        ingredients: true
+                    }
+                }}
         });
         res.status(200).json({
             saved_products: user.saved_products,
