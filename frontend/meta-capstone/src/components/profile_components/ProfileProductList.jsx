@@ -11,6 +11,16 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
 
     const [modalProductId, setModalProductId] = useState(null);
 
+    const getProductModal = (data) => {
+        return (
+            <ProductModal
+            data={data}
+            modalProductId={modalProductId}
+            setError={setError}
+            setModalProductId={setModalProductId}/>
+            )
+    }
+
     // lots of repeated code here unfortunately
     if(filter === ProfileFilters.LIKED){
         if(likedProducts.length === 0){
@@ -18,13 +28,7 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
         }
         return (
         <>
-            {modalProductId &&
-            <ProductModal
-            data={likedProducts}
-            modalProductId={modalProductId}
-            setError={setError}
-            setModalProductId={setModalProductId}/>
-            }
+            { modalProductId && getProductModal(likedProducts) }
             <div className="product-container">
             {
             likedProducts.map(prod => {
@@ -55,13 +59,7 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
         }
         return (
         <>
-            {modalProductId &&
-            <ProductModal
-            data={savedProducts}
-            modalProductId={modalProductId}
-            setError={setError}
-            setModalProductId={setModalProductId}/>
-            }
+            { modalProductId && getProductModal(savedProducts) }
             <div className="product-container">
             {
             savedProducts.map(prod => {
@@ -92,13 +90,7 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
         }
         return (
         <>
-            {modalProductId &&
-            <ProductModal
-            data={dislikedProducts}
-            modalProductId={modalProductId}
-            setError={setError}
-            setModalProductId={setModalProductId}/>
-            }
+            { modalProductId && getProductModal(dislikedProducts) }
             <div className="product-container">
             {
             dislikedProducts.map(prod => {
