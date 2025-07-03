@@ -1,5 +1,4 @@
 const express = require('express')
-const bcrypt = require('bcrypt')
 const { PrismaClient } = require('../generated/prisma/index.js')
 
 const prisma = new PrismaClient()
@@ -60,6 +59,11 @@ router.get('/user-info', async(req, res) => {
                     ingredients: true, // Include ingredients for loved products
                 },
             },
+            disliked_products: {
+                include: {
+                    ingredients: true
+                }
+            }
         }
     });
 
@@ -73,7 +77,8 @@ router.get('/user-info', async(req, res) => {
         concerns: user.concerns,
         skin_type: user.skin_type,
         loved_products: user.loved_products,
-        saved_products: user.saved_products
+        saved_products: user.saved_products,
+        disliked_products: user.disliked_products
     })
 })
 
@@ -124,7 +129,7 @@ router.get('/user-liked-saved-disliked', async (req, res) => {
             include: {
                 saved_products: {
                     include: {
-                        ingredients: true 
+                        ingredients: true
                     },
                 },
                 loved_products: {

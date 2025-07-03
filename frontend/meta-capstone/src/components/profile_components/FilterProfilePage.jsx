@@ -23,6 +23,9 @@ const FilterProfilePage = () => {
             setUsername(res.username);
             setConcerns(res.concerns);
             setSkinType(res.skin_type);
+            setLikedProducts(res.loved_products);
+            setSavedProducts(res.saved_products);
+            setDislikedProducts(res.disliked_products);
         })
         .catch((error) => {
             setError("unable to fetch user info");
@@ -35,28 +38,6 @@ const FilterProfilePage = () => {
     useEffect(() => {
         loadUserInfo();
     }, []);
-
-    const fetchLikedSavedDisliked = async () => {
-        setIsLoading(true);
-        fetch(`http://localhost:3000/user-liked-saved-disliked`,
-            {credentials: "include"})
-        .then((response) => response.json())
-        .then((res) => {
-            setLikedProducts(res.loved_products);
-            setSavedProducts(res.saved_products);
-            setDislikedProducts(res.disliked_products);
-        })
-        .catch((error) => {
-            setError("unable to fetch products");
-        })
-        .finally(() => {
-            setTimeout(() => setIsLoading(false), 500);
-        });
-    }
-
-    useEffect(() => {
-        fetchLikedSavedDisliked();
-    }, [])
 
     const onFilterClick = (event) => {
         setError(null);
