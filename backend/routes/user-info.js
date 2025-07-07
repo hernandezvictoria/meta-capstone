@@ -1,5 +1,4 @@
 const express = require('express')
-const bcrypt = require('bcrypt')
 const { PrismaClient } = require('../generated/prisma/index.js')
 
 const prisma = new PrismaClient()
@@ -60,6 +59,11 @@ router.get('/user-info', async(req, res) => {
                     ingredients: true, // Include ingredients for loved products
                 },
             },
+            disliked_products: {
+                include: {
+                    ingredients: true
+                }
+            }
         }
     });
 
@@ -73,7 +77,8 @@ router.get('/user-info', async(req, res) => {
         concerns: user.concerns,
         skin_type: user.skin_type,
         loved_products: user.loved_products,
-        saved_products: user.saved_products
+        saved_products: user.saved_products,
+        disliked_products: user.disliked_products
     })
 })
 
@@ -110,5 +115,42 @@ router.put('/change-skin-concerns', async (req, res) => {
     }
 })
 
+router.get('/user-liked-saved-disliked', async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try{
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                saved_products: {
+                    include: {
+                        ingredients: true
+                    },
+                },
+                loved_products: {
+                    include: {
+                        ingredients: true
+                    },
+                },
+                disliked_products: {
+                    include: {
+                        ingredients: true
+                    }
+                }}
+        });
+        res.status(200).json({
+            saved_products: user.saved_products,
+            loved_products: user.loved_products,
+            disliked_products: user.disliked_products});
+    } catch(error){
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while fetching user's liked, saved, and disliked products" });
+    }
+})
 
 module.exports = router;
