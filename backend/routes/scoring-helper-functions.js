@@ -18,11 +18,17 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
                 tempIngredientScore += 1; // add up ingredient skin type matches
             }
         }
-        tempIngredientScore = tempIngredientScore / userSkinType.length; // proportion of skin types satisfied by ingredient, userSkinType.length is nonzero
+        if(userSkinType.length > 0) {
+            tempIngredientScore = tempIngredientScore / userSkinType.length; // proportion of skin types satisfied by ingredient
+        }
         ingredientSkinTypeScore += tempIngredientScore;
     }
-    productSkinTypeScore = productSkinTypeScore / userSkinType.length; // proportion of skin types satisfied by product, userSkinType.length is nonzero
-    ingredientSkinTypeScore /= product.ingredients.length; // average skin type score of ingredients
+    if(userSkinType.length > 0) {
+        productSkinTypeScore = productSkinTypeScore / userSkinType.length; // proportion of skin types satisfied by product
+    }
+    if(product.ingredients.length > 0) {
+        ingredientSkinTypeScore /= product.ingredients.length; // average skin type score of ingredients
+    }
 
     // repeat for skin concern overlap
     let productConcernsScore = 0;
@@ -38,11 +44,17 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
                 tempIngredientScore += 1;
             }
         }
-        tempIngredientScore = tempIngredientScore / userSkinConcerns.length;
+        if(userSkinConcerns.length > 0) {
+            tempIngredientScore = tempIngredientScore / userSkinConcerns.length;
+        }
         ingredientConcernsScore += tempIngredientScore;
     }
-    productConcernsScore = productConcernsScore / userSkinConcerns.length; // proportion of skin concerns satisfied by product, userSkinConcerns.length is nonzero
-    ingredientConcernsScore /= product.ingredients.length; // average concerns score of ingredients
+    if(userSkinConcerns.length > 0) {
+        productConcernsScore = productConcernsScore / userSkinConcerns.length; // proportion of skin concerns satisfied by product, userSkinConcerns.length is nonzero
+    }
+    if(product.ingredients.length > 0) {
+        ingredientConcernsScore /= product.ingredients.length; // average concerns score of ingredients
+    }
 
     // ========== get popularity score of product ==========
     let popularityScore = 0;
@@ -56,10 +68,10 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     // get overlap with loved products
     let lovedProductOverlapScore = 0;
     let lovedProductIngredientSimilarityScore = 0;
-    let isProductLoved = false;
+    let duplicateSubtraction = 0;
     for (const lovedProduct of lovedProducts) {
         if(lovedProduct.id === product.id) { // ignore if product is already loved
-            isProductLoved = true;
+            duplicateSubtraction = 1;
             continue;
         }
 
@@ -73,9 +85,9 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
             product.ingredients.map(i => i.id)
         );
     }
-    if(lovedProducts.length - (isProductLoved ? 1 : 0) > 0) {
+    if(lovedProducts.length - duplicateSubtraction > 0) {
         // subtract by 1 if product is already loved, to avoid double counting
-        lovedProductOverlapScore += lovedProductIngredientSimilarityScore / (lovedProducts.length - (isProductLoved ? 1 : 0)); // average jaccard score of loved products
+        lovedProductOverlapScore += lovedProductIngredientSimilarityScore / (lovedProducts.length - duplicateSubtraction); // average jaccard score of loved products
     }
 
     // penalize for overlap with disliked products
@@ -104,12 +116,19 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     const bonusScore = lovedProductOverlapScore + dislikedProductOverlapScore;
 
     // ========== combine all scores ===========
+    let weights = {}; // can adjust weights further
+    weights['productSkinTypeScore'] = 5;
+    weights['ingredientSkinTypeScore'] = 1;
+    weights['productConcernsScore'] = 2.5;
+    weights['ingredientConcernsScore'] = 0.5;
+    weights['popularityScore'] = 1;
+
     let totalScore = 0;
-    totalScore += productSkinTypeScore * 5; // can adjust weights further
-    totalScore += ingredientSkinTypeScore * 1;
-    totalScore += productConcernsScore * 2.5;
-    totalScore += ingredientConcernsScore * 0.5;
-    totalScore += popularityScore * 1;
+    totalScore += productSkinTypeScore * weights['productSkinTypeScore'];
+    totalScore += ingredientSkinTypeScore * weights['ingredientSkinTypeScore'];
+    totalScore += productConcernsScore * weights['productConcernsScore'];
+    totalScore += ingredientConcernsScore * weights['ingredientConcernsScore'];
+    totalScore += popularityScore * weights['popularityScore'];
     totalScore += bonusScore;
 
     // in theory, a product can get above 10 points with bonus score, so cap it at 10
