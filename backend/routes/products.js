@@ -1,6 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
+const computeProductScore = require('./helper-functions.js');
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -38,79 +39,155 @@ termToEnum['retinoid'] = ProductTypes.retinol;
 
 
 // http://localhost:3000/products
+// router.get('/products', async (req, res) => {
+//     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
+//     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
+//     const searchTerm = req.query.searchTerm ? req.query.searchTerm : ""; // default to "" if no search term
+//     const offset = (page - 1) * limit;
+
+//     if (!req.session.userId) {
+//         return res.status(401).json({ error: "you must be logged in to perform this action" })
+//     }
+
+
+//     if(searchTerm === ""){
+//         try {
+//             const products = await prisma.productInfo.findMany({
+//                 skip: offset,
+//                 take: limit,
+//                 include: { ingredients: true }
+//             });
+//             //RES NOW HAS TWO ELEMENTS IN JSON
+//             res.status(200).json({
+//                 totalProducts: products.length,
+//                 products});
+//         } catch (error) {
+//             console.error(error);
+//             res.status(500).json({ error: "error fetching user products" })
+//         }
+//     }
+//     else{
+
+//         stopWords = ["skin", "and", "for", "face"]
+//         let foundProducts = [];
+//         let cleanedSearchTerm = searchTerm.replace(/-/g, " ")
+//         const queryArray = cleanedSearchTerm.split(" ")
+//             .filter((q) => {
+//                 if(!stopWords.includes(q)){
+//                     return q;
+//                 }
+//             }) // remove filler words from query, can add more later
+//             .map(q => (q in termToEnum) ? termToEnum[q] : q) // map terms to enums
+//             .map(q => q.toLowerCase());
+//         //TODO: make everything lowercase, clean hyphens and plus signs, delegate logic elsewhere
+//         //TODO: fix search
+
+//         try {
+//             foundProducts = await prisma.productInfo.findMany({
+//                 where: {
+//                     AND: queryArray.map(q => ({
+//                         OR: [
+//                             { brand: { contains: q} },
+//                             { name: { contains: q} },
+//                             { product_type: { equals: ProductTypes[q] } },
+//                             { concerns: { has: q } }, // Use has for exact match in array
+//                             { skin_type: { has : (SkinTypes[q] ? SkinTypes[q] : null) } } // Use has for exact match in array
+//                         ]
+//                     }))},
+//                 skip: offset,
+//                 take: limit,
+//                 include: { ingredients: true }
+//             });
+
+//             // Remove duplicates based on product ID
+//             const uniqueFoundProducts = foundProducts.filter((product, index, self) =>
+//                 index === self.findIndex((p) => p.id === product.id)
+//             );
+
+//             res.status(200).json({
+//                 totalProducts: uniqueFoundProducts.length,
+//                 products: uniqueFoundProducts
+//             });
+//         } catch (error) {
+//             console.error(error);
+//             res.status(500).json({ error: "error fetching queried products" });
+//         }
+//     }
+// });
+
+// trying to update the function here to test new ranking functionality
 router.get('/products', async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
     const searchTerm = req.query.searchTerm ? req.query.searchTerm : ""; // default to "" if no search term
     const offset = (page - 1) * limit;
+    const id = req.session.userId;
 
-    if (!req.session.userId) {
+    if (!id) {
         return res.status(401).json({ error: "you must be logged in to perform this action" })
     }
 
+    // Retrieve the user
+    const userInfo = await prisma.user.findUnique({
+        where: { id: id },
+        include: {
+            loved_products: {
+                include: {
+                    ingredients: true, // Include ingredients for loved products
+                },
+            },
+            disliked_products: {
+                include: {
+                    ingredients: true
+                }
+            }
+        }
+    });
+
+    if (!userInfo) {
+        return res.status(404).send({ message: "user not found" });
+    }
 
     if(searchTerm === ""){
+        let productCandidates = [];
         try {
-            const products = await prisma.productInfo.findMany({
-                skip: offset,
-                take: limit,
-                include: { ingredients: true }
-            });
-            //RES NOW HAS TWO ELEMENTS IN JSON
-            res.status(200).json({
-                totalProducts: products.length,
-                products});
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: "error fetching user products" })
-        }
-    }
-    else{
-
-        stopWords = ["skin", "and", "for", "face"]
-        let foundProducts = [];
-        let cleanedSearchTerm = searchTerm.replace(/-/g, " ")
-        const queryArray = cleanedSearchTerm.split(" ")
-            .filter((q) => {
-                if(!stopWords.includes(q)){
-                    return q;
-                }
-            }) // remove filler words from query, can add more later
-            .map(q => (q in termToEnum) ? termToEnum[q] : q) // map terms to enums
-            .map(q => q.toLowerCase());
-        //TODO: make everything lowercase, clean hyphens and plus signs, delegate logic elsewhere
-        //TODO: fix search
-
-        try {
-            foundProducts = await prisma.productInfo.findMany({
+            productCandidates = await prisma.productInfo.findMany({
                 where: {
-                    AND: queryArray.map(q => ({
-                        OR: [
-                            { brand: { contains: q} },
-                            { name: { contains: q} },
-                            { product_type: { equals: ProductTypes[q] } },
-                            { concerns: { has: q } }, // Use has for exact match in array
-                            { skin_type: { has : (SkinTypes[q] ? SkinTypes[q] : null) } } // Use has for exact match in array
-                        ]
-                    }))},
-                skip: offset,
-                take: limit,
-                include: { ingredients: true }
-            });
-
-            // Remove duplicates based on product ID
-            const uniqueFoundProducts = foundProducts.filter((product, index, self) =>
-                index === self.findIndex((p) => p.id === product.id)
-            );
-
-            res.status(200).json({
-                totalProducts: uniqueFoundProducts.length,
-                products: uniqueFoundProducts
+                    OR : [ { skin_type: {hasSome: userInfo.skin_type} },
+                        { concerns: {hasSome: userInfo.concerns} } ]
+                },
+                include: { ingredients: true,
+                            loved_by_user: true,
+                            disliked_by_user: true },
+                take: 200 // limit to 200 products for now (though there are only 70)
             });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "error fetching queried products" });
+            res.status(500).json({ error: "error fetching products" })
         }
+
+        let scoredProducts = productCandidates.map((product) => {
+            return {
+                id: product.id,
+                brand: product.brand,
+                name: product.name,
+                image: product.image,
+                product_type: product.product_type,
+                price: product.price,
+                concerns: product.concerns,
+                skin_type: product.skin_type,
+                ingredients: product.ingredients,
+                loved_by_user: product.loved_by_user,
+                disliked_by_user: product.disliked_by_user,
+                score: computeProductScore(product, userInfo.loved_products, userInfo.disliked_products, userInfo.skin_type, userInfo.concerns)
+            };
+        });
+
+        scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
+        res.status(200).json({
+            totalProducts: scoredProducts.length,
+            products: scoredProducts,
+        });
     }
 });
 
