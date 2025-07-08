@@ -161,7 +161,23 @@ const cleanSearchQuery = (searchTerm) => {
         .map(q => q.toLowerCase());
 
     return queryArray;
-
 }
 
-module.exports = {computeProductScore, cleanSearchQuery};
+// returns same array of products, but with scores as a field
+const updateProductsWithScore = (products, user) => {
+    return products.map((product) => {
+        return {
+            id: product.id,
+            brand: product.brand,
+            name: product.name,
+            image: product.image,
+            product_type: product.product_type,
+            price: product.price,
+            concerns: product.concerns,
+            skin_type: product.skin_type,
+            ingredients: product.ingredients,
+            score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns)};
+    })
+}
+
+module.exports = {computeProductScore, cleanSearchQuery, updateProductsWithScore};

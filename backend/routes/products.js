@@ -1,7 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
-const {computeProductScore, cleanSearchQuery} = require('./helper-functions.js');
+const {cleanSearchQuery, updateProductsWithScore} = require('./helper-functions.js');
 const prisma = new PrismaClient()
 const router = express.Router()
 
@@ -37,7 +37,7 @@ router.get('/products', async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "error fetching user" })
+        res.status(500).json({ error: "error fetching user" });
     }
 
     if (!userInfo) {
@@ -94,23 +94,7 @@ router.get('/products', async (req, res) => {
         }
     }
 
-    let scoredProducts = productCandidates.map((product) => {
-        return {
-            id: product.id,
-            brand: product.brand,
-            name: product.name,
-            image: product.image,
-            product_type: product.product_type,
-            price: product.price,
-            concerns: product.concerns,
-            skin_type: product.skin_type,
-            ingredients: product.ingredients,
-            loved_by_user: product.loved_by_user,
-            disliked_by_user: product.disliked_by_user,
-            score: computeProductScore(product, userInfo.loved_products, userInfo.disliked_products, userInfo.skin_type, userInfo.concerns)
-        };
-    });
-
+    let scoredProducts = updateProductsWithScore(productCandidates, userInfo);
     scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
     res.status(200).json({
         totalProducts: scoredProducts.length,
