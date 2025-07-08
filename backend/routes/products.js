@@ -148,8 +148,8 @@ router.get('/products', async (req, res) => {
         return res.status(404).send({ message: "user not found" });
     }
 
+    let productCandidates = [];
     if(searchTerm === ""){
-        let productCandidates = [];
         try {
             productCandidates = await prisma.productInfo.findMany({
                 where: {
@@ -165,30 +165,71 @@ router.get('/products', async (req, res) => {
             console.error(error);
             res.status(500).json({ error: "error fetching products" })
         }
-
-        let scoredProducts = productCandidates.map((product) => {
-            return {
-                id: product.id,
-                brand: product.brand,
-                name: product.name,
-                image: product.image,
-                product_type: product.product_type,
-                price: product.price,
-                concerns: product.concerns,
-                skin_type: product.skin_type,
-                ingredients: product.ingredients,
-                loved_by_user: product.loved_by_user,
-                disliked_by_user: product.disliked_by_user,
-                score: computeProductScore(product, userInfo.loved_products, userInfo.disliked_products, userInfo.skin_type, userInfo.concerns)
-            };
-        });
-
-        scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
-        res.status(200).json({
-            totalProducts: scoredProducts.length,
-            products: scoredProducts,
-        });
     }
+    else{
+        //TODO: delegate logic elsewhere
+        //TODO: fix search
+        stopWords = ["skin", "and", "for", "face"];
+        let cleanedSearchTerm = searchTerm.replace(/-/g, " ");
+        const queryArray = cleanedSearchTerm.split(" ")
+            .filter((q) => {
+                if(!stopWords.includes(q)){
+                    return q;
+                }
+            }) // remove filler words from query, can add more later
+            .map(q => (q in termToEnum) ? termToEnum[q] : q) // map terms to enums
+            .map(q => q.toLowerCase());
+
+        try {
+            productCandidates = await prisma.productInfo.findMany({
+                where: {
+                    AND: queryArray.map(q => ({
+                        OR: [
+                            { brand: { contains: q} },
+                            { name: { contains: q} },
+                            { product_type: { equals: ProductTypes[q] } },
+                            { concerns: { has: q } }, // Use has for exact match in array
+                            { skin_type: { has : (SkinTypes[q] ? SkinTypes[q] : null) } } // Use has for exact match in array
+                        ]
+                    }))},
+                    include: { ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true },
+                    take: 200 // limit to 200 products for now (though there are only 70)
+            });
+
+            // Remove duplicates based on product ID
+            productCandidates = productCandidates.filter((product, index, self) =>
+                index === self.findIndex((p) => p.id === product.id)
+            );
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "error fetching queried products" });
+        }
+    }
+
+    let scoredProducts = productCandidates.map((product) => {
+        return {
+            id: product.id,
+            brand: product.brand,
+            name: product.name,
+            image: product.image,
+            product_type: product.product_type,
+            price: product.price,
+            concerns: product.concerns,
+            skin_type: product.skin_type,
+            ingredients: product.ingredients,
+            loved_by_user: product.loved_by_user,
+            disliked_by_user: product.disliked_by_user,
+            score: computeProductScore(product, userInfo.loved_products, userInfo.disliked_products, userInfo.skin_type, userInfo.concerns)
+        };
+    });
+
+    scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
+    res.status(200).json({
+        totalProducts: scoredProducts.length,
+        products: scoredProducts,
+    });
 });
 
 // http://localhost:3000/change-product-image
