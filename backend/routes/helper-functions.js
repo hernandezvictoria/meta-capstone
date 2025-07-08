@@ -113,8 +113,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     totalScore += bonusScore;
 
     // in theory, a product can get above 10 points with bonus score, so cap it at 10
-    totalScore = Math.min(totalScore, 10);
-    return totalScore;
+    const roundedScore = Math.round(totalScore * 10) / 10; // round to 1 decimal place
+    return(Math.min(roundedScore, 10));
 }
 
 module.exports = computeProductScore;
