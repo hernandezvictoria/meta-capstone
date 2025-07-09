@@ -50,7 +50,6 @@ router.post('/signup', async (req, res) => {
 // Login Route: http://localhost:3000/login
 router.post('/login', async (req, res) => {
     const { username, password } = req.body
-
     try {
         if (!username || !password) {
             return res.status(400).json({ error: "username and password are required" })

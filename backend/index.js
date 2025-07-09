@@ -2,9 +2,16 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const session = require('express-session')
+const {createClient} = require('redis')
+const {RedisStore} = require('connect-redis')
 
-const { SkinTypes, SkinConcerns } = require('./enums');
 
+const client = createClient({
+  url: "rediss://default:ActfAAIjcDE3MzNjNjJmNTUyMGY0NDFmODIwZWIzOWE0ZWI0MzBhNXAxMA@distinct-muskox-52063.upstash.io:6379"
+});
+
+client.on('error', (err) => console.error('Redis Client Error', err));
+client.connect().catch(console.error);
 
 const PORT = 3000
 
@@ -26,7 +33,15 @@ app.use(cors({
 
 app.use(express.json());
 
+// app.use(session({
+//     secret: 'capstone',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1-hour session
+// }))
+
 app.use(session({
+    store: new RedisStore({ client: client }),
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
