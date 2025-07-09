@@ -29,12 +29,7 @@ app.use(session({
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
-    cookie: {
-        secure: true,           // Must be true for HTTPS
-        httpOnly: true,
-        sameSite: 'none',       // Required for cross-site cookies
-        maxAge: 1000 * 60 * 60  // 1 hour
-    }
+    cookie: cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 }
 }))
 
 app.use(authRoutes);
