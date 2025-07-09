@@ -15,19 +15,17 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         let tempIngredientScore = 0;
         for (ingredient of product.ingredients) {
             if (ingredient.skin_type.includes(skinType)) {
-                tempIngredientScore += 1; // add up ingredient skin type matches
+                tempIngredientScore = 1; // if at least one of the ingredients matches the skin type, get a point
             }
-        }
-        if(userSkinType.length > 0) {
-            tempIngredientScore = tempIngredientScore / userSkinType.length; // proportion of skin types satisfied by ingredient
         }
         ingredientSkinTypeScore += tempIngredientScore;
     }
     if(userSkinType.length > 0) {
-        productSkinTypeScore = productSkinTypeScore / userSkinType.length; // proportion of skin types satisfied by product
+        productSkinTypeScore /= userSkinType.length; // proportion of skin types satisfied by product
     }
     if(product.ingredients.length > 0) {
-        ingredientSkinTypeScore /= product.ingredients.length; // average skin type score of ingredients
+        // ingredientSkinTypeScore is the number of skin types satisfied by the ingredients' skin types
+        ingredientSkinTypeScore /= product.ingredients.length; // proportion of skin types satisfied by ingredients
     }
 
     // repeat for skin concern overlap
@@ -41,11 +39,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         let tempIngredientScore = 0;
         for (ingredient of product.ingredients) {
             if (ingredient.concerns.includes(concern)) {
-                tempIngredientScore += 1;
+                tempIngredientScore = 1;
             }
-        }
-        if(userSkinConcerns.length > 0) {
-            tempIngredientScore = tempIngredientScore / userSkinConcerns.length;
         }
         ingredientConcernsScore += tempIngredientScore;
     }
@@ -53,7 +48,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         productConcernsScore = productConcernsScore / userSkinConcerns.length; // proportion of skin concerns satisfied by product, userSkinConcerns.length is nonzero
     }
     if(product.ingredients.length > 0) {
-        ingredientConcernsScore /= product.ingredients.length; // average concerns score of ingredients
+        ingredientConcernsScore /= product.ingredients.length; // proportion of skin concerns satisfied by ingredients
     }
 
     // ========== get popularity score of product ==========
