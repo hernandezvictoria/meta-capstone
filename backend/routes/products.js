@@ -143,9 +143,29 @@ router.put('/change-product-image/:productId', async (req, res) => {
     }
 })
 
+router.get('/products/:productId', async (req, res) => {
+    const productId = parseInt(req.params.productId);
+
+    try {
+        // Retrieve the current product
+        const product = await prisma.productInfo.findUnique({
+            where: { id: productId },
+            include: { ingredients: true,
+                loved_by_user: true,
+                disliked_by_user: true }
+        });
+
+        res.status(200).json(product);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while fetching product" });
+    }
+});
+
 // like/unlike products
 router.put('/toggle-like/:productId', async (req, res) => {
-    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
 
     if (!userId) {
