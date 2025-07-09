@@ -19,7 +19,7 @@ const { ValidationError } = require('./middleware/CustomErrors')
 
 // Configure CORS to allow requests from your frontend's origin and include credentials
 app.use(cors({
-    origin: 'http://localhost:5173', // frontend's origin
+    origin: 'https://meta-capstone-cy5u.onrender.com', // frontend's origin
     credentials: true
 }))
 
