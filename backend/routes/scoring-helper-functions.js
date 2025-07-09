@@ -1,7 +1,7 @@
 var jaccard = require('jaccard');
 
 // given a product, compute its score based on user preferences
-const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns) => {
+const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, totalUsers) => {
 
     // =========== get overlap between skin types and skin concerns ===========
     // skin type overlap
@@ -55,9 +55,10 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     let popularityScore = 0;
     const likeCount = product.loved_by_user.length;
     const dislikeCount = product.disliked_by_user.length;
-    if (likeCount + dislikeCount > 0) { // else, score remains zero
-        popularityScore = (likeCount - dislikeCount) / (likeCount + dislikeCount); // normalize by total count
+    if (totalUsers > 0) {
+        popularityScore = (likeCount - dislikeCount) / totalUsers; // normalize by total number of users
     }
+
 
     // ========== bonus points: overlap with loved and disliked products ===========
     // get overlap with loved products
@@ -88,10 +89,10 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     // penalize for overlap with disliked products
     let dislikedProductOverlapScore = 0;
     let dislikedProductIngredientSimilarityScore = 0;
-    let isProductDisliked = false;
+    duplicateSubtraction = 0;
     for(const dislikedProduct of dislikedProducts) {
         if(dislikedProduct.id === product.id) { // ignore if product is already disliked
-            isProductDisliked = true;
+            duplicateSubtraction = 1;
             continue;
         }
 
@@ -104,8 +105,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
             product.ingredients.map(i => i.id)
         ) // penalize for ingredient overlap
     }
-    if(dislikedProducts.length - (isProductDisliked ? 1 : 0) > 0) {
-        dislikedProductOverlapScore += dislikedProductIngredientSimilarityScore / (dislikedProducts.length - (isProductDisliked ? 1 : 0)); // average jaccard score of disliked products
+    if(dislikedProducts.length - duplicateSubtraction > 0) {
+        dislikedProductOverlapScore += dislikedProductIngredientSimilarityScore / (dislikedProducts.length - duplicateSubtraction); // average jaccard score of disliked products
     }
 
     const bonusScore = lovedProductOverlapScore + dislikedProductOverlapScore;
