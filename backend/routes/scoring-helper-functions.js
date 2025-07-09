@@ -126,8 +126,10 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     totalScore += popularityScore * weights['popularityScore'];
     totalScore += bonusScore;
 
-    // in theory, a product can get above 10 points with bonus score, so cap it at 10
+    // cap score between 0 and 10
     totalScore = Math.min(totalScore, 10);
+    totalScore = Math.max(totalScore, 0);
+    totalScore = Math.round(totalScore * 10) / 10; // round to 1 decimal place
     return totalScore;
 }
 
