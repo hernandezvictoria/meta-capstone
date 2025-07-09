@@ -5,7 +5,6 @@ const session = require('express-session')
 
 const { SkinTypes, SkinConcerns } = require('./enums');
 
-
 const PORT = 3000
 
 app.get('/', (req, res) => {
@@ -30,7 +29,12 @@ app.use(session({
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1-hour session
+    cookie: {
+        secure: true,           // Must be true for HTTPS
+        httpOnly: true,
+        sameSite: 'none',       // Required for cross-site cookies
+        maxAge: 1000 * 60 * 60  // 1 hour
+    }
 }))
 
 app.use(authRoutes);
