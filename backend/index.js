@@ -5,7 +5,6 @@ const session = require('express-session')
 
 const { SkinTypes, SkinConcerns } = require('./enums');
 
-
 const PORT = 3000
 
 app.get('/', (req, res) => {
@@ -20,7 +19,7 @@ const { ValidationError } = require('./middleware/CustomErrors')
 
 // Configure CORS to allow requests from your frontend's origin and include credentials
 app.use(cors({
-    origin: 'http://localhost:5173', // frontend's origin
+    origin: 'https://meta-capstone-cy5u.onrender.com', // frontend's origin
     credentials: true
 }))
 
@@ -30,7 +29,12 @@ app.use(session({
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1-hour session
+    cookie: {
+        secure: true,           // Only over HTTPS
+        httpOnly: true,
+        sameSite: 'none',       // Required for cross-site cookies
+        maxAge: 1000 * 60 * 60
+    }
 }))
 
 app.use(authRoutes);
