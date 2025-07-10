@@ -93,8 +93,8 @@ router.get('/products', async (req, res) => {
             res.status(500).json({ error: "error fetching queried products" });
         }
     }
-
-    let scoredProducts = updateProductsWithScore(productCandidates, userInfo);
+    const users = await prisma.user.findMany();
+    let scoredProducts = updateProductsWithScore(productCandidates, userInfo, users?.length);
     scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
     res.status(200).json({
         totalProducts: scoredProducts.length,

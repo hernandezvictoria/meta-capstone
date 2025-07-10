@@ -84,14 +84,15 @@ router.get('/user-info', async(req, res) => {
         return res.status(404).send({ message: "user not found" });
     }
 
+    const users = await prisma.user.findMany();
     // do not include user id or user hashed password
     res.status(200).json({
         username: user.username,
         concerns: user.concerns,
         skin_type: user.skin_type,
-        loved_products: updateProductsWithScore(user.loved_products, user),
-        saved_products: updateProductsWithScore(user.saved_products, user),
-        disliked_products: updateProductsWithScore(user.disliked_products, user)
+        loved_products: updateProductsWithScore(user.loved_products, user, users?.length),
+        saved_products: updateProductsWithScore(user.saved_products, user, users?.length),
+        disliked_products: updateProductsWithScore(user.disliked_products, user, users?.length)
     })
 })
 
@@ -163,10 +164,11 @@ router.get('/user-liked-saved-disliked', async (req, res) => {
                 }
             }
         });
+        const users = await prisma.user.findMany();
         res.status(200).json({
-            loved_products: updateProductsWithScore(user.loved_products, user),
-            saved_products: updateProductsWithScore(user.saved_products, user),
-            disliked_products: updateProductsWithScore(user.disliked_products, user)
+            loved_products: updateProductsWithScore(user.loved_products, user, users?.length),
+            saved_products: updateProductsWithScore(user.saved_products, user, users?.length),
+            disliked_products: updateProductsWithScore(user.disliked_products, user, users?.length)
         });
     } catch(error){
         console.error(error);

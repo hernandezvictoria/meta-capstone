@@ -3,7 +3,6 @@ const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
 // given a product, compute its score based on user preferences
 const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, totalUsers) => {
-
     // =========== get overlap between skin types and skin concerns ===========
     // skin type overlap
     let productSkinTypeScore = 0;
@@ -182,7 +181,7 @@ const cleanSearchQuery = (searchTerm) => {
 }
 
 // returns same array of products, but with scores as a field
-const updateProductsWithScore = (products, user) => {
+const updateProductsWithScore = (products, user, totalUsers) => {
     return products.map((product) => {
         return {
             id: product.id,
@@ -194,7 +193,7 @@ const updateProductsWithScore = (products, user) => {
             concerns: product.concerns,
             skin_type: product.skin_type,
             ingredients: product.ingredients,
-            score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns)};
+            score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns, totalUsers)};
     })
 }
 
