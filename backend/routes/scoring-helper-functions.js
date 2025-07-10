@@ -12,13 +12,9 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
             productSkinTypeScore += 1; // add up product skin type matches
         }
 
-        let tempIngredientScore = 0;
-        for (ingredient of product.ingredients) {
-            if (ingredient.skin_type.includes(skinType)) {
-                tempIngredientScore = 1; // if at least one of the ingredients matches the skin type, get a point
-            }
+        if(product.ingredients.some(ingredient => ingredient.skin_type.includes(skinType))){
+            ingredientSkinTypeScore += 1; // if at least one of the ingredients matches the skin type, get a point
         }
-        ingredientSkinTypeScore += tempIngredientScore;
     }
     if(userSkinType.length > 0) {
         productSkinTypeScore /= userSkinType.length; // proportion of skin types satisfied by product
@@ -36,13 +32,9 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
             productConcernsScore += 1;
         }
 
-        let tempIngredientScore = 0;
-        for (ingredient of product.ingredients) {
-            if (ingredient.concerns.includes(concern)) {
-                tempIngredientScore = 1;
-            }
+        if(product.ingredients.some(ingredient => ingredient.concerns.includes(concern))){
+            ingredientConcernsScore += 1; // if at least one of the ingredients matches the skin type, get a point
         }
-        ingredientConcernsScore += tempIngredientScore;
     }
     if(userSkinConcerns.length > 0) {
         productConcernsScore = productConcernsScore / userSkinConcerns.length; // proportion of skin concerns satisfied by product, userSkinConcerns.length is nonzero
