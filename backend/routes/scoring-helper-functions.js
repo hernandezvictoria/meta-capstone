@@ -1,6 +1,54 @@
 var jaccard = require('jaccard');
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
+const parseDislikedProducts = (dislikedProducts) => {
+    const dislikedProductsBrands = dislikedProducts.map(product => product.brand);
+    const dislikedBrands = new Set();
+    const brandFrequencies = {}; // count of each brand
+    for (const brand of dislikedProductsBrands) {
+        brandFrequencies[brand] = (brandFrequencies[brand] || 0) + 1;
+        if(brandFrequencies[brand] >= 3) {
+            dislikedBrands.add(brand);
+        }
+    }
+
+    const dislikedProductsIngredients = dislikedProducts.map(product => product.ingredients.map(ingredient => ingredient.id)).flat();
+    const dislikedIngredients = new Set();
+    const ingredientFrequencies = {}; // count of each brand
+    for (const ingredient of dislikedProductsIngredients) {
+        ingredientFrequencies[ingredient] = (ingredientFrequencies[ingredient] || 0) + 1;
+        if(ingredientFrequencies[ingredient] >= 5) {
+            dislikedIngredients.add(ingredient);
+        }
+    }
+    // list of brand names that appeared greater than 3 times, list of ingredient ids that appeared greater than 5 times
+    return {dislikedBrands, dislikedIngredients};
+}
+
+const parseLikedProducts = (likedProducts) => {
+    const likedProductsBrands = likedProducts.map(product => product.brand);
+    const likedBrands = new Set();
+    const brandFrequencies = {}; // count of each brand
+    for (const brand of likedProductsBrands) {
+        brandFrequencies[brand] = (brandFrequencies[brand] || 0) + 1;
+        if(brandFrequencies[brand] >= 3) {
+            likedBrands.add(brand);
+        }
+    }
+
+    const likedProductsIngredients = likedProducts.map(product => product.ingredients.map(ingredient => ingredient.id)).flat();
+    const likedIngredients = new Set();
+    const ingredientFrequencies = {}; // count of each brand
+    for (const ingredient of likedProductsIngredients) {
+        ingredientFrequencies[ingredient] = (ingredientFrequencies[ingredient] || 0) + 1;
+        if(ingredientFrequencies[ingredient] >= 4) {
+            likedIngredients.add(ingredient);
+        }
+    }
+    // list of brand names, list of ingredient ids
+    return {likedBrands, likedIngredients};
+}
+
 // given a product, compute its score based on user preferences
 const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, totalUsers) => {
     // =========== get overlap between skin types and skin concerns ===========
@@ -54,6 +102,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
 
     // ========== bonus points: overlap with loved and disliked products ===========
     // get overlap with loved products
+    const lovedBrands = parseLikedProducts(lovedProducts).likedBrands;
+    const lovedIngredients = parseLikedProducts(lovedProducts).likedIngredients;
     let lovedProductOverlapScore = 0;
     let lovedProductIngredientSimilarityScore = 0;
     let isProductLoved = false;
@@ -65,7 +115,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         }
 
         if(lovedProduct.brand === product.brand) {
-            lovedProductOverlapScore += 0.1; // boost for loved brand
+            lovedProductOverlapScore += (lovedBrands.has(lovedProduct.brand) ? 0.2 : 0.1); // double boost if brand is well-liked
         }
 
         // jaccard index computes similarity between two sets
@@ -74,12 +124,22 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
             product.ingredients.map(i => i.id)
         );
     }
+
     if(!isProductLoved && lovedProducts.length > 0) {
         // subtract by 1 if product is already loved, to avoid double counting
         lovedProductOverlapScore += (lovedProductIngredientSimilarityScore / lovedProducts.length); // average jaccard score of loved products
     }
 
+    for(const ingredientId of lovedIngredients) {
+        console.log(ingredientId);
+        if(product.ingredients.some(i => i.id === ingredientId)) {
+            lovedProductOverlapScore += 0.5; // extra boost for loved ingredient
+        }
+    }
+
     // penalize for overlap with disliked products
+    const dislikedBrands = parseDislikedProducts(dislikedProducts).dislikedBrands;
+    const dislikedIngredients = parseDislikedProducts(dislikedProducts).dislikedIngredients;
     let dislikedProductOverlapScore = 0;
     let dislikedProductIngredientSimilarityScore = 0;
     let isProductDisliked = false;
@@ -91,7 +151,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         }
 
         if(dislikedProduct.brand === product.brand) {
-            dislikedProductOverlapScore -= 0.1; // penalize for disliked brand
+            dislikedProductOverlapScore -= (dislikedBrands.has(dislikedProduct.brand) ? 0.2 : 0.1); // penalize for disliked brand
         }
 
         dislikedProductIngredientSimilarityScore -= jaccard.index(
@@ -103,6 +163,13 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         dislikedProductOverlapScore += (dislikedProductIngredientSimilarityScore / dislikedProducts.length); // average jaccard score of disliked products
     }
 
+    for(const ingredientId of dislikedIngredients) {
+        if(product.ingredients.some(i => i.id === ingredientId)) {
+            dislikedProductOverlapScore -= 0.5; // penalize extra for disliked ingredient
+        }
+    }
+    lovedProductOverlapScore = Math.min(lovedProductOverlapScore, 2); // cap at 2
+    dislikedProductOverlapScore = Math.max(dislikedProductOverlapScore, -2); // cap at -2
     const bonusScore = lovedProductOverlapScore + dislikedProductOverlapScore;
 
     // ========== combine all scores ===========
@@ -120,7 +187,6 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     totalScore += ingredientConcernsScore * weights['ingredientConcernsScore'];
     totalScore += popularityScore * weights['popularityScore'];
     totalScore += bonusScore;
-
 
     // cap score between 0 and 10
     totalScore = Math.min(totalScore, 10);
