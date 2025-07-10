@@ -49,14 +49,22 @@ router.get('/products', async (req, res) => {
         try {
             productCandidates = await prisma.productInfo.findMany({
                 where: {
-                    OR : [ { skin_type: {hasSome: userInfo.skin_type} },
-                        { concerns: {hasSome: userInfo.concerns} } ]
+                    OR : [
+                        { skin_type: { hasSome: userInfo.skin_type } },
+                        { concerns: { hasSome: userInfo.concerns } }
+                    ]
                 },
                 include: { ingredients: true,
                             loved_by_user: true,
                             disliked_by_user: true },
                 take: 200 // limit to 200 products for now (though there are only 70)
             });
+            productCandidates = productCandidates.filter((p) => {
+                if(!userInfo.disliked_products.some((d) => d.id === p.id)){
+                    return p; // filter out products that are disliked by the user
+                }
+            })
+
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "error fetching products" })
@@ -93,8 +101,8 @@ router.get('/products', async (req, res) => {
             res.status(500).json({ error: "error fetching queried products" });
         }
     }
-
-    let scoredProducts = updateProductsWithScore(productCandidates, userInfo);
+    const users = await prisma.user.findMany();
+    let scoredProducts = updateProductsWithScore(productCandidates, userInfo, users?.length);
     scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
     res.status(200).json({
         totalProducts: scoredProducts.length,

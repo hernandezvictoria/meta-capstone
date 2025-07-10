@@ -11,7 +11,7 @@ const Profile = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch('${import.meta.env.VITE_BASE_URL}/logout', {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/logout`, {
                 method: 'POST',
                 credentials: 'include', // Include credentials
             });

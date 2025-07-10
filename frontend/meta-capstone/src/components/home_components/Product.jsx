@@ -2,7 +2,7 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
 
-function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
+function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type, score}) {
 
   const [displayImage, setDisplayImage] = useState(image);
   const [isLoading, setIsLoading] = useState(false);
@@ -121,6 +121,31 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     .catch((error) => setError("error while toggling dislike"));
   }
 
+  const getScoreClass = (score) => {
+    const scoreNum = parseFloat(score);
+    if(scoreNum <= 1.5){
+      return "score-1";
+    }
+    else if(scoreNum <= 3){
+      return "score-2";
+    }
+    else if(scoreNum <= 4.5){
+      return "score-3";
+    }
+    else if(scoreNum <= 6){
+      return "score-4";
+    }
+    else if(scoreNum <= 7.5){
+      return "score-5";
+    }
+    else if(scoreNum <= 9){
+      return "score-6";
+    }
+    else {
+      return "score-7";
+    }
+  }
+
   return (
     <div className="product" onClick={openModal}>
       { isLoading
@@ -131,19 +156,13 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
       <section className="product-info">
         <p className="product-brand">{brand}</p>
         <p className="product-name">{name}</p>
-        <section className="skin_type">
-          {skin_type.map(type => {
-            return(<p key={type} className="type_box">{type}</p>)
-            })
-          }
-        </section>
+        <p id={getScoreClass(score)} className="product-score">score: {score}</p>
+          <p>skin type(s): {skin_type.join(', ')}</p>
 
-        <section className="concerns">
           {concerns.map(concern => {
-              return(<p key={concern} className="concern_box">{concern}</p>)
+              return(<p key={concern} className="concern-box">{concern}</p>)
               })
           }
-        </section>
       </section>
       <section className="like-and-save">
           <button onClick={toggleLike}>{likedProducts.some(p => p.id === id) ? '♥️' : '♡'}</button>

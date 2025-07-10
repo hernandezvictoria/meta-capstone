@@ -27,6 +27,12 @@
     cursor:pointer;
 }
 
+.product-info{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .product-image{
     margin: 0;
     position: relative;
@@ -34,20 +40,24 @@
     border-radius: 14px;
 }
 
+
 .product-brand{
-    font-size: 90%;
+    font-size: 100%;
     color: #676767;
 }
 
 .concerns-and-type{
     display:flex;
+    overflow: wrap;
 }
 
 .product-name{
-    font-size:110%;
+    font-size:120%;
 }
 
-
+.type-box .concern-box{
+    padding: 10px;
+}
 
 .modal-overlay {
     position: fixed;
@@ -70,4 +80,41 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     border-radius: 15px;
     animation: fadeIn 0.3s ease-out;
+}
+
+.product-score{
+    font-size:110%;
+    padding:2%;
+    color: white;
+    width:30%;
+    border-radius: 10px;
+    margin:2% 0px;
+}
+
+#score-1{
+    background-color: #B60101;
+}
+
+#score-2{
+    background-color: #FC6F33
+}
+
+#score-3{
+   background-color: #D59C57
+}
+
+#score-4{
+    background-color: #EACA12
+}
+
+#score-5{
+    background-color: #8BC500
+}
+
+#score-6{
+    background-color: #4B8A10;
+}
+
+#score-7{
+    background-color: #006824;
 }

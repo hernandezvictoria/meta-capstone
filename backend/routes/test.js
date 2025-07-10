@@ -1,4 +1,4 @@
-const computeProductScore = require('./scoring-helper-functions.js');
+const {computeProductScore} = require('./scoring-helper-functions.js');
 
 const userInfo = {
 	"username": "victoria1",
