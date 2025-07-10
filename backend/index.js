@@ -27,18 +27,11 @@ const { ValidationError } = require('./middleware/CustomErrors')
 
 // Configure CORS to allow requests from your frontend's origin and include credentials
 app.use(cors({
-    origin: 'http://localhost:5173', // frontend's origin
+    origin: process.env.FRONTEND_URL, // frontend's origin
     credentials: true
 }))
 
 app.use(express.json());
-
-// app.use(session({
-//     secret: 'capstone',
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1-hour session
-// }))
 
 app.use(session({
     store: new RedisStore({ client: client }),

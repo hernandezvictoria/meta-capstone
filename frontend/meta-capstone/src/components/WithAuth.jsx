@@ -9,7 +9,7 @@ const WithAuth = (WrappedComponent) => {
 
         useEffect(() => {
             if (!user) {
-                fetch("http://localhost:3000/me", { credentials: "include" })
+                fetch(`${import.meta.env.VITE_BASE_URL}/me`, { credentials: "include" })
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.id) { // Ensure the response contains the user id

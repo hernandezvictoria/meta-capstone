@@ -25,7 +25,7 @@ const SignupForm = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:3000/signup", {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -46,7 +46,7 @@ const SignupForm = () => {
 
     const login = async () => {
         try {
-            const response = await fetch("http://localhost:3000/login", {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),

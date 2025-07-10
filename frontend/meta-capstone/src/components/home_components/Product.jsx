@@ -43,7 +43,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
   }
 
   const updateImageInDb = async(image) => {
-    fetch(`http://localhost:3000/change-product-image/${id}`, {
+    fetch(`${import.meta.env.VITE_BASE_URL}/change-product-image/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({image: image}),
@@ -63,7 +63,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
   const toggleLike = async(event) => {
     event.stopPropagation();
 
-    fetch(`http://localhost:3000/toggle-like/${id}`,
+    fetch(`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
       {method: "PUT",
       credentials: "include"})
     .then((response) => response.json())
@@ -83,7 +83,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleSave = async(event) => {
     event.stopPropagation();
-    fetch(`http://localhost:3000/toggle-save/${id}`,
+    fetch(`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
       {method: "PUT",
       credentials: "include"})
     .then((response) => response.json())
@@ -103,7 +103,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleDislike = async(event) => {
     event.stopPropagation();
-    fetch(`http://localhost:3000/toggle-dislike/${id}`,
+    fetch(`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
       {method: "PUT",
       credentials: "include"})
     .then((response) => response.json())
