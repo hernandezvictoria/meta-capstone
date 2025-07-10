@@ -19,7 +19,7 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
 
   const fetchAllData = async () => {
       setIsLoading(true);
-      fetch(`http://localhost:3000/products?page=${pageNum}&limit=${limit}&searchTerm=${searchTerm}`,
+      fetch(`${import.meta.env.VITE_BASE_URL}/products?page=${pageNum}&limit=${limit}&searchTerm=${searchTerm}`,
         {credentials: "include"})
       .then((response) => response.json())
       .then((res) => {
@@ -64,7 +64,7 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
   }, [searchTerm, pageNum])
 
   const fetchLikedSavedDisliked = async () => {
-    fetch(`http://localhost:3000/user-liked-saved-disliked`,
+    fetch(`${import.meta.env.VITE_BASE_URL}/user-liked-saved-disliked`,
       {credentials: "include"})
     .then((response) => response.json())
     .then((res) => {

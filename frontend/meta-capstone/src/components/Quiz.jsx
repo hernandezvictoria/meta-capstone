@@ -46,7 +46,7 @@ const Quiz = () => {
 
         //update skin type
         try {
-            const response = await fetch("http://localhost:3000/change-skin-type", {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/change-skin-type`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: skinTypesJson,
@@ -67,7 +67,7 @@ const Quiz = () => {
 
         //update skin concern
         try {
-            const response = await fetch("http://localhost:3000/change-skin-concerns", {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/change-skin-concerns`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: concernsJson,

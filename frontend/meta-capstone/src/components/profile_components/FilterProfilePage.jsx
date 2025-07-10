@@ -17,7 +17,7 @@ const FilterProfilePage = () => {
 
     const loadUserInfo = async () => {
         setIsLoading(true);
-        fetch(`http://localhost:3000/user-info`, { credentials: "include" })
+        fetch(`${import.meta.env.VITE_BASE_URL}/user-info`, { credentials: "include" })
         .then((response) => response.json())
         .then((res) => {
             setUsername(res.username);

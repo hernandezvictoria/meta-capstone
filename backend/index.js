@@ -2,8 +2,16 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const session = require('express-session')
+const {createClient} = require('redis')
+const {RedisStore} = require('connect-redis')
 
-const { SkinTypes, SkinConcerns } = require('./enums');
+
+const client = createClient({
+  url: "rediss://default:ActfAAIjcDE3MzNjNjJmNTUyMGY0NDFmODIwZWIzOWE0ZWI0MzBhNXAxMA@distinct-muskox-52063.upstash.io:6379"
+});
+
+client.on('error', (err) => console.error('Redis Client Error', err));
+client.connect().catch(console.error);
 
 const PORT = 3000
 
@@ -19,22 +27,20 @@ const { ValidationError } = require('./middleware/CustomErrors')
 
 // Configure CORS to allow requests from your frontend's origin and include credentials
 app.use(cors({
-    origin: 'https://meta-capstone-cy5u.onrender.com', // frontend's origin
+    origin: process.env.FRONTEND_URL, // frontend's origin
     credentials: true
 }))
 
 app.use(express.json());
 
 app.use(session({
+    store: new RedisStore({ client: client }),
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
-    cookie: {
-        secure: true,           // Only over HTTPS
-        httpOnly: true,
-        sameSite: 'none',       // Required for cross-site cookies
-        maxAge: 1000 * 60 * 60
-    }
+
+    cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 }
+
 }))
 
 app.use(authRoutes);
