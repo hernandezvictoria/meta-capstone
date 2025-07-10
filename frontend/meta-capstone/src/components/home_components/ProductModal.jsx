@@ -23,7 +23,7 @@ function ProductModal ({data, modalProductId, setError, setModalProductId}){
           <p className="product-brand">{product.brand}</p>
           <p className="product-name">{product.name}</p>
           <p className="product-type">{product.product_type}</p>
-          <p className="product-price">{product.price}</p>
+          <p className="product-price">${product.price}</p>
           <section className="skin_type">
             {product.skin_type.map(type => {
               return(<p key={type} className="type_box">{type}</p>)
