@@ -121,7 +121,8 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
               name={prod.name}
               concerns={prod.concerns}
               skin_type={prod.skin_type}
-              image={prod.image}/>);
+              image={prod.image}
+              score={prod.score}/>);
           })
         }
         </div>

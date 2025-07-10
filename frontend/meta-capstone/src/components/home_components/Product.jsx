@@ -2,7 +2,7 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
 
-function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type}) {
+function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type, score}) {
 
   const [displayImage, setDisplayImage] = useState(image);
   const [isLoading, setIsLoading] = useState(false);
@@ -144,6 +144,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
               })
           }
         </section>
+        <p className="product-score">score: {score}</p>
       </section>
       <section className="like-and-save">
           <button onClick={toggleLike}>{likedProducts.some(p => p.id === id) ? '♥️' : '♡'}</button>

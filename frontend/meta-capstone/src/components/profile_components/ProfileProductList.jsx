@@ -47,7 +47,8 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
                 name={prod.name}
                 concerns={prod.concerns}
                 skin_type={prod.skin_type}
-                image={prod.image}/>);
+                image={prod.image}
+                score={prod.score}/>);
             })
             }
             </div>
@@ -78,7 +79,8 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
                 name={prod.name}
                 concerns={prod.concerns}
                 skin_type={prod.skin_type}
-                image={prod.image}/>);
+                image={prod.image}
+                score={prod.score}/>);
             })
             }
             </div>
@@ -109,7 +111,8 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
                 name={prod.name}
                 concerns={prod.concerns}
                 skin_type={prod.skin_type}
-                image={prod.image}/>);
+                image={prod.image}
+                score={prod.score}/>);
             })
             }
             </div>
