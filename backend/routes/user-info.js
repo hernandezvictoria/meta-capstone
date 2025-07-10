@@ -1,6 +1,6 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
-
+const {updateProductsWithScore} = require('./helper-functions.js');
 const prisma = new PrismaClient()
 const router = express.Router()
 
@@ -46,26 +46,39 @@ router.get('/user-info', async(req, res) => {
     }
 
     // Retrieve the user
-    const user = await prisma.user.findUnique({
-        where: { id: id },
-        include: {
-            saved_products: {
-                include: {
-                    ingredients: true, // Include ingredients for saved products
+    let user;
+    try{
+        user = await prisma.user.findUnique({
+            where: { id: id },
+            include: {
+                saved_products: {
+                    include: {
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true
+                    },
                 },
-            },
-            loved_products: {
-                include: {
-                    ingredients: true, // Include ingredients for loved products
+                loved_products: {
+                    include: {
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true
+                    },
                 },
-            },
-            disliked_products: {
-                include: {
-                    ingredients: true
+                disliked_products: {
+                    include: {
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).send({ message: "An error occurred while fetching user's info" });
+    }
 
     if (!user) {
         return res.status(404).send({ message: "user not found" });
@@ -76,9 +89,9 @@ router.get('/user-info', async(req, res) => {
         username: user.username,
         concerns: user.concerns,
         skin_type: user.skin_type,
-        loved_products: user.loved_products,
-        saved_products: user.saved_products,
-        disliked_products: user.disliked_products
+        loved_products: updateProductsWithScore(user.loved_products, user),
+        saved_products: updateProductsWithScore(user.saved_products, user),
+        disliked_products: updateProductsWithScore(user.disliked_products, user)
     })
 })
 
@@ -129,24 +142,32 @@ router.get('/user-liked-saved-disliked', async (req, res) => {
             include: {
                 saved_products: {
                     include: {
-                        ingredients: true
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true
                     },
                 },
                 loved_products: {
                     include: {
-                        ingredients: true
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true
                     },
                 },
                 disliked_products: {
                     include: {
-                        ingredients: true
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true
                     }
-                }}
+                }
+            }
         });
         res.status(200).json({
-            saved_products: user.saved_products,
-            loved_products: user.loved_products,
-            disliked_products: user.disliked_products});
+            loved_products: updateProductsWithScore(user.loved_products, user),
+            saved_products: updateProductsWithScore(user.saved_products, user),
+            disliked_products: updateProductsWithScore(user.disliked_products, user)
+        });
     } catch(error){
         console.error(error);
         res.status(500).send({ message: "An error occurred while fetching user's liked, saved, and disliked products" });

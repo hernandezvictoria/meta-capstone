@@ -1,41 +1,9 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
-
+const {cleanSearchQuery, updateProductsWithScore} = require('./helper-functions.js');
 const prisma = new PrismaClient()
 const router = express.Router()
-
-
-const termToEnum = {}; // hm to store related terms to skin types and concerns
-
-// Add key-value pairs
-termToEnum['combo'] = SkinTypes.COMBINATION;
-termToEnum['wrinkles'] = SkinConcerns.WRINKLES;
-termToEnum['fine'] = SkinConcerns.WRINKLES;
-termToEnum['lines'] = SkinConcerns.WRINKLES;
-termToEnum['line'] = SkinConcerns.WRINKLES;
-termToEnum['rough'] = SkinConcerns.TEXTURE;
-termToEnum['smooth'] = SkinConcerns.TEXTURE;
-termToEnum['dark'] = SkinConcerns.HYPERPIGMENTATION;
-termToEnum['spots'] = SkinConcerns.HYPERPIGMENTATION;
-termToEnum['hyperpigmentation'] = SkinConcerns.HYPERPIGMENTATION;
-termToEnum['redness'] = SkinConcerns.REDNESS;
-termToEnum['irritation'] = SkinConcerns.REDNESS;
-termToEnum['damaged'] = SkinConcerns.REDNESS;
-termToEnum['red'] = SkinConcerns.REDNESS;
-termToEnum['acne'] = SkinConcerns.ACNE;
-termToEnum['blemish'] = SkinConcerns.ACNE;
-termToEnum['blemishes'] = SkinConcerns.ACNE;
-termToEnum['pimple'] = SkinConcerns.ACNE;
-termToEnum['pimples'] = SkinConcerns.ACNE;
-termToEnum['dull'] = SkinConcerns.DULLNESS;
-termToEnum['dry'] = SkinConcerns.DRYNESS;
-termToEnum['lotion'] = ProductTypes.moisturizer;
-termToEnum['eye'] = ProductTypes.eye_cream; // not a great soln for eye cream rn
-termToEnum['cream'] = ProductTypes.moisturizer;
-termToEnum['wash'] = ProductTypes.cleanser;
-termToEnum['retinoid'] = ProductTypes.retinol;
-
 
 // http://localhost:3000/products
 router.get('/products', async (req, res) => {
@@ -43,46 +11,63 @@ router.get('/products', async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
     const searchTerm = req.query.searchTerm ? req.query.searchTerm : ""; // default to "" if no search term
     const offset = (page - 1) * limit;
+    const id = req.session.userId;
 
-    if (!req.session.userId) {
+    if (!id) {
         return res.status(401).json({ error: "you must be logged in to perform this action" })
     }
 
+    let userInfo;
+    // Retrieve the user
+    try{
+        userInfo = await prisma.user.findUnique({
+            where: { id: id },
+            include: {
+                loved_products: {
+                    include: {
+                        ingredients: true, // Include ingredients for loved products
+                    },
+                },
+                disliked_products: {
+                    include: {
+                        ingredients: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "error fetching user" });
+    }
 
-    if(searchTerm === ""){
+    if (!userInfo) {
+        return res.status(404).send({ message: "user not found" });
+    }
+
+    let productCandidates = [];
+    if(searchTerm === ""){ // get all products if no search term
         try {
-            const products = await prisma.productInfo.findMany({
-                skip: offset,
-                take: limit,
-                include: { ingredients: true }
+            productCandidates = await prisma.productInfo.findMany({
+                where: {
+                    OR : [ { skin_type: {hasSome: userInfo.skin_type} },
+                        { concerns: {hasSome: userInfo.concerns} } ]
+                },
+                include: { ingredients: true,
+                            loved_by_user: true,
+                            disliked_by_user: true },
+                take: 200 // limit to 200 products for now (though there are only 70)
             });
-            //RES NOW HAS TWO ELEMENTS IN JSON
-            res.status(200).json({
-                totalProducts: products.length,
-                products});
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: "error fetching user products" })
+            res.status(500).json({ error: "error fetching products" })
         }
     }
-    else{
-
-        stopWords = ["skin", "and", "for", "face"]
-        let foundProducts = [];
-        let cleanedSearchTerm = searchTerm.replace(/-/g, " ")
-        const queryArray = cleanedSearchTerm.split(" ")
-            .filter((q) => {
-                if(!stopWords.includes(q)){
-                    return q;
-                }
-            }) // remove filler words from query, can add more later
-            .map(q => (q in termToEnum) ? termToEnum[q] : q) // map terms to enums
-            .map(q => q.toLowerCase());
-        //TODO: make everything lowercase, clean hyphens and plus signs, delegate logic elsewhere
+    else{ // filter products based on search term
         //TODO: fix search
+        const queryArray = cleanSearchQuery(searchTerm); // split search term into array of words
 
         try {
-            foundProducts = await prisma.productInfo.findMany({
+            productCandidates = await prisma.productInfo.findMany({
                 where: {
                     AND: queryArray.map(q => ({
                         OR: [
@@ -93,25 +78,28 @@ router.get('/products', async (req, res) => {
                             { skin_type: { has : (SkinTypes[q] ? SkinTypes[q] : null) } } // Use has for exact match in array
                         ]
                     }))},
-                skip: offset,
-                take: limit,
-                include: { ingredients: true }
+                    include: { ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true },
+                    take: 200 // limit to 200 products for now (though there are only 70)
             });
 
             // Remove duplicates based on product ID
-            const uniqueFoundProducts = foundProducts.filter((product, index, self) =>
+            productCandidates = productCandidates.filter((product, index, self) =>
                 index === self.findIndex((p) => p.id === product.id)
             );
-
-            res.status(200).json({
-                totalProducts: uniqueFoundProducts.length,
-                products: uniqueFoundProducts
-            });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "error fetching queried products" });
         }
     }
+
+    let scoredProducts = updateProductsWithScore(productCandidates, userInfo);
+    scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
+    res.status(200).json({
+        totalProducts: scoredProducts.length,
+        products: scoredProducts,
+    });
 });
 
 // http://localhost:3000/change-product-image
