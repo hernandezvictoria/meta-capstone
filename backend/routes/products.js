@@ -1,7 +1,7 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
-const {cleanSearchQuery, updateProductsWithScore} = require('./helper-functions.js');
+const {cleanSearchQuery, updateProductsWithScore} = require('./scoring-helper-functions.js');
 const prisma = new PrismaClient()
 const router = express.Router()
 
