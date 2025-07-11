@@ -10,37 +10,39 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const loadImage = async () => {
     // if image is not in DB
-    if(!image){
-      setIsLoading(true);
-      console.error("no image in DB"); // throw error to be caught, sets display image to placeholder
-      const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-          'x-rapidapi-host': 'real-time-sephora-api.p.rapidapi.com'
-        }
-      };
+    setDisplayImage(placeholderImage);
+    updateImageInDb(placeholderImage);
+    // if(!image){
+    //   setIsLoading(true);
+    //   console.error("no image in DB"); // throw error to be caught, sets display image to placeholder
+    //   const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
+    //   const options = {
+    //     method: 'GET',
+    //     headers: {
+    //       'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+    //       'x-rapidapi-host': 'real-time-sephora-api.p.rapidapi.com'
+    //     }
+    //   };
 
-      fetch(url, options)
-      .then((response) => response.json())
-      .then((res) => {
-        const products_list = res.data.products;
-        if(products_list.length === 0){
-          throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
-        }
-        const fetchedImage = products_list[0].heroImage;
-        setDisplayImage(fetchedImage);
-        updateImageInDb(fetchedImage);
-      })
-      .catch((error) => {
-        setDisplayImage(placeholderImage);
-        updateImageInDb(placeholderImage);
-      })
-      .finally(() => {
-        setTimeout(() => setIsLoading(false), 500);
-      });
-    }
+    //   fetch(url, options)
+    //   .then((response) => response.json())
+    //   .then((res) => {
+    //     const products_list = res.data.products;
+    //     if(products_list.length === 0){
+    //       throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
+    //     }
+    //     const fetchedImage = products_list[0].heroImage;
+    //     setDisplayImage(fetchedImage);
+    //     updateImageInDb(fetchedImage);
+    //   })
+    //   .catch((error) => {
+    //     setDisplayImage(placeholderImage);
+    //     updateImageInDb(placeholderImage);
+    //   })
+    //   .finally(() => {
+    //     setTimeout(() => setIsLoading(false), 500);
+    //   });
+    // }
   }
 
   const updateImageInDb = async(image) => {
