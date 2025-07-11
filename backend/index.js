@@ -40,6 +40,10 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: process.env.NODE_ENV === "production",
             sameSite: 'none',
+            domain:
+            process.env.NODE_ENV === "production"
+            ? ".meta-capstone-cy5u.onrender.com"
+            : "localhost",
              httpOnly: true,
              maxAge: 1000 * 60 * 60 }
 }))
