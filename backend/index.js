@@ -43,6 +43,8 @@ app.use(session({
              maxAge: 1000 * 60 * 60 }
 }))
 
+app.set('trust proxy', 1)
+
 app.use(authRoutes);
 app.use(userRoutes);
 app.use(productRoutes);
