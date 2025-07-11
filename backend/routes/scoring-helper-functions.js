@@ -174,11 +174,19 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
 
     // ========== combine all scores ===========
     let weights = {}; // can adjust weights further
-    weights['productSkinTypeScore'] = 5;
-    weights['ingredientSkinTypeScore'] = 1;
-    weights['productConcernsScore'] = 2.5;
-    weights['ingredientConcernsScore'] = 0.5;
-    weights['popularityScore'] = 1;
+    if(product.ingredients.length > 0) {
+        weights['productSkinTypeScore'] = 5;
+        weights['ingredientSkinTypeScore'] = 1;
+        weights['productConcernsScore'] = 2.5;
+        weights['ingredientConcernsScore'] = 0.5;
+        weights['popularityScore'] = 1;
+    } else {
+        weights['productSkinTypeScore'] = 5.5;
+        weights['ingredientSkinTypeScore'] = 0;
+        weights['productConcernsScore'] = 3;
+        weights['ingredientConcernsScore'] = 0;
+        weights['popularityScore'] = 1.5;
+    }
 
     let totalScore = 0;
     totalScore += productSkinTypeScore * weights['productSkinTypeScore'];

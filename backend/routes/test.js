@@ -1652,9 +1652,29 @@ const product2 = {
 	"disliked_by_user": []
 }
 
+const product3 = { // no ingredients
+	"id": 8,
+	"brand": "Drunk Elephant",
+	"name": "Protini Polypeptide Cream",
+	"image": "https://www.sephora.com/productimages/sku/s2385748-main-zoom.jpg?imwidth=270&pb=clean-at-sephora",
+	"product_type": "moisturizer",
+	"price": "68",
+	"concerns": [
+		"fine lines & wrinkles",
+		"dryness"
+	],
+	"skin_type": [
+		"combination",
+		"normal"
+	],
+	"ingredients": [],
+	"loved_by_user": [],
+	"disliked_by_user": []
+}
+
 const testComputeScore = async () => {
-	const userInfo = user2;
-    const productToCheck = product2;
+	const userInfo = user3;
+    const productToCheck = product3;
     const lovedProducts = userInfo.loved_products;
     const dislikedProducts = userInfo.disliked_products;
     const userSkinType = userInfo.skin_type;
