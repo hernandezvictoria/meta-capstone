@@ -12,6 +12,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     // if image is not in DB
     if(!image){
       setIsLoading(true);
+      console.error("no image in DB"); // throw error to be caught, sets display image to placeholder
       const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
       const options = {
         method: 'GET',
