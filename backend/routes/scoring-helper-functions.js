@@ -1,7 +1,7 @@
 var jaccard = require('jaccard');
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
-const parseLikedDislikedProducts = (products) => {
+const parseLikedDislikedProductsBrands = (products) => {
     const brands = products.map(product => product.brand);
     const brandSet = new Set();
     const brandFrequencies = {}; // count of each brand
@@ -11,7 +11,10 @@ const parseLikedDislikedProducts = (products) => {
             brandSet.add(brand);
         }
     }
+    return brandSet;
+}
 
+const parseLikedDislikedProductsIngredients = (products) => {
     const ingredients = products.map(product => product.ingredients.map(ingredient => ingredient.id)).flat();
     const ingredientSet = new Set();
     const ingredientFrequencies = {}; // count of each ingredient
@@ -21,8 +24,8 @@ const parseLikedDislikedProducts = (products) => {
             ingredientSet.add(ingredient);
         }
     }
-    // list of brand names that appeared greater than 3 times, list of ingredient ids that appeared greater than 5 times
-    return {brands: brandSet, ingredients: ingredientSet};
+    //  list of ingredient ids that appeared greater than 5 times
+    return ingredientSet;
 }
 
 // given a product, compute its score based on user preferences
@@ -78,8 +81,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
 
     // ========== bonus points: overlap with loved and disliked products ===========
     // get overlap with loved products
-    const lovedBrands = parseLikedDislikedProducts(lovedProducts).brands;
-    const lovedIngredients = parseLikedDislikedProducts(lovedProducts).ingredients;
+    const lovedBrands = parseLikedDislikedProductsBrands(lovedProducts);
+    const lovedIngredients = parseLikedDislikedProductsIngredients(lovedProducts);
     let lovedProductOverlapScore = 0;
     let lovedProductIngredientSimilarityScore = 0;
     let isProductLoved = false;
@@ -113,8 +116,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     }
 
     // penalize for overlap with disliked products
-    const dislikedBrands = parseLikedDislikedProducts(dislikedProducts).brands;
-    const dislikedIngredients = parseLikedDislikedProducts(dislikedProducts).ingredients;
+    const dislikedBrands = parseLikedDislikedProductsBrands(dislikedProducts);
+    const dislikedIngredients = parseLikedDislikedProductsIngredients(dislikedProducts);
     let dislikedProductOverlapScore = 0;
     let dislikedProductIngredientSimilarityScore = 0;
     let isProductDisliked = false;
