@@ -29,7 +29,7 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
         if(pageNum === 1){
             if(res.products.length === 0){
               if(searchTerm === ""){
-                setError("unable to load products")
+                setError("no products to display")
               }
               else{
                 setError("no products match your search")
