@@ -38,8 +38,14 @@ app.use(session({
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 }
+    cookie: { secure: process.env.NODE_ENV === "production",
+             httpOnly: true,
+             maxAge: 1000 * 60 * 60 }
 }))
+
+if(process.env.NODE_ENV === "production") {
+    app.set('trust proxy', 1); // trust first proxy
+}
 
 app.use(authRoutes);
 app.use(userRoutes);
