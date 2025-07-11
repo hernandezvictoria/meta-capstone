@@ -1,52 +1,28 @@
 var jaccard = require('jaccard');
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
 
-const parseDislikedProducts = (dislikedProducts) => {
-    const dislikedProductsBrands = dislikedProducts.map(product => product.brand);
-    const dislikedBrands = new Set();
+const parseLikedDislikedProducts = (products) => {
+    const brands = products.map(product => product.brand);
+    const brandSet = new Set();
     const brandFrequencies = {}; // count of each brand
-    for (const brand of dislikedProductsBrands) {
+    for (const brand of brands) {
         brandFrequencies[brand] = (brandFrequencies[brand] || 0) + 1;
-        if(brandFrequencies[brand] >= 3) {
-            dislikedBrands.add(brand);
+        if(brandFrequencies[brand] >= 3) { // if brand appears 3 or more times, add to set
+            brandSet.add(brand);
         }
     }
 
-    const dislikedProductsIngredients = dislikedProducts.map(product => product.ingredients.map(ingredient => ingredient.id)).flat();
-    const dislikedIngredients = new Set();
-    const ingredientFrequencies = {}; // count of each brand
-    for (const ingredient of dislikedProductsIngredients) {
+    const ingredients = products.map(product => product.ingredients.map(ingredient => ingredient.id)).flat();
+    const ingredientSet = new Set();
+    const ingredientFrequencies = {}; // count of each ingredient
+    for (const ingredient of ingredients) {
         ingredientFrequencies[ingredient] = (ingredientFrequencies[ingredient] || 0) + 1;
-        if(ingredientFrequencies[ingredient] >= 5) {
-            dislikedIngredients.add(ingredient);
+        if(ingredientFrequencies[ingredient] >= 5) { // if ingredient appears 5 or more times, add to set
+            ingredientSet.add(ingredient);
         }
     }
     // list of brand names that appeared greater than 3 times, list of ingredient ids that appeared greater than 5 times
-    return {dislikedBrands, dislikedIngredients};
-}
-
-const parseLikedProducts = (likedProducts) => {
-    const likedProductsBrands = likedProducts.map(product => product.brand);
-    const likedBrands = new Set();
-    const brandFrequencies = {}; // count of each brand
-    for (const brand of likedProductsBrands) {
-        brandFrequencies[brand] = (brandFrequencies[brand] || 0) + 1;
-        if(brandFrequencies[brand] >= 3) {
-            likedBrands.add(brand);
-        }
-    }
-
-    const likedProductsIngredients = likedProducts.map(product => product.ingredients.map(ingredient => ingredient.id)).flat();
-    const likedIngredients = new Set();
-    const ingredientFrequencies = {}; // count of each brand
-    for (const ingredient of likedProductsIngredients) {
-        ingredientFrequencies[ingredient] = (ingredientFrequencies[ingredient] || 0) + 1;
-        if(ingredientFrequencies[ingredient] >= 4) {
-            likedIngredients.add(ingredient);
-        }
-    }
-    // list of brand names, list of ingredient ids
-    return {likedBrands, likedIngredients};
+    return {brands: brandSet, ingredients: ingredientSet};
 }
 
 // given a product, compute its score based on user preferences
@@ -102,8 +78,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
 
     // ========== bonus points: overlap with loved and disliked products ===========
     // get overlap with loved products
-    const lovedBrands = parseLikedProducts(lovedProducts).likedBrands;
-    const lovedIngredients = parseLikedProducts(lovedProducts).likedIngredients;
+    const lovedBrands = parseLikedDislikedProducts(lovedProducts).brands;
+    const lovedIngredients = parseLikedDislikedProducts(lovedProducts).ingredients;
     let lovedProductOverlapScore = 0;
     let lovedProductIngredientSimilarityScore = 0;
     let isProductLoved = false;
@@ -130,15 +106,15 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         lovedProductOverlapScore += (lovedProductIngredientSimilarityScore / lovedProducts.length); // average jaccard score of loved products
     }
 
-    for(const ingredientId of lovedIngredients) {
-        if(product.ingredients.some(i => i.id === ingredientId)) {
-            lovedProductOverlapScore += 0.5; // extra boost for loved ingredient
+    for(const ingredient of product.ingredients){
+        if(lovedIngredients.has(ingredient.id)) {
+            lovedProductOverlapScore += 0.5; // penalize extra for disliked ingredient
         }
     }
 
     // penalize for overlap with disliked products
-    const dislikedBrands = parseDislikedProducts(dislikedProducts).dislikedBrands;
-    const dislikedIngredients = parseDislikedProducts(dislikedProducts).dislikedIngredients;
+    const dislikedBrands = parseLikedDislikedProducts(dislikedProducts).brands;
+    const dislikedIngredients = parseLikedDislikedProducts(dislikedProducts).ingredients;
     let dislikedProductOverlapScore = 0;
     let dislikedProductIngredientSimilarityScore = 0;
     let isProductDisliked = false;
@@ -162,11 +138,12 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         dislikedProductOverlapScore += (dislikedProductIngredientSimilarityScore / dislikedProducts.length); // average jaccard score of disliked products
     }
 
-    for(const ingredientId of dislikedIngredients) {
-        if(product.ingredients.some(i => i.id === ingredientId)) {
+    for(const ingredient of product.ingredients){
+        if(dislikedIngredients.has(ingredient.id)) {
             dislikedProductOverlapScore -= 0.5; // penalize extra for disliked ingredient
         }
     }
+
     lovedProductOverlapScore = Math.min(lovedProductOverlapScore, 2); // cap at 2
     dislikedProductOverlapScore = Math.max(dislikedProductOverlapScore, -2); // cap at -2
     const bonusScore = lovedProductOverlapScore + dislikedProductOverlapScore;

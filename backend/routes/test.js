@@ -1749,7 +1749,7 @@ const product3 = { // no ingredients
 
 const testComputeScore = async () => {
 	const userInfo = user3;
-    const productToCheck = product3;
+    const productToCheck = product1;
     const lovedProducts = userInfo.loved_products;
     const dislikedProducts = userInfo.disliked_products;
     const userSkinType = userInfo.skin_type;
