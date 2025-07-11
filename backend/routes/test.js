@@ -1582,6 +1582,81 @@ const user3 = { // tons of liked and disliked products to test parsing liked/dis
 	]
 }
 
+const user4 = {
+	"username": "victoria2",
+	"concerns": [
+		"redness & irritation",
+		"acne & blemishes"
+	],
+	"skin_type": [
+		"oily",
+		"combination"
+	],
+	"loved_products": [],
+	"saved_products": [],
+	"disliked_products": [
+		{
+			"id": 27,
+			"brand": "The Inkey List",
+			"name": "Niacinamide Oil Control Serum",
+			"image": "https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg",
+			"product_type": "serum",
+			"price": "7",
+			"concerns": [
+				"acne & blemishes",
+				"redness & irritation"
+			],
+			"skin_type": [
+				"oily",
+				"combination"
+			],
+			"ingredients": [
+				{
+					"id": 342,
+					"name": "squalane",
+					"ingredient_type": "moisturizing, skin softening",
+					"purpose": "deeply moisturizes and softens skin",
+					"skin_type": [
+						"dry"
+					],
+					"concerns": [
+						"dryness"
+					]
+				},
+				{
+					"id": 504,
+					"name": "niacinamide",
+					"ingredient_type": "active ingredient",
+					"purpose": "anti-inflammatory, brightening",
+					"skin_type": [
+						"dry",
+						"oily",
+						"combination",
+						"normal"
+					],
+					"concerns": [
+						"redness & irritation",
+						"dullness"
+					]
+				},
+				{
+					"id": 957,
+					"name": "hyaluronic acid",
+					"ingredient_type": "humectant",
+					"purpose": "moisturizing, skin plumping",
+					"skin_type": [
+						"dry"
+					],
+					"concerns": [
+						"dryness"
+					]
+				}
+			],
+			"score": 6
+		}
+	]
+}
+
 const product1 =  {
 	"id": 20,
 	"brand": "The Ordinary",

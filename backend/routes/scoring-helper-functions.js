@@ -131,7 +131,6 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     }
 
     for(const ingredientId of lovedIngredients) {
-        console.log(ingredientId);
         if(product.ingredients.some(i => i.id === ingredientId)) {
             lovedProductOverlapScore += 0.5; // extra boost for loved ingredient
         }
