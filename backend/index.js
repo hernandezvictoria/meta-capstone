@@ -38,11 +38,11 @@ app.use(session({
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === "production",
-            sameSite: 'none',
+    cookie: {secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
             domain:
             process.env.NODE_ENV === "production"
-            ? ".meta-capstone-cy5u.onrender.com"
+            ? ".meta-capstone-backend.onrender.com"
             : "localhost",
              httpOnly: true,
              maxAge: 1000 * 60 * 60 }
