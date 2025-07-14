@@ -262,6 +262,7 @@ router.put('/toggle-dislike/:productId', async (req, res) => {
     const productId = parseInt(req.params.productId); // Corrected from postId to productId
     const userId = req.session.userId;
 
+
     if (!userId) {
         return res.status(401).json({ error: "you must be logged in to perform this action" });
     }
@@ -349,4 +350,30 @@ router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
     }
 });
 
+router.post('/log-click/:productId', async (req, res) => {
+    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const userId = req.session.userId;
+    const { clickType } = req.body
+
+    if (!userId) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" });
+    }
+
+    try {
+        // Create a new click in the database
+        const newClick = await prisma.click.create({
+            data: {
+                product_id: productId,
+                user_id: userId,
+                click_time: new Date(),
+                click_type: clickType
+            }
+        })
+        res.status(201).json({ message: "click successfully logged"})
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: "something went wrong while logging click" })
+    }
+
+});
 module.exports = router;

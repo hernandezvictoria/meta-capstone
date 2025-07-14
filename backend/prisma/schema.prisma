@@ -9,6 +9,13 @@ enum ProductType {
     eye_cream
 }
 
+enum ClickType{
+  toggle_like
+  toggle_dislike
+  toggle_save
+  open_modal
+}
+
 enum SkinType{
   normal
   dry
@@ -45,6 +52,7 @@ model User{
   loved_products ProductInfo[] @relation("loved")
   saved_products ProductInfo[] @relation("saved")
   disliked_products ProductInfo[] @relation("disliked")
+  clicks Click[]
 }
 
 model ProductInfo{
@@ -60,4 +68,15 @@ model ProductInfo{
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
   disliked_by_user User[] @relation("disliked")
+  clicks Click[]
+}
+
+model Click{
+  id Int @id @default(autoincrement())
+  product ProductInfo @relation(fields: [product_id], references: [id])
+  product_id Int
+  user User @relation(fields: [user_id], references: [id])
+  user_id Int
+  click_time DateTime
+  click_type ClickType
 }
