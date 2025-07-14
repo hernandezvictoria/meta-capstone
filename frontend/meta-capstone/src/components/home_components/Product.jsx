@@ -63,13 +63,24 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     loadImage();
       }, [])
 
+  const logClickInDb = async(clickType) => {
+      fetch(`${import.meta.env.VITE_BASE_URL}/log-click/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({clickType: clickType}),
+        credentials: "include",
+    })
+    .catch((error) => setError("an error ocurred clicking the product"));
+  }
+
   const openModal = () => {
+    logClickInDb("open_modal");
     setModalProductId(id);
   }
 
   const toggleLike = async(event) => {
     event.stopPropagation();
-
+    logClickInDb("toggle_like");
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
       {method: "PUT",
       credentials: "include"})
@@ -90,6 +101,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleSave = async(event) => {
     event.stopPropagation();
+    logClickInDb("toggle_save");
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
       {method: "PUT",
       credentials: "include"})
@@ -110,6 +122,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleDislike = async(event) => {
     event.stopPropagation();
+    logClickInDb("toggle_dislike");
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
       {method: "PUT",
       credentials: "include"})
