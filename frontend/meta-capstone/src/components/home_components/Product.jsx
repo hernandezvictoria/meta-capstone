@@ -80,7 +80,13 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleLike = async(event) => {
     event.stopPropagation();
-    logClickInDb("toggle_like");
+    if(likedProducts.find(p => p.id === id)){ //if product is already liked, remove like
+      logClickInDb("remove_like");
+    }
+    else{
+      logClickInDb("like");
+    }
+
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
       {method: "PUT",
       credentials: "include"})
@@ -101,7 +107,13 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleSave = async(event) => {
     event.stopPropagation();
-    logClickInDb("toggle_save");
+    if(savedProducts.find(p => p.id === id)){ //if product is already saved, remove save
+      logClickInDb("remove_save");
+    }
+    else{
+      logClickInDb("save");
+    }
+
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
       {method: "PUT",
       credentials: "include"})
@@ -122,7 +134,13 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleDislike = async(event) => {
     event.stopPropagation();
-    logClickInDb("toggle_dislike");
+    if(dislikedProducts.find(p => p.id === id)){ //if product is already disliked, remove dislike
+      logClickInDb("remove_dislike");
+    }
+    else{
+      logClickInDb("dislike");
+    }
+
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
       {method: "PUT",
       credentials: "include"})

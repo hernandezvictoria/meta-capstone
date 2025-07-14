@@ -361,7 +361,7 @@ router.post('/log-click/:productId', async (req, res) => {
 
     try {
         // Create a new click in the database
-        const newClick = await prisma.click.create({
+        const newClick = await prisma.UserProductInteraction.create({
             data: {
                 product_id: productId,
                 user_id: userId,
