@@ -1,6 +1,12 @@
 import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
+import closedBookmark from "../../assets/closed-bookmark.png";
+import openBookmark from "../../assets/open-bookmark.png";
+import closedHeart from "../../assets/closed-heart.png";
+import openHeart from "../../assets/open-heart.png";
+import closedDislike from "../../assets/closed-dislike.png";
+import openDislike from "../../assets/open-dislike.png";
 
 function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type, score}) {
 
@@ -10,39 +16,37 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const loadImage = async () => {
     // if image is not in DB
-    setDisplayImage(placeholderImage);
-    updateImageInDb(placeholderImage);
-    // if(!image){
-    //   setIsLoading(true);
-    //   console.error("no image in DB"); // throw error to be caught, sets display image to placeholder
-    //   const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
-    //   const options = {
-    //     method: 'GET',
-    //     headers: {
-    //       'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-    //       'x-rapidapi-host': 'real-time-sephora-api.p.rapidapi.com'
-    //     }
-    //   };
+    if(!image){
+      setIsLoading(true);
+      console.error("no image in DB"); // throw error to be caught, sets display image to placeholder
+      const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
+      const options = {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+          'x-rapidapi-host': 'real-time-sephora-api.p.rapidapi.com'
+        }
+      };
 
-    //   fetch(url, options)
-    //   .then((response) => response.json())
-    //   .then((res) => {
-    //     const products_list = res.data.products;
-    //     if(products_list.length === 0){
-    //       throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
-    //     }
-    //     const fetchedImage = products_list[0].heroImage;
-    //     setDisplayImage(fetchedImage);
-    //     updateImageInDb(fetchedImage);
-    //   })
-    //   .catch((error) => {
-    //     setDisplayImage(placeholderImage);
-    //     updateImageInDb(placeholderImage);
-    //   })
-    //   .finally(() => {
-    //     setTimeout(() => setIsLoading(false), 500);
-    //   });
-    // }
+      fetch(url, options)
+      .then((response) => response.json())
+      .then((res) => {
+        const products_list = res.data.products;
+        if(products_list.length === 0){
+          throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
+        }
+        const fetchedImage = products_list[0].heroImage;
+        setDisplayImage(fetchedImage);
+        updateImageInDb(fetchedImage);
+      })
+      .catch((error) => {
+        setDisplayImage(placeholderImage);
+        updateImageInDb(placeholderImage);
+      })
+      .finally(() => {
+        setTimeout(() => setIsLoading(false), 500);
+      });
+    }
   }
 
   const updateImageInDb = async(image) => {
@@ -168,9 +172,21 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
           }
       </section>
       <section className="like-and-save">
-          <button onClick={toggleLike}>{likedProducts.some(p => p.id === id) ? '♥️' : '♡'}</button>
-          <button onClick={toggleSave}>{savedProducts.some(p => p.id === id) ? 'unsave' : 'save'}</button>
-          <button onClick={toggleDislike}>{dislikedProducts.some(p => p.id === id) ? 'un-dislike' : 'dislike'}</button>
+          <button className="button-wrapper" onClick={toggleLike}>
+            {likedProducts.find(p => p.id === id)
+            ? <img className="button-image" src={closedHeart}></img>
+            : <img className="button-image" src={openHeart}></img>}
+          </button>
+          <button className="button-wrapper" onClick={toggleSave}>
+            {savedProducts.find(p => p.id === id)
+            ? <img className="button-image" src={closedBookmark}></img>
+            : <img className="button-image" src={openBookmark}></img>}
+          </button>
+          <button className="button-wrapper" onClick={toggleDislike}>
+            {dislikedProducts.find(p => p.id === id)
+            ? <img className="button-image" src={closedDislike}></img>
+            : <img className="button-image" src={openDislike}></img>}
+          </button>
       </section>
     </div>
   );
