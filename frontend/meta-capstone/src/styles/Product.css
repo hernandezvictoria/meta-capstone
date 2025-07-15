@@ -118,3 +118,20 @@
 #score-7{
     background-color: #006824;
 }
+
+.button-image{
+    width:100%;
+}
+
+.button-wrapper{
+
+    width:50%;
+    border: 0px solid black;
+}
+
+.like-and-save{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0% 25%;
+}

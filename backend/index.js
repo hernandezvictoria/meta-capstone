@@ -38,10 +38,18 @@ app.use(session({
     secret: 'capstone',
     resave: false,
     saveUninitialized: false,
-
-    cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 }
+    cookie: {secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+            domain:
+            process.env.NODE_ENV === "production"
+            ? ".meta-capstone-backend.onrender.com"
+            : "localhost",
+             httpOnly: true,
+             maxAge: 1000 * 60 * 60 }
 
 }))
+
+app.set('trust proxy', 1)
 
 app.use(authRoutes);
 app.use(userRoutes);

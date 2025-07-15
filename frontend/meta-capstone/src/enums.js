@@ -33,4 +33,14 @@ const ProfileFilters = Object.freeze({
     DISLIKED: "disliked"
 })
 
-export { SkinTypes, SkinConcerns, ProductTypes, ProfileFilters};
+const InteractionTypes = Object.freeze({
+  LIKE: "like",
+  DISLIKE: "dislike",
+  SAVE: "save",
+  REMOVE_LIKE: "remove_like",
+  REMOVE_DISLIKE: "remove_dislike",
+  REMOVE_SAVE: "remove_save",
+  OPEN_MODAL: "open_modal"
+})
+
+export { SkinTypes, SkinConcerns, ProductTypes, ProfileFilters, InteractionTypes};

@@ -1,6 +1,13 @@
 import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
+import closedBookmark from "../../assets/closed-bookmark.png";
+import openBookmark from "../../assets/open-bookmark.png";
+import closedHeart from "../../assets/closed-heart.png";
+import openHeart from "../../assets/open-heart.png";
+import closedDislike from "../../assets/closed-dislike.png";
+import openDislike from "../../assets/open-dislike.png";
+import { InteractionTypes } from "../../enums";
 
 function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type, score}) {
 
@@ -12,6 +19,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     // if image is not in DB
     if(!image){
       setIsLoading(true);
+      console.error("image does not exist in db"); // throw error to be caught, sets display image to placeholder
       const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
       const options = {
         method: 'GET',
@@ -56,12 +64,29 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     loadImage();
       }, [])
 
+  const logClickInDb = async(interactionType) => {
+      fetch(`${import.meta.env.VITE_BASE_URL}/log-interaction/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({interactionType: interactionType}),
+        credentials: "include",
+    })
+    .catch((error) => setError("an error ocurred when clicking the product"));
+  }
+
   const openModal = () => {
+    logClickInDb(InteractionTypes.OPEN_MODAL);
     setModalProductId(id);
   }
 
   const toggleLike = async(event) => {
     event.stopPropagation();
+    if(likedProducts.find(p => p.id === id)){ //if product is already liked, remove like
+      logClickInDb(InteractionTypes.REMOVE_LIKE);
+    }
+    else{
+      logClickInDb(InteractionTypes.LIKE);
+    }
 
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
       {method: "PUT",
@@ -83,6 +108,13 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleSave = async(event) => {
     event.stopPropagation();
+    if(savedProducts.find(p => p.id === id)){ //if product is already saved, remove save
+      logClickInDb(InteractionTypes.REMOVE_SAVE);
+    }
+    else{
+      logClickInDb(InteractionTypes.SAVE);
+    }
+
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
       {method: "PUT",
       credentials: "include"})
@@ -103,6 +135,13 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const toggleDislike = async(event) => {
     event.stopPropagation();
+    if(dislikedProducts.find(p => p.id === id)){ //if product is already disliked, remove dislike
+      logClickInDb(InteractionTypes.REMOVE_DISLIKE);
+    }
+    else{
+      logClickInDb(InteractionTypes.DISLIKE);
+    }
+
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
       {method: "PUT",
       credentials: "include"})
@@ -165,9 +204,21 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
           }
       </section>
       <section className="like-and-save">
-          <button onClick={toggleLike}>{likedProducts.some(p => p.id === id) ? '♥️' : '♡'}</button>
-          <button onClick={toggleSave}>{savedProducts.some(p => p.id === id) ? 'unsave' : 'save'}</button>
-          <button onClick={toggleDislike}>{dislikedProducts.some(p => p.id === id) ? 'un-dislike' : 'dislike'}</button>
+          <button className="button-wrapper" onClick={toggleLike}>
+            {likedProducts.find(p => p.id === id)
+            ? <img className="button-image" src={closedHeart}></img>
+            : <img className="button-image" src={openHeart}></img>}
+          </button>
+          <button className="button-wrapper" onClick={toggleSave}>
+            {savedProducts.find(p => p.id === id)
+            ? <img className="button-image" src={closedBookmark}></img>
+            : <img className="button-image" src={openBookmark}></img>}
+          </button>
+          <button className="button-wrapper" onClick={toggleDislike}>
+            {dislikedProducts.find(p => p.id === id)
+            ? <img className="button-image" src={closedDislike}></img>
+            : <img className="button-image" src={openDislike}></img>}
+          </button>
       </section>
     </div>
   );
