@@ -9,7 +9,7 @@ enum ProductType {
     eye_cream
 }
 
-enum ClickType{
+enum InteractionType{
   like
   dislike
   save
@@ -55,7 +55,7 @@ model User{
   loved_products ProductInfo[] @relation("loved")
   saved_products ProductInfo[] @relation("saved")
   disliked_products ProductInfo[] @relation("disliked")
-  clicks UserProductInteraction[]
+  interactions UserProductInteraction[]
 }
 
 model ProductInfo{
@@ -71,7 +71,7 @@ model ProductInfo{
   loved_by_user User[] @relation("loved")
   saved_by_user User[] @relation("saved")
   disliked_by_user User[] @relation("disliked")
-  clicks UserProductInteraction[]
+  interactions UserProductInteraction[]
 }
 
 model UserProductInteraction{
@@ -80,6 +80,6 @@ model UserProductInteraction{
   product_id Int
   user User @relation(fields: [user_id], references: [id])
   user_id Int
-  click_time DateTime
-  click_type ClickType
+  interaction_time DateTime
+  interaction_type InteractionType
 }

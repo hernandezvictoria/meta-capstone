@@ -351,7 +351,7 @@ router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
 });
 
 router.post('/log-click/:productId', async (req, res) => {
-    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
     const { clickType } = req.body
 
@@ -360,13 +360,13 @@ router.post('/log-click/:productId', async (req, res) => {
     }
 
     try {
-        // Create a new click in the database
-        const newClick = await prisma.UserProductInteraction.create({
+        // Create a new interaction in the database
+        const newInteraction = await prisma.UserProductInteraction.create({
             data: {
                 product_id: productId,
                 user_id: userId,
-                click_time: new Date(),
-                click_type: clickType
+                interaction_time: new Date(),
+                interaction_type: clickType
             }
         })
         res.status(201).json({ message: "click successfully logged"})

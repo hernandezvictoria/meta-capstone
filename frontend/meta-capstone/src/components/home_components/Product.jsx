@@ -7,6 +7,7 @@ import closedHeart from "../../assets/closed-heart.png";
 import openHeart from "../../assets/open-heart.png";
 import closedDislike from "../../assets/closed-dislike.png";
 import openDislike from "../../assets/open-dislike.png";
+import { InteractionTypes } from "../../enums";
 
 function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type, score}) {
 
@@ -18,7 +19,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     // if image is not in DB
     if(!image){
       setIsLoading(true);
-      console.error("no image in DB"); // throw error to be caught, sets display image to placeholder
+      console.error("image does not exist in db"); // throw error to be caught, sets display image to placeholder
       const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
       const options = {
         method: 'GET',
@@ -74,17 +75,17 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
   }
 
   const openModal = () => {
-    logClickInDb("open_modal");
+    logClickInDb(InteractionTypes.OPEN_MODAL);
     setModalProductId(id);
   }
 
   const toggleLike = async(event) => {
     event.stopPropagation();
     if(likedProducts.find(p => p.id === id)){ //if product is already liked, remove like
-      logClickInDb("remove_like");
+      logClickInDb(InteractionTypes.REMOVE_LIKE);
     }
     else{
-      logClickInDb("like");
+      logClickInDb(InteractionTypes.LIKE);
     }
 
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
@@ -108,10 +109,10 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
   const toggleSave = async(event) => {
     event.stopPropagation();
     if(savedProducts.find(p => p.id === id)){ //if product is already saved, remove save
-      logClickInDb("remove_save");
+      logClickInDb(InteractionTypes.REMOVE_SAVE);
     }
     else{
-      logClickInDb("save");
+      logClickInDb(InteractionTypes.SAVE);
     }
 
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
@@ -135,10 +136,10 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
   const toggleDislike = async(event) => {
     event.stopPropagation();
     if(dislikedProducts.find(p => p.id === id)){ //if product is already disliked, remove dislike
-      logClickInDb("remove_dislike");
+      logClickInDb(InteractionTypes.REMOVE_DISLIKE);
     }
     else{
-      logClickInDb("dislike");
+      logClickInDb(InteractionTypes.DISLIKE);
     }
 
     fetch(`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
