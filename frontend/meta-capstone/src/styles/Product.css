@@ -124,7 +124,7 @@
 }
 
 .button-wrapper{
-    
+
     width:50%;
     border: 0px solid black;
 }
@@ -133,5 +133,5 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 0px 25%;
+    margin: 0% 25%;
 }
