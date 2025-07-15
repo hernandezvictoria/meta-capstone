@@ -350,10 +350,10 @@ router.get('/get-liked-and-saved-status/:productId', async (req, res) => {
     }
 });
 
-router.post('/log-click/:productId', async (req, res) => {
+router.post('/log-interaction/:productId', async (req, res) => {
     const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
-    const { clickType } = req.body
+    const { interactionType } = req.body
 
     if (!userId) {
         return res.status(401).json({ error: "you must be logged in to perform this action" });
@@ -366,13 +366,13 @@ router.post('/log-click/:productId', async (req, res) => {
                 product_id: productId,
                 user_id: userId,
                 interaction_time: new Date(),
-                interaction_type: clickType
+                interaction_type: interactionType
             }
         })
-        res.status(201).json({ message: "click successfully logged"})
+        res.status(201).json({ message: "interaction successfully logged"})
     } catch (error) {
         console.error(error)
-        res.status(500).json({ error: "something went wrong while logging click" })
+        res.status(500).json({ error: "something went wrong while logging interaction" })
     }
 
 });

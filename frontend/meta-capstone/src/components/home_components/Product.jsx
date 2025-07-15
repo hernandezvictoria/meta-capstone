@@ -64,14 +64,14 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     loadImage();
       }, [])
 
-  const logClickInDb = async(clickType) => {
-      fetch(`${import.meta.env.VITE_BASE_URL}/log-click/${id}`, {
+  const logClickInDb = async(interactionType) => {
+      fetch(`${import.meta.env.VITE_BASE_URL}/log-interaction/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({clickType: clickType}),
+        body: JSON.stringify({interactionType: interactionType}),
         credentials: "include",
     })
-    .catch((error) => setError("an error ocurred clicking the product"));
+    .catch((error) => setError("an error ocurred when clicking the product"));
   }
 
   const openModal = () => {
