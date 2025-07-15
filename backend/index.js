@@ -46,6 +46,7 @@ app.use(session({
             : "localhost",
              httpOnly: true,
              maxAge: 1000 * 60 * 60 }
+
 }))
 
 app.set('trust proxy', 1)

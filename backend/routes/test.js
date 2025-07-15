@@ -1755,7 +1755,7 @@ const testComputeScore = async () => {
     const userSkinType = userInfo.skin_type;
     const userSkinConcerns = userInfo.concerns;
 
-    const score = computeProductScore(productToCheck, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns);
+    const score = computeProductScore(productToCheck, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, 2);
     console.log('Score:', score);
     console.log("Score computed successfully");
 }

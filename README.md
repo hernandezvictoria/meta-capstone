@@ -7,8 +7,8 @@
 
 
 ## Links
-**Project Plan**: [doc]<add link to your project plan here>
-**Wireframes**: [here]<add a link to wire frames>
+**Project Plan**: [doc]<add [link to your project plan here](https://docs.google.com/document/d/1sXPKWMEg1QUV5aqYk-g3KkvGz1FCOdhzxZbPEKeSENI/edit?usp=sharing)>
+**Wireframes**: [here]<add a [link to wire frames](https://docs.google.com/document/d/1moDrGmQiok8iH2Sw9i0omxsLibCSLRu4I-KIcaegK94/edit?usp=sharing)>
 <img src="OR_INSERT_INLINE_YOUR_WIREFRAME_IMAGE_URL" width=600>
 
 <add any other links here as you work on your project>
