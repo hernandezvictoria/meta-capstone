@@ -54,4 +54,21 @@ const testFlush = async () => {
     console.log(getQueue());
 }
 
-testFlush();
+const testFlushAfterExpire = async () => {
+    // even though 55 has higher priority, it will be flushed first because it's expired
+    await insertProduct(55); // 3 x open modal #1
+    await wait(2000);
+    await insertProduct(53); // save, like, open modal #2
+    await wait(1000);
+
+    console.log(getCache());
+    console.log(getQueue());
+
+    flushCache();
+
+    console.log(getCache());
+    console.log(getQueue());
+}
+
+
+testFlushAfterExpire();

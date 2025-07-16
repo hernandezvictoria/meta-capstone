@@ -33,7 +33,7 @@ const computePriority = async (productId) => {
             return Number.MIN_SAFE_INTEGER; // if product data is stale, return lowest priority (first to be flushed)
         }
 
-        const twoDayMilliseconds = 1000 * 60 * 60 * 24 * 2; // 2 days, but can be changed
+        const twoDayMilliseconds = 1000*60*60*24*2; // 2 days, but can be changed
         const totalUserClicks = await prisma.UserProductInteraction.findMany({
             where: {
                 user_id: currentUserId,
@@ -68,8 +68,8 @@ const flushCache = () => {
     if(productImageCache.size > 0) {
         // remove all the products with stale data from cache
         while(computePriority(productQueue.front()) === Number.MIN_SAFE_INTEGER){
-            const idToRemove = productQueue.dequeue();
-            productImageCache.delete(idToRemove);
+            const dequeuedProduct = productQueue.dequeue();
+            productImageCache.delete(dequeuedProduct.productId);
             totalRemoved++;
             if(productImageCache.size === 0) {
                 return; // if all products are removed, return
