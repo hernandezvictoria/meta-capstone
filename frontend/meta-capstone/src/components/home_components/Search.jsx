@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import "../../styles/Search.css";
+import clearIcon from "../../assets/clear.png";
 
 
 function Search({setError, setMaxPages, setPageNum, setSearchTerm}) {
@@ -28,14 +29,11 @@ function Search({setError, setMaxPages, setPageNum, setSearchTerm}) {
         <input
             className="search-input"
             type="text"
-            placeholder="search boards"
+            placeholder="search products"
             ref={inputRef}
         />
-        <button aria-label="submit search" type="submit" className="search-button">
-            search
-        </button>
         <button aria-label="clear search" type="reset" className="clear-button">
-            clear
+            <img className="button-image" src={clearIcon}></img>
         </button>
         </form>
     );

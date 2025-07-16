@@ -18,22 +18,23 @@ const Home = () => {
         <>
             <NavBar/>
             <div className="main-content">
+                <p className="greeting">hello, {user.username}</p>
                 <h1>skinterest</h1>
-                <p>This is the Home Page</p>
-                <p>hello, {user.username}</p>
                 <Search
                     setError={setError}
                     setMaxPages={setMaxPages}
                     setPageNum={setPageNum}
                     setSearchTerm={setSearchTerm}/>
-                <ProductList
-                    error={error}
-                    setError={setError}
-                    pageNum={pageNum}
-                    setPageNum={setPageNum}
-                    maxPages={maxPages}
-                    setMaxPages={setMaxPages}
-                    searchTerm={searchTerm}/>
+                <div className="body">
+                    <ProductList
+                        error={error}
+                        setError={setError}
+                        pageNum={pageNum}
+                        setPageNum={setPageNum}
+                        maxPages={maxPages}
+                        setMaxPages={setMaxPages}
+                        searchTerm={searchTerm}/>
+                </div>
             </div>
         </>
     );

@@ -5,15 +5,18 @@
     left: 0;
     height: 100%;
     width: 5%;
-    background-color: #f8f9fa;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: start;
     padding-top: 10px;
-    /* z-index: 1000; Ensure it stays on top of other elements */
+    border-right: 1px solid #e4e4e4;
 }
 
+.nav-icon{
+    width:55%;
+    margin:30% 0%;
+}
 .main-content {
     margin-left: 5%; /* Offset by the width of the nav bar */
 }

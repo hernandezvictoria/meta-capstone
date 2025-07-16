@@ -52,22 +52,24 @@ const FilterProfilePage = () => {
             <button aria-label="show disliked products" id={ProfileFilters.DISLIKED} className="filter-button" onClick={onFilterClick}>disliked</button>
             <button aria-label="show user info" id={ProfileFilters.USERINFO} className="filter-button" onClick={onFilterClick}>view profile</button>
         </section>
-        { isLoading
-            ? (<Loading/>)
-            : error
-                ? ( <p>{error}</p>)
-                : selectedFilter === ProfileFilters.USERINFO
-                    ? ( <UserInfo username={username} concerns={concerns} skinType={skinType}/> )
-                    : ( <ProfileProductList
-                        filter={selectedFilter}
-                        setError={setError}
-                        likedProducts={likedProducts}
-                        setLikedProducts={setLikedProducts}
-                        savedProducts={savedProducts}
-                        setSavedProducts={setSavedProducts}
-                        dislikedProducts={dislikedProducts}
-                        setDislikedProducts={setDislikedProducts}/>)
-        }
+        <div className="body">
+            { isLoading
+                ? (<Loading/>)
+                : error
+                    ? ( <p>{error}</p>)
+                    : selectedFilter === ProfileFilters.USERINFO
+                        ? ( <UserInfo username={username} concerns={concerns} skinType={skinType}/> )
+                        : ( <ProfileProductList
+                            filter={selectedFilter}
+                            setError={setError}
+                            likedProducts={likedProducts}
+                            setLikedProducts={setLikedProducts}
+                            savedProducts={savedProducts}
+                            setSavedProducts={setSavedProducts}
+                            dislikedProducts={dislikedProducts}
+                            setDislikedProducts={setDislikedProducts}/>)
+            }
+        </div>
         </>
     )
 }
