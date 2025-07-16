@@ -9,7 +9,7 @@ const {InteractionTypes} = require('../enums.js')
 const MAX_CACHE_SIZE = 50; // max number of products in cache
 const TTL = 1000*60*60; // time to live for each product in cache, 1 hour for now
 const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
-let currentUserId = null; // current user id, set to 1 for testing
+let currentUserId = 1; // current user id, set to 1 for testing
 
 // priority queue for products, less interacted with products have higher priority (first to be flushed from cache)
 const productQueue = new PriorityQueue((a, b) => {
@@ -33,7 +33,7 @@ const computePriority = async (productId) => {
             return Number.MIN_SAFE_INTEGER; // if product data is stale, return lowest priority (first to be flushed)
         }
 
-        const oneDayMilliseconds = 1000 * 60 * 60 * 24;
+        const twoDayMilliseconds = 1000 * 60 * 60 * 24 * 2; // 2 days, but can be changed
         const totalUserClicks = await prisma.UserProductInteraction.findMany({
             where: {
                 user_id: currentUserId,
@@ -44,7 +44,7 @@ const computePriority = async (productId) => {
         if(totalUserClicks.length === 0) {
             return 0;
         }
-        const userClicksInLastDay = totalUserClicks.filter(interaction => interaction.interaction_time.getTime() >= currentTime - oneDayMilliseconds);
+        const userClicksInLastDay = totalUserClicks.filter(interaction => interaction.interaction_time.getTime() >= currentTime - twoDayMilliseconds);
 
         const openModalVelocity = userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.OPEN_MODAL).length / 24; // total opens per hour
         const likeVelocity = (userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.LIKE).length
@@ -55,7 +55,6 @@ const computePriority = async (productId) => {
                             -  userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.REMOVE_DISLIKE).length ) / 24; // net dislikes per hour
 
         // opening modal carries most weight
-        console.log("priority for product " + productId + ": " + (openModalVelocity + (likeVelocity + saveVelocity + dislikeVelocity) * 0.5));
         return openModalVelocity + (likeVelocity + saveVelocity + dislikeVelocity) * 0.5; // higher velocity -> higher priority score -> less likely to be flushed from cache
     }
     else{
@@ -86,8 +85,8 @@ const flushCache = () => {
             if(productImageCache.size === 0) {
                 return; // if all products are removed, return
             }
-            const idToRemove = productQueue.dequeue();
-            productImageCache.delete(idToRemove);
+            const dequeuedProduct = productQueue.dequeue();
+            productImageCache.delete(dequeuedProduct.productId);
         }
     }
 }

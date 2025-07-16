@@ -36,4 +36,22 @@ const testReplacement = () => {
     console.log(getQueue());
 }
 
-testQueueOrdering();
+const testFlush = async () => {
+    await insertProduct(53); // save, like, open modal #2
+    await wait(1000);
+    await insertProduct(55); // 3 x open modal #1
+    await wait(1000);
+    await insertProduct(6); // like, remove like, dislike #4 (tied with 5)
+    await wait(1000);
+    await insertProduct(5); // none #3 (tied with 6)
+
+    console.log(getCache());
+    console.log(getQueue());
+
+    flushCache();
+
+    console.log(getCache());
+    console.log(getQueue());
+}
+
+testFlush();
