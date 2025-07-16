@@ -70,5 +70,17 @@ const testFlushAfterExpire = async () => {
     console.log(getQueue());
 }
 
+const testGetImage = async () => {
+    // even though 55 has higher priority, it will be flushed first because it's expired
+    await insertProduct(55); // 3 x open modal #1
+    await wait(2000);
+    await insertProduct(53); // save, like, open modal #2
+    await wait(1000);
 
-testFlushAfterExpire();
+    console.log(getQueue().toArray());
+    getProductImage(1, 53);
+    console.log(getQueue().toArray());
+}
+
+
+testGetImage();

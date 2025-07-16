@@ -11,20 +11,24 @@ const TTL = 1000*60*60; // time to live for each product in cache, 1 hour for no
 const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
 let currentUserId = 1; // current user id, set to 1 for testing
 
-// priority queue for products, less interacted with products have higher priority (first to be flushed from cache)
-const productQueue = new PriorityQueue((a, b) => {
-    if (a.priority === b.priority) { // if they are tied, sort by recency
-        const aTime = productImageCache.has(a.productId) ? productImageCache.get(a.productId).timestamp.getTime() : Date.now();
-        const bTime = productImageCache.has(b.productId) ? productImageCache.get(b.productId).timestamp.getTime() : Date.now();
-        return aTime - bTime;
-    }
-    return a.priority - b.priority;
-});
+let productQueue;
+let productImageCache;
 
-const productImageCache = new Map(); // productId -> image url, timestamp
+const createQueueAndCache = () => {
+    // priority queue for products, less interacted with products have higher priority (first to be flushed from cache)
+    productQueue = new PriorityQueue((a, b) => {
+        if (a.priority === b.priority) { // if they are tied, sort by recency
+            const aTime = productImageCache.has(a.productId) ? productImageCache.get(a.productId).timestamp.getTime() : Date.now();
+            const bTime = productImageCache.has(b.productId) ? productImageCache.get(b.productId).timestamp.getTime() : Date.now();
+            return aTime - bTime;
+        }
+        return a.priority - b.priority;
+    });
+    productImageCache = new Map(); // productId -> image url, timestamp
+}
 
 // returns a number representing the priority of the product (based on how used it is)
-const computePriority = async (productId) => {
+const computeInitialPriority = async (productId) => {
     //higher click velocity -> higher priority score, less likely to be flushed from cache
     if (productImageCache.has(productId)) {
         const currentTime = Date.now();
@@ -34,7 +38,7 @@ const computePriority = async (productId) => {
         }
 
         const twoDayMilliseconds = 1000*60*60*24*2; // 2 days, but can be changed
-        const totalUserClicks = await prisma.UserProductInteraction.findMany({
+        const totalUserClicks = await prisma.userProductInteraction.findMany({
             where: {
                 user_id: currentUserId,
                 product_id: productId
@@ -67,7 +71,7 @@ const flushCache = () => {
     const totalRemoved = 0;
     if(productImageCache.size > 0) {
         // remove all the products with stale data from cache
-        while(computePriority(productQueue.front()) === Number.MIN_SAFE_INTEGER){
+        while(computeInitialPriority(productQueue.front()) === Number.MIN_SAFE_INTEGER){
             const dequeuedProduct = productQueue.dequeue();
             productImageCache.delete(dequeuedProduct.productId);
             totalRemoved++;
@@ -92,19 +96,22 @@ const flushCache = () => {
 }
 
 const insertProduct = async (productId) => {
+    if(!productQueue) {
+        createQueueAndCache(); // if queue and cache are not created, create them
+    }
+
     if (productImageCache.size >= MAX_CACHE_SIZE) {
         flushCache(); // if cache is at capacity, flush FLUSH_SIZE products from cache
     }
     productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
-    const priority = await computePriority(productId);
+    const priority = await computeInitialPriority(productId);
     productQueue.enqueue({ productId, priority });
-
 };
 
 const replaceProduct = async (productId) => {
     productQueue.remove((p) => p.productId === productId);
     productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
-    const priority = await computePriority(productId);
+    const priority = await computeInitialPriority(productId);
     productQueue.enqueue({ productId, priority });
 };
 
@@ -116,6 +123,11 @@ const getProductImage = async (userId, productId) => {
     if (productImageCache.has(productId)) {
         if (Date.now() - productImageCache.get(productId).timestamp.getTime() >= TTL) {
             await replaceProduct(productId); // if product data is stale, replace it with new data
+        } else {
+            const removed = productQueue.remove((p) => p.productId === productId);
+            if (removed[0]) {
+                productQueue.enqueue({ productId, priority: removed[0].priority + 1 });
+            }
         }
     } else { // if product data is not in cache
         await insertProduct(productId);
