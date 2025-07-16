@@ -103,14 +103,14 @@ const insertProduct = async (productId) => {
     if (productImageCache.size >= MAX_CACHE_SIZE) {
         flushCache(); // if cache is at capacity, flush FLUSH_SIZE products from cache
     }
-    productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
+    productImageCache.set(productId, { image: await fetchImageFromDB(productId), timestamp: new Date() });
     const priority = await computeInitialPriority(productId);
     productQueue.enqueue({ productId, priority });
 };
 
 const replaceProduct = async (productId) => {
     productQueue.remove((p) => p.productId === productId);
-    productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
+    productImageCache.set(productId, { image: await fetchImageFromDB(productId), timestamp: new Date() });
     const priority = await computeInitialPriority(productId);
     productQueue.enqueue({ productId, priority });
 };
@@ -119,6 +119,10 @@ const replaceProduct = async (productId) => {
 // returns the image url of the product, given the product ID
 // TODO: change method to a router GET request
 const getProductImage = async (userId, productId) => {
+    if(!productImageCache) {
+        createQueueAndCache(); // if queue and cache are not created, create them
+    }
+    
     currentUserId = userId; // set the current user id
     if (productImageCache.has(productId)) {
         if (Date.now() - productImageCache.get(productId).timestamp.getTime() >= TTL) {

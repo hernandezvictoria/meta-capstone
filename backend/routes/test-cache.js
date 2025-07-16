@@ -107,4 +107,10 @@ const testTTL = async () => {
     console.log("image url: " + image);
 }
 
-testDBCall();
+const testGetProductImage = async () => {
+    const image = await getProductImage(1, 1);
+    console.log("finished executing getProductImage");
+    console.log("image url: " + image);
+}
+
+testGetProductImage();
