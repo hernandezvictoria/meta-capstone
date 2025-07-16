@@ -1,5 +1,6 @@
 const {flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache}= require('./local-cache.js');
 const wait = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const {fetchImageFromAPI, fetchImageFromDB}= require('./server-cache.js');
 
 const testQueueOrdering = async () => {
     await insertProduct(53); // save, like, open modal #2
@@ -82,5 +83,9 @@ const testGetImage = async () => {
     console.log(getQueue().toArray());
 }
 
+const testAPICall = async () => {
+    await fetchImageFromAPI(1);
+    console.log("finished executing fetchImageFromAPI");
+}
 
-testGetImage();
+testAPICall();
