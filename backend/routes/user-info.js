@@ -96,6 +96,15 @@ router.get('/user-info', async(req, res) => {
     })
 })
 
+router.get('/user-id', async(req, res) => {
+    if(!req.session.userId){
+        res.status(401).json({error: "you must be logged in to perform this action"})
+    }
+    else{
+        res.status(200).json({id: req.session.userId})
+    }
+});
+
 // http://localhost:3000/change-skin-concerns
 router.put('/change-skin-concerns', async (req, res) => {
     const concerns = req.body

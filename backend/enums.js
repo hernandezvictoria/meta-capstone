@@ -26,4 +26,14 @@ const ProductTypes = Object.freeze({
     eye_cream: "eye_cream"
 })
 
-module.exports = { SkinTypes, SkinConcerns, ProductTypes };
+const InteractionTypes = Object.freeze({
+  LIKE: "like",
+  DISLIKE: "dislike",
+  SAVE: "save",
+  REMOVE_LIKE: "remove_like",
+  REMOVE_DISLIKE: "remove_dislike",
+  REMOVE_SAVE: "remove_save",
+  OPEN_MODAL: "open_modal"
+})
+
+module.exports = { SkinTypes, SkinConcerns, ProductTypes, InteractionTypes };

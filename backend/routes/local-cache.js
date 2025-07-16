@@ -1,50 +1,137 @@
 const { PriorityQueue } = require('@datastructures-js/priority-queue');
 const {fetchImageFromDB} = require('./server-cache.js')
+const { PrismaClient } = require('../generated/prisma/index.js')
+const prisma = new PrismaClient()
+const express = require('express')
+const router = express.Router()
+const {InteractionTypes} = require('../enums.js')
 
 const MAX_CACHE_SIZE = 50; // max number of products in cache
 const TTL = 1000*60*60; // time to live for each product in cache, 1 hour for now
+const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
+let currentUserId = null; // current user id, set to 1 for testing
 
+// priority queue for products, less interacted with products have higher priority (first to be flushed from cache)
 const productQueue = new PriorityQueue((a, b) => {
-    // priority queue for productIds in the cache based on computed priority
-    // ordered from lowest priority to highest priority (where priority is computed based on how "used" the product is)
-    return computePriority(a) - computePriority(b);
-  }
-);
+    if (a.priority === b.priority) { // if they are tied, sort by recency
+        const aTime = productImageCache.has(a.productId) ? productImageCache.get(a.productId).timestamp.getTime() : Date.now();
+        const bTime = productImageCache.has(b.productId) ? productImageCache.get(b.productId).timestamp.getTime() : Date.now();
+        return aTime - bTime;
+    }
+    return a.priority - b.priority;
+});
 
 const productImageCache = new Map(); // productId -> image url, timestamp
 
 // returns a number representing the priority of the product (based on how used it is)
-const computePriority = (productId) => {
-    //higher click velocity -> higher priority
+const computePriority = async (productId) => {
+    //higher click velocity -> higher priority score, less likely to be flushed from cache
     if (productImageCache.has(productId)) {
-        if (new Date() - productImageCache.get(productId).timestamp >= TTL) {
-            return Math.min();
+        const currentTime = Date.now();
+        const productTime = productImageCache.get(productId).timestamp.getTime()
+        if (currentTime - productTime >= TTL) {
+            return Number.MIN_SAFE_INTEGER; // if product data is stale, return lowest priority (first to be flushed)
         }
+
+        const oneDayMilliseconds = 1000 * 60 * 60 * 24;
+        const totalUserClicks = await prisma.UserProductInteraction.findMany({
+            where: {
+                user_id: currentUserId,
+                product_id: productId
+            }
+        });
+
+        if(totalUserClicks.length === 0) {
+            return 0;
+        }
+        const userClicksInLastDay = totalUserClicks.filter(interaction => interaction.interaction_time.getTime() >= currentTime - oneDayMilliseconds);
+
+        const openModalVelocity = userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.OPEN_MODAL).length / 24; // total opens per hour
+        const likeVelocity = (userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.LIKE).length
+                            -  userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.REMOVE_LIKE).length ) / 24; // net likes per hour
+        const saveVelocity = (userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.SAVE).length
+                            -  userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.REMOVE_SAVE).length ) / 24; // net saves per hour
+        const dislikeVelocity = (userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.DISLIKE).length
+                            -  userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.REMOVE_DISLIKE).length ) / 24; // net dislikes per hour
+
+        // opening modal carries most weight
+        console.log("priority for product " + productId + ": " + (openModalVelocity + (likeVelocity + saveVelocity + dislikeVelocity) * 0.5));
+        return openModalVelocity + (likeVelocity + saveVelocity + dislikeVelocity) * 0.5; // higher velocity -> higher priority score -> less likely to be flushed from cache
+    }
+    else{
+        return Number.MIN_SAFE_INTEGER; // edge case if product not in cache, should never happen, but if it does, will get flushed first
     }
 };
 
 const flushCache = () => {
-    // flushes 10 highest priority products from cache
-}
+    // flush stale data from cache or FLUSH_SIZE products from cache in priority order
+    const totalRemoved = 0;
+    if(productImageCache.size > 0) {
+        // remove all the products with stale data from cache
+        while(computePriority(productQueue.front()) === Number.MIN_SAFE_INTEGER){
+            const idToRemove = productQueue.dequeue();
+            productImageCache.delete(idToRemove);
+            totalRemoved++;
+            if(productImageCache.size === 0) {
+                return; // if all products are removed, return
+            }
+        }
 
-const insertProduct = (productId) => {
-    if(productImageCache.size >= MAX_CACHE_SIZE) {
-        flushCache();
+        if (totalRemoved >= FLUSH_SIZE){
+            return; // if enough products have already been removed, return
+        }
+
+        // remove more items from cache if not enough products with stale data were removed
+        for (let i = 0; i < FLUSH_SIZE - totalRemoved; i++) {
+            if(productImageCache.size === 0) {
+                return; // if all products are removed, return
+            }
+            const idToRemove = productQueue.dequeue();
+            productImageCache.delete(idToRemove);
+        }
     }
-
-    productQueue.enqueue(productId);
-    productImageCache.set(productId, {image: fetchImageFromDB, timestamp: new Date()});
 }
 
-const getProductImage = (productId) => {
-    // fetches image from cache, if not in cache or expired, flushes cache and fetches from DB
+const insertProduct = async (productId) => {
+    if (productImageCache.size >= MAX_CACHE_SIZE) {
+        flushCache(); // if cache is at capacity, flush FLUSH_SIZE products from cache
+    }
+    productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
+    const priority = await computePriority(productId);
+    productQueue.enqueue({ productId, priority });
 
-    // If product in cache
-    // If fetched.time - current.time >= refreshTime
-    // Flush stale data (from cache and queue)
-    // Fetch new value and store (in cache and queue)
-    // Return data from cache
-    // Else (if the product is not in the cache)
-
-    fetchImageFromDB(productId);
 };
+
+const replaceProduct = async (productId) => {
+    productQueue.remove((p) => p.productId === productId);
+    productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
+    const priority = await computePriority(productId);
+    productQueue.enqueue({ productId, priority });
+};
+
+
+// returns the image url of the product, given the product ID
+// TODO: change method to a router GET request
+const getProductImage = async (userId, productId) => {
+    currentUserId = userId; // set the current user id
+    if (productImageCache.has(productId)) {
+        if (Date.now() - productImageCache.get(productId).timestamp.getTime() >= TTL) {
+            await replaceProduct(productId); // if product data is stale, replace it with new data
+        }
+    } else { // if product data is not in cache
+        await insertProduct(productId);
+    }
+    return productImageCache.get(productId).image;
+};
+
+
+// ====================== GETTERS USED FOR TESTING ======================
+const getQueue = () => {
+    return productQueue;
+}
+
+const getCache = () => {
+    return productImageCache;
+}
+
+module.exports = {flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache};
