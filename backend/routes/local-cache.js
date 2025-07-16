@@ -7,9 +7,9 @@ const router = express.Router()
 const {InteractionTypes} = require('../enums.js')
 
 const MAX_CACHE_SIZE = 50; // max number of products in cache
-const TTL = 1000*60*60; // time to live for each product in cache, 1 hour for now
+const TTL = 1000*60*60*24; // time to live for each product in cache, 1 day for now
 const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
-let currentUserId = 1; // current user id, set to 1 for testing
+let currentUserId = null;
 
 let productQueue;
 let productImageCache;
@@ -37,7 +37,7 @@ const computeInitialPriority = async (productId) => {
             return Number.MIN_SAFE_INTEGER; // if product data is stale, return lowest priority (first to be flushed)
         }
 
-        const twoDayMilliseconds = 1000*60*60*24*2; // 2 days, but can be changed
+        const oneDayMilliseconds = 1000*60*60*24; // 1 day, but can be changed
         const totalUserClicks = await prisma.userProductInteraction.findMany({
             where: {
                 user_id: currentUserId,
@@ -48,7 +48,7 @@ const computeInitialPriority = async (productId) => {
         if(totalUserClicks.length === 0) {
             return 0;
         }
-        const userClicksInLastDay = totalUserClicks.filter(interaction => interaction.interaction_time.getTime() >= currentTime - twoDayMilliseconds);
+        const userClicksInLastDay = totalUserClicks.filter(interaction => interaction.interaction_time.getTime() >= currentTime - oneDayMilliseconds);
 
         const openModalVelocity = userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.OPEN_MODAL).length / 24; // total opens per hour
         const likeVelocity = (userClicksInLastDay.filter(interaction => interaction.interaction_type === InteractionTypes.LIKE).length
@@ -122,7 +122,7 @@ const getProductImage = async (userId, productId) => {
     if(!productImageCache) {
         createQueueAndCache(); // if queue and cache are not created, create them
     }
-    
+
     currentUserId = userId; // set the current user id
     if (productImageCache.has(productId)) {
         if (Date.now() - productImageCache.get(productId).timestamp.getTime() >= TTL) {
