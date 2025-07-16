@@ -86,6 +86,25 @@ const testGetImage = async () => {
 const testAPICall = async () => {
     await fetchImageFromAPI(1);
     console.log("finished executing fetchImageFromAPI");
+    // checked in prisma that the image was inserted and fetch time was updated
 }
 
-testAPICall();
+const testDBCall = async () => {
+    const image = await fetchImageFromDB(3);
+    console.log("finished executing fetchImageFromDB");
+    console.log("image url: " + image);
+    // test cases:
+    // 1. image is in DB and not expired, fetched from DB
+    // 2. image is in DB and expired, fetched from API
+    // 3. image is not in DB, fetched from API
+    // 4. image is in DB but has no timestamp, fetched from API
+}
+
+const testTTL = async () => {
+    //changed TTL to 1 second and verified that it is refetcheda
+    const image = await fetchImageFromDB(3);
+    console.log("finished executing fetchImageFromDB");
+    console.log("image url: " + image);
+}
+
+testDBCall();
