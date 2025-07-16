@@ -72,6 +72,7 @@ model ProductInfo{
   saved_by_user User[] @relation("saved")
   disliked_by_user User[] @relation("disliked")
   interactions UserProductInteraction[]
+  image_fetch_time DateTime?
 }
 
 model UserProductInteraction{
