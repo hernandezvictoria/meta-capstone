@@ -102,7 +102,7 @@ router.get('/products', async (req, res) => {
         }
     }
     const users = await prisma.user.findMany();
-    let scoredProducts = updateProductsWithScore(productCandidates, userInfo, users?.length);
+    let scoredProducts = await updateProductsWithScore(productCandidates, userInfo, users?.length);
     scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
     res.status(200).json({
         totalProducts: scoredProducts.length,

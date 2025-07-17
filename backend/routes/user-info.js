@@ -90,9 +90,9 @@ router.get('/user-info', async(req, res) => {
         username: user.username,
         concerns: user.concerns,
         skin_type: user.skin_type,
-        loved_products: updateProductsWithScore(user.loved_products, user, users?.length),
-        saved_products: updateProductsWithScore(user.saved_products, user, users?.length),
-        disliked_products: updateProductsWithScore(user.disliked_products, user, users?.length)
+        loved_products: await updateProductsWithScore(user.loved_products, user, users?.length),
+        saved_products: await updateProductsWithScore(user.saved_products, user, users?.length),
+        disliked_products: await updateProductsWithScore(user.disliked_products, user, users?.length)
     })
 })
 
@@ -175,9 +175,9 @@ router.get('/user-liked-saved-disliked', async (req, res) => {
         });
         const users = await prisma.user.findMany();
         res.status(200).json({
-            loved_products: updateProductsWithScore(user.loved_products, user, users?.length),
-            saved_products: updateProductsWithScore(user.saved_products, user, users?.length),
-            disliked_products: updateProductsWithScore(user.disliked_products, user, users?.length)
+            loved_products: await updateProductsWithScore(user.loved_products, user, users?.length),
+            saved_products: await updateProductsWithScore(user.saved_products, user, users?.length),
+            disliked_products: await updateProductsWithScore(user.disliked_products, user, users?.length)
         });
     } catch(error){
         console.error(error);

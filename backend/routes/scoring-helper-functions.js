@@ -1,5 +1,6 @@
 var jaccard = require('jaccard');
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
+const {getProductImage}= require('./local-cache.js');
 
 const parseLikedDislikedProducts = (products) => {
     const brands = products.map(product => product.brand);
@@ -224,21 +225,45 @@ const cleanSearchQuery = (searchTerm) => {
     return queryArray;
 }
 
+// // returns same array of products, but with scores as a field
+// const updateProductsWithScore = async (products, user, totalUsers) => {
+//     const updatedProducts = await products.map( async (product) => {
+//         return {
+//             id: product.id,
+//             brand: product.brand,
+//             name: product.name,
+//             image: product.image,
+//             product_type: product.product_type,
+//             price: product.price,
+//             concerns: product.concerns,
+//             skin_type: product.skin_type,
+//             ingredients: product.ingredients,
+//             score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns, totalUsers),
+//             image: await getProductImage(user.id, product.id)
+//         };
+//     })
+//     return updatedProducts;
+// }
+
 // returns same array of products, but with scores as a field
-const updateProductsWithScore = (products, user, totalUsers) => {
-    return products.map((product) => {
+const updateProductsWithScore = async (products, user, totalUsers) => {
+    // need to await Promise.all to ensure all images are fetched before returning (otherwise map will return promises)
+    const updatedProducts = await Promise.all(products.map(async (product) => {
         return {
             id: product.id,
             brand: product.brand,
             name: product.name,
-            image: product.image,
+            image: await getProductImage(user.id, product.id), // getProductImage is async, so need to await
             product_type: product.product_type,
             price: product.price,
             concerns: product.concerns,
             skin_type: product.skin_type,
             ingredients: product.ingredients,
-            score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns, totalUsers)};
-    })
+            score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns, totalUsers)
+        };
+    }));
+    return updatedProducts;
 }
+
 
 module.exports = {computeProductScore, cleanSearchQuery, updateProductsWithScore};

@@ -119,6 +119,7 @@ const replaceProduct = async (productId) => {
 // returns the image url of the product, given the product ID
 // TODO: change method to a router GET request
 const getProductImage = async (userId, productId) => {
+    console.log("getProductImage called with userId: " + userId + " and productId: " + productId);
     if(!productImageCache) {
         createQueueAndCache(); // if queue and cache are not created, create them
     }
@@ -136,6 +137,7 @@ const getProductImage = async (userId, productId) => {
     } else { // if product data is not in cache
         await insertProduct(productId);
     }
+    console.log("returning: " + productImageCache.get(productId).image);
     return productImageCache.get(productId).image;
 };
 
