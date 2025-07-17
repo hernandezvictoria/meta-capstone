@@ -5,7 +5,6 @@ const session = require('express-session')
 const {createClient} = require('redis')
 const {RedisStore} = require('connect-redis')
 
-
 const client = createClient({
   url: "rediss://default:ActfAAIjcDE3MzNjNjJmNTUyMGY0NDFmODIwZWIzOWE0ZWI0MzBhNXAxMA@distinct-muskox-52063.upstash.io:6379"
 });
