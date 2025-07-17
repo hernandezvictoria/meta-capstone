@@ -1,4 +1,3 @@
-import React from "react";
 import {useState, useEffect} from 'react';
 import "../../styles/Product.css";
 import closedBookmark from "../../assets/closed-bookmark.png";
@@ -17,7 +16,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
   const loadImage = async () => {
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 500);
+    setTimeout(() => setIsLoading(false), 500); // wait 500ms before setting the image to the display image
   }
 
   useEffect(() => {
