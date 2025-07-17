@@ -11,53 +11,13 @@ import { InteractionTypes } from "../../enums";
 
 function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type, score}) {
 
-  const [displayImage, setDisplayImage] = useState(image);
+  // const [displayImage, setDisplayImage] = useState(image);
   const [isLoading, setIsLoading] = useState(false);
   const placeholderImage = "https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg";
 
   const loadImage = async () => {
-    // if image is not in DB
-    if(!image){
-      setIsLoading(true);
-      console.error("image does not exist in db"); // throw error to be caught, sets display image to placeholder
-      const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-          'x-rapidapi-host': 'real-time-sephora-api.p.rapidapi.com'
-        }
-      };
-
-      fetch(url, options)
-      .then((response) => response.json())
-      .then((res) => {
-        const products_list = res.data.products;
-        if(products_list.length === 0){
-          throw new Error("no products in products list"); // throw error to be caught, sets display image to placeholder
-        }
-        const fetchedImage = products_list[0].heroImage;
-        setDisplayImage(fetchedImage);
-        updateImageInDb(fetchedImage);
-      })
-      .catch((error) => {
-        setDisplayImage(placeholderImage);
-        updateImageInDb(placeholderImage);
-      })
-      .finally(() => {
-        setTimeout(() => setIsLoading(false), 500);
-      });
-    }
-  }
-
-  const updateImageInDb = async(image) => {
-    fetch(`${import.meta.env.VITE_BASE_URL}/change-product-image/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({image: image}),
-        credentials: "include",
-    })
-    .catch((error) => setError("an error ocurred while fetching the product image"));
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 500);
   }
 
   useEffect(() => {
@@ -189,7 +149,7 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
     <div className="product" onClick={openModal}>
       { isLoading
         ? <img className="shimmer" alt={name} aria-label={name} src={placeholderImage}/> // loading image with shimmering effect
-        : <img className="product-image" alt={name} aria-label={name} src={displayImage}/>
+        : <img className="product-image" alt={name} aria-label={name} src={image}/>
       }
 
       <section className="product-info">
