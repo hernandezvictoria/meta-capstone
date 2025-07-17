@@ -5,7 +5,7 @@ import closedHome from "../assets/closed-home.png";
 import openProfile from "../assets/open-profile.png";
 import closedProfile from "../assets/closed-profile.png";
 import logo from "../assets/logo.png";
-import { useNav } from "../context/NavContext";
+import { useNav } from "../contexts/NavContext";
 
 const NavBar = () => {
   const { isHome, setIsHome } = useNav();
@@ -22,7 +22,6 @@ const NavBar = () => {
         aria-label="profile"
         onClick={() => {
           setIsHome(false);
-          console.log("switched to profile, isHome:", false);
         }}
       >
         <img

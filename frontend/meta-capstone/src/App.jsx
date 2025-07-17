@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import WithAuth from "./components/WithAuth";
 import Quiz from "./components/Quiz";
 import Profile from "./components/profile_components/Profile";
-import { NavProvider } from "./context/NavContext";
+import { NavProvider } from "./contexts/NavContext";
 
 function App() {
   const ProtectedHome = WithAuth(Home);
