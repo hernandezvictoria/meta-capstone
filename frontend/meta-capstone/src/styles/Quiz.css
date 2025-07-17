@@ -40,3 +40,20 @@ form{
     display:flex;
     flex-direction: column;
 }
+
+.skin-type-button, .concern-button {
+  position: relative;
+  margin: 0.5em;
+  padding: 0.5em 1em;
+  border: 0;
+  border-radius: 0.5em;
+  background-color: pink;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.skin-type-button:active, .concern-button:active, .active {
+  top: 2px;
+  left: 1px;
+  box-shadow: none;
+}

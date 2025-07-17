@@ -11,22 +11,68 @@ const Quiz = () => {
     const navigate = useNavigate();
     const [message, setMessage] = useState({ type: "none", text: "" });
     const [formSubmitted, setFormSubmitted] = useState(false);
+    const [selectedSkinTypes, setSelectedSkinTypes] = useState([]);
+    const [selectedConcerns, setSelectedConcerns] = useState([]);
+
+    const loadInitialTypesAndConcerns = async () => {
+        console.log("loading initial types and concerns");
+        try{
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/user-skin-types-and-concerns`, {credentials: "include"});
+            if (response.ok) {
+                const data = await response.json();
+                setSelectedSkinTypes(data.skinTypes);
+                setSelectedConcerns(data.concerns);
+
+                for (const skinType of data.skinTypes) {
+                    document.getElementById(skinType).classList.add("active");
+                }
+                for (const concern of data.concerns) {
+                    document.getElementById(concern.replace(/\s+/g, '_')).classList.add("active");
+                }
+            } else{
+                throw new Error(); // throw error to be caught
+            }
+
+        } catch (error) {
+            navigate("/login"); // redirect to login page if error occurs
+        }
+    }
+
+    useEffect(() => {
+        loadInitialTypesAndConcerns();
+    }, []); // load initial types and concerns on page load
+
+    const handleSkinTypeClick = (event) => {
+        event.preventDefault();
+        const skinType = event.target.name;
+        const button = document.getElementById(skinType);
+        if (selectedSkinTypes.includes(skinType)) { // remove if already selected
+            setSelectedSkinTypes(selectedSkinTypes.filter((type) => type !== skinType));
+            button.classList.remove("active");
+        }
+        else { // add if not selected
+            setSelectedSkinTypes([...selectedSkinTypes, skinType]);
+            button.classList.add("active");
+        }
+    }
+
+    const handleConcernClick = (event) => {
+        event.preventDefault();
+        const concern = event.target.name;
+        const button = document.getElementById(concern.replace(/\s+/g, '_'));
+        if (selectedConcerns.includes(concern)) { // remove if already selected
+            setSelectedConcerns(selectedConcerns.filter((c) => c !== concern));
+            button.classList.remove("active");
+        }
+        else { // add if not selected
+            setSelectedConcerns([...selectedConcerns, concern]);
+            button.classList.add("active");
+        }
+    }
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const form = event.target;
-        const selectedSkinTypes = [];
-        const selectedConcerns = [];
-
-        // collect selected skin types
-        form.querySelectorAll('input[name="type"]:checked').forEach((input) => {
-            selectedSkinTypes.push(input.value);
-        });
-
-        // collect selected concerns
-        form.querySelectorAll('input[name="concern"]:checked').forEach((input) => {
-            selectedConcerns.push(input.value);
-        });
 
         if (selectedSkinTypes.length === 0 || selectedConcerns.length === 0) {
             setMessage({ type: "error", text: "you must select at least one of each" });
@@ -103,19 +149,13 @@ const Quiz = () => {
                 <form onSubmit={handleSubmit}>
                     <h3>skin type(s) </h3>
                     {Object.values(SkinTypes).map((skinType) => (
-                        <div key={skinType}>
-                            <input type="checkbox" name="type" id={skinType} value={skinType}/>
-                            <label>{skinType}</label><br></br>
-                        </div>
+                        <button id={skinType} className="skin-type-button" onClick={handleSkinTypeClick} key={skinType} name={skinType}>{skinType}</button>
                     ))}
 
 
                     <h3>concern(s)</h3>
                     {Object.values(SkinConcerns).map((concern) => (
-                        <div key={concern}>
-                            <input type="checkbox" name="concern" id={concern} value={concern}/>
-                            <label>{concern}</label><br></br>
-                        </div>
+                        <button id={concern.replace(/\s+/g, '_')} className="concern-button" onClick={handleConcernClick} key={concern} name={concern}>{concern}</button>
                     ))}
 
                     {message && (

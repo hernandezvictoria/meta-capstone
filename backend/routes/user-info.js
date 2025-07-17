@@ -185,4 +185,19 @@ router.get('/user-liked-saved-disliked', async (req, res) => {
     }
 })
 
+router.get('/user-skin-types-and-concerns', async (req, res) => {
+    const id = req.session.userId;
+    if (!id) {
+        return res.status(401).json({ error: "you must be logged in to perform this action" })
+    }
+    try{
+        const user = await prisma.user.findUnique({
+            where: { id: id }
+        });
+        res.status(200).json({ skinTypes: user.skin_type, concerns: user.concerns });
+    } catch (error) {
+        res.status(500).send({ message: "An error occurred while fetching user's skin types and concerns" });
+    }
+});
+
 module.exports = router;
