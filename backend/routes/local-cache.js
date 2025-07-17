@@ -15,7 +15,7 @@ let productQueue;
 let productImageCache;
 
 const createQueueAndCache = () => {
-    // priority queue for products, less interacted with products have higher priority (first to be flushed from cache)
+    // priority queue for products, less interacted with products have lower priority (first to be flushed from cache)
     productQueue = new PriorityQueue((a, b) => {
         if (a.priority === b.priority) { // if they are tied, sort by recency
             const aTime = productImageCache.has(a.productId) ? productImageCache.get(a.productId).timestamp.getTime() : Date.now();
