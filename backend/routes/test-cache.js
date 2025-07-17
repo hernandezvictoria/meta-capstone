@@ -1,5 +1,6 @@
 const {flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache}= require('./local-cache.js');
 const wait = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const {fetchImageFromAPI, fetchImageFromDB}= require('./server-cache.js');
 
 const testQueueOrdering = async () => {
     await insertProduct(53); // save, like, open modal #2
@@ -82,5 +83,28 @@ const testGetImage = async () => {
     console.log(getQueue().toArray());
 }
 
+const testAPICall = async () => {
+    await fetchImageFromAPI(1);
+    console.log("finished executing fetchImageFromAPI");
+    // checked in prisma that the image was inserted and fetch time was updated
+}
 
-testGetImage();
+const testDBCall = async () => {
+    const image = await fetchImageFromDB(3);
+    console.log("finished executing fetchImageFromDB");
+    console.log("image url: " + image);
+    // test cases:
+    // 1. image is in DB and not expired, fetched from DB
+    // 2. image is in DB and expired, fetched from API
+    // 3. image is not in DB, fetched from API
+    // 4. image is in DB but has no timestamp, fetched from API
+}
+
+const testTTL = async () => {
+    //changed TTL to 1 second and verified that it is refetcheda
+    const image = await fetchImageFromDB(3);
+    console.log("finished executing fetchImageFromDB");
+    console.log("image url: " + image);
+}
+
+testDBCall();
