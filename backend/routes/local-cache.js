@@ -1,5 +1,5 @@
 const { PriorityQueue } = require('@datastructures-js/priority-queue');
-const {fetchImageFromDB} = require('./server-cache.js')
+const {fetchImageFromDB, placeholderImage} = require('./server-cache.js')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const prisma = new PrismaClient()
 const express = require('express')
@@ -10,7 +10,6 @@ const MAX_CACHE_SIZE = 50; // max number of products in cache
 const TTL = 1000*60*60*24; // time to live for each product in cache, 1 day for now
 const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
 let currentUserId = null;
-const placeholderImage = "https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg";
 
 let productQueue;
 let productImageCache;
