@@ -1,15 +1,18 @@
 const { PriorityQueue } = require('@datastructures-js/priority-queue');
-const {fetchImageFromDB, placeholderImage} = require('./server-cache.js')
+const {fetchImageFromDB, placeholderImage, getActualAPICalls, getDBHits} = require('./server-cache.js')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const prisma = new PrismaClient()
 const express = require('express')
 const router = express.Router()
-const {InteractionTypes} = require('../enums.js')
+const {InteractionTypes} = require('../enums.js');
 
 const MAX_CACHE_SIZE = 50; // max number of products in cache
 const TTL = 1000*60*60*24; // time to live for each product in cache, 1 day for now
 const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
 let currentUserId = null;
+
+let potentialAPICalls = 0;
+let cacheHits = 0;
 
 let productQueue;
 let productImageCache;
@@ -119,6 +122,7 @@ const replaceProduct = async (productId) => {
 // returns the image url of the product, given the product ID
 // TODO: change method to a router GET request
 const getProductImage = async (userId, productId) => {
+    potentialAPICalls++;
     try{
         if(!productImageCache) {
             createQueueAndCache(); // if queue and cache are not created, create them
@@ -129,6 +133,7 @@ const getProductImage = async (userId, productId) => {
             if (Date.now() - productImageCache.get(productId).timestamp.getTime() >= TTL) {
                 await replaceProduct(productId); // if product data is stale, replace it with new data
             } else {
+                cacheHits++; // if product data is not stale, increment cache hits
                 const removed = productQueue.remove((p) => p.productId === productId);
                 if (removed[0]) {
                     productQueue.enqueue({ productId, priority: removed[0].priority + 1 });
@@ -152,5 +157,10 @@ const getQueue = () => {
 const getCache = () => {
     return productImageCache;
 }
+
+router.get('/cache-stats', async (req, res) => {
+    res.json({ potentialAPICalls, cacheHits, actualAPICalls: getActualAPICalls(), DBHits: getDBHits() });
+});
+
 
 module.exports = {flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache};
