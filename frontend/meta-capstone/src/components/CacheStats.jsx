@@ -82,13 +82,7 @@ const CacheStats = () => {
         </div>
       )}
 
-      <button
-        className="refresh-button"
-        onClick={fetchStats}
-        disabled={loading}
-      >
-        refresh
-      </button>
+      <button className="refresh-button" onClick={fetchStats} disabled={loading}>refresh</button>
     </div>
   ) : (
     <button className="show-stats-button" onClick={() => setIsVisible(true)}>
