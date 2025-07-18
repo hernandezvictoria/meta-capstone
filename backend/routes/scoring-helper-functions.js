@@ -59,6 +59,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         if(product.ingredients.some(ingredient => ingredient.concerns.includes(concern))){
             ingredientConcernsScore += 1; // if at least one of the ingredients matches the skin type, get a point
         }
+
     }
     if(userSkinConcerns.length > 0) {
         productConcernsScore = productConcernsScore / userSkinConcerns.length; // proportion of skin concerns satisfied by product, userSkinConcerns.length is nonzero
@@ -78,6 +79,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
 
     // ========== bonus points: overlap with loved and disliked products ===========
     // get overlap with loved products
+
     const lovedBrands = parseLikedDislikedProducts(lovedProducts).brands;
     const lovedIngredients = parseLikedDislikedProducts(lovedProducts).ingredients;
     let lovedProductOverlapScore = 0;
@@ -134,6 +136,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
             product.ingredients.map(i => i.id)
         ) // penalize for ingredient overlap
     }
+
     if(!isProductDisliked && dislikedProducts.length > 0) {
         dislikedProductOverlapScore += (dislikedProductIngredientSimilarityScore / dislikedProducts.length); // average jaccard score of disliked products
     }
@@ -146,10 +149,12 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
 
     lovedProductOverlapScore = Math.min(lovedProductOverlapScore, 2); // cap at 2
     dislikedProductOverlapScore = Math.max(dislikedProductOverlapScore, -2); // cap at -2
+
     const bonusScore = lovedProductOverlapScore + dislikedProductOverlapScore;
 
     // ========== combine all scores ===========
     let weights = {}; // can adjust weights further
+
     if(product.ingredients.length > 0) {
         weights['productSkinTypeScore'] = 5;
         weights['ingredientSkinTypeScore'] = 1;
@@ -163,6 +168,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         weights['ingredientConcernsScore'] = 0;
         weights['popularityScore'] = 1.5;
     }
+
 
     let totalScore = 0;
     totalScore += productSkinTypeScore * weights['productSkinTypeScore'];
