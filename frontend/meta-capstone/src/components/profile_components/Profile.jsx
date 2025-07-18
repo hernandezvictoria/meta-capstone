@@ -31,8 +31,8 @@ const Profile = () => {
         <>
             <NavBar />
             <div className="main-content">
+                <p className="greeting">hello, {user.username}</p>
                 <h1>skinterest</h1>
-                <p>this is the profile page</p>
                 <button type="button" onClick={handleLogout}>log out</button>
                 <FilterProfilePage/>
             </div>
