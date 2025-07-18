@@ -4,6 +4,7 @@ const {
   placeholderImage,
   getActualAPICalls,
   getDBHits,
+  resetCounters
 } = require("./server-cache.js");
 const { PrismaClient } = require("../generated/prisma/index.js");
 const prisma = new PrismaClient();
@@ -176,6 +177,13 @@ const getProductImage = async (userId, productId) => {
       createQueueAndCache(); // if queue and cache are not created, create them
     }
 
+    //if new user logs in, reset data
+    if (userId !== currentUserId) {
+        createQueueAndCache();
+        potentialAPICalls = 0;
+        cacheHits = 0;
+        resetCounters();
+    }
     currentUserId = userId; // set the current user id
     if (productImageCache.has(productId)) {
       if (
@@ -212,6 +220,7 @@ const getCache = () => {
   return productImageCache;
 };
 
+// ====================== ROUTE FOR GETTING STATS ======================
 router.get("/cache-stats", async (req, res) => {
   res.json({
     potentialAPICalls,

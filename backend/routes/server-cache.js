@@ -79,8 +79,13 @@ const updateImageInDb = async (id, image) => {
     }
 };
 
+const resetCounters = () => {
+    actualAPICalls = 0;
+    DBHits = 0;
+}
+
 // server-cache.js
 const getActualAPICalls = () => actualAPICalls;
 const getDBHits = () => DBHits;
 
-module.exports = { placeholderImage, fetchImageFromDB, fetchImageFromAPI, getActualAPICalls, getDBHits };
+module.exports = { placeholderImage, fetchImageFromDB, fetchImageFromAPI, getActualAPICalls, getDBHits, resetCounters};
