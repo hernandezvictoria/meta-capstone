@@ -4,6 +4,7 @@ import '../../styles/Profile.css';
 import WithAuth from '../WithAuth'
 import NavBar from '../NavBar'
 import FilterProfilePage from './FilterProfilePage.jsx'
+import CacheStats from '../CacheStats';
 
 const Profile = () => {
     const { user, setUser } = useUser();
@@ -30,6 +31,7 @@ const Profile = () => {
     return (
         <>
             <NavBar />
+            <CacheStats />
             <div className="main-content">
                 <p className="greeting">hello, {user.username}</p>
                 <h1>skinterest</h1>
