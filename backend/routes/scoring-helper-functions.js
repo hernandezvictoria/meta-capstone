@@ -25,10 +25,7 @@ const parseLikedDislikedProducts = (products) => {
     return {brands: brandSet, ingredients: ingredientSet};
 }
 
-// given a product, compute its score based on user preferences
-const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, totalUsers) => {
-    // =========== get overlap between skin types and skin concerns ===========
-    // skin type overlap
+const computeSkinTypeScore = (product, userSkinType) => {
     let productSkinTypeScore = 0;
     let ingredientSkinTypeScore = 0;
     for (const skinType of userSkinType) {
@@ -47,8 +44,10 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         // ingredientSkinTypeScore is the number of skin types satisfied by the ingredients' skin types
         ingredientSkinTypeScore /= product.ingredients.length; // proportion of skin types satisfied by ingredients
     }
+    return {productSkinTypeScore, ingredientSkinTypeScore};
+}
 
-    // repeat for skin concern overlap
+const computeConcernScore = (product, userSkinConcerns) => {
     let productConcernsScore = 0;
     let ingredientConcernsScore = 0;
     for (const concern of userSkinConcerns) {
@@ -67,116 +66,107 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     if(product.ingredients.length > 0) {
         ingredientConcernsScore /= product.ingredients.length; // proportion of skin concerns satisfied by ingredients
     }
+    return {productConcernsScore, ingredientConcernsScore};
+}
 
-    // ========== get popularity score of product ==========
+const computePopularityScore = (product, totalUsers) => {
     let popularityScore = 0;
     const likeCount = product.loved_by_user.length;
     const dislikeCount = product.disliked_by_user.length;
     if (totalUsers > 0) {
         popularityScore = (likeCount - dislikeCount) / totalUsers; // normalize by total number of users
     }
+    return popularityScore;
+}
 
-
-    // ========== bonus points: overlap with loved and disliked products ===========
-    // get overlap with loved products
-
-    const lovedBrands = parseLikedDislikedProducts(lovedProducts).brands;
-    const lovedIngredients = parseLikedDislikedProducts(lovedProducts).ingredients;
-    let lovedProductOverlapScore = 0;
-    let lovedProductIngredientSimilarityScore = 0;
-    let isProductLoved = false;
-    for (const lovedProduct of lovedProducts) {
+const likedDislikedOverlapScore = (product, likedDislikedProducts, likedDislikedBrands, likedDislikedIngredients) => {
+    // get overlap with loved or disliked products products
+    let likedDislikedProductOverlapScore = 0;
+    let likedDislikedProductIngredientSimilarityScore = 0;
+    let isProductLikedDisliked = false;
+    for (const lovedProduct of likedDislikedProducts) {
         if(lovedProduct.id === product.id) {
-            isProductLoved = true;
-            lovedProductOverlapScore = 2; // automatically boost for loved product by 2 points
+            isProductLikedDisliked = true;
+            likedDislikedProductOverlapScore = 2; // automatically boost for loved/disliked product by 2 points
             break;
         }
 
         if(lovedProduct.brand === product.brand) {
-            lovedProductOverlapScore += (lovedBrands.has(lovedProduct.brand) ? 0.2 : 0.1); // double boost if brand is well-liked
+            likedDislikedProductOverlapScore += (likedDislikedBrands.has(lovedProduct.brand) ? 0.2 : 0.1); // double boost if brand is well-liked/well-disliked
         }
 
         // jaccard index computes similarity between two sets
-        lovedProductIngredientSimilarityScore += jaccard.index(
+        likedDislikedProductIngredientSimilarityScore += jaccard.index(
             lovedProduct.ingredients.map(i => i.id), // convert to array of ids
             product.ingredients.map(i => i.id)
         );
     }
 
-    if(!isProductLoved && lovedProducts.length > 0) {
-        // subtract by 1 if product is already loved, to avoid double counting
-        lovedProductOverlapScore += (lovedProductIngredientSimilarityScore / lovedProducts.length); // average jaccard score of loved products
+    if(!isProductLikedDisliked && likedDislikedProducts.length > 0) {
+        likedDislikedProductOverlapScore += (likedDislikedProductIngredientSimilarityScore / likedDislikedProducts.length); // average jaccard score
     }
 
     for(const ingredient of product.ingredients){
-        if(lovedIngredients.has(ingredient.id)) {
-            lovedProductOverlapScore += 0.5; // penalize extra for disliked ingredient
+        if(likedDislikedIngredients.has(ingredient.id)) {
+            likedDislikedProductOverlapScore += 0.5; // extra boost for liked/disliked ingredient
         }
     }
 
-    // penalize for overlap with disliked products
+    likedDislikedProductOverlapScore = Math.min(likedDislikedProductOverlapScore, 2); // cap at 2
+    return likedDislikedProductOverlapScore;
+}
+
+// given a product, compute its score based on user preferences
+const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, totalUsers) => {
+    // =========== get overlap between skin types and skin concerns ===========
+    const {productSkinTypeScore, ingredientSkinTypeScore} = computeSkinTypeScore(product, userSkinType);
+    const {productConcernsScore, ingredientConcernsScore} = computeConcernScore(product, userSkinConcerns);
+
+    // ========== get popularity score of product ==========
+    const popularityScore = computePopularityScore(product, totalUsers);
+
+    // ========== bonus points: overlap with loved and disliked products ===========
+    const lovedBrands = parseLikedDislikedProducts(lovedProducts).brands;
+    const lovedIngredients = parseLikedDislikedProducts(lovedProducts).ingredients;
+    let lovedProductOverlapScore = likedDislikedOverlapScore(product, lovedProducts, lovedBrands, lovedIngredients);
+
     const dislikedBrands = parseLikedDislikedProducts(dislikedProducts).brands;
     const dislikedIngredients = parseLikedDislikedProducts(dislikedProducts).ingredients;
-    let dislikedProductOverlapScore = 0;
-    let dislikedProductIngredientSimilarityScore = 0;
-    let isProductDisliked = false;
-    for(const dislikedProduct of dislikedProducts) {
-        if(dislikedProduct.id === product.id) {
-            isProductDisliked = true;
-            dislikedProductOverlapScore = -2; // automatically penalize for disliked product by 2 points
-            break;
-        }
+    let dislikedProductOverlapScore = likedDislikedOverlapScore(product, dislikedProducts, dislikedBrands, dislikedIngredients);
 
-        if(dislikedProduct.brand === product.brand) {
-            dislikedProductOverlapScore -= (dislikedBrands.has(dislikedProduct.brand) ? 0.2 : 0.1); // penalize for disliked brand
-        }
-
-        dislikedProductIngredientSimilarityScore -= jaccard.index(
-            dislikedProduct.ingredients.map(i => i.id),
-            product.ingredients.map(i => i.id)
-        ) // penalize for ingredient overlap
-    }
-
-    if(!isProductDisliked && dislikedProducts.length > 0) {
-        dislikedProductOverlapScore += (dislikedProductIngredientSimilarityScore / dislikedProducts.length); // average jaccard score of disliked products
-    }
-
-    for(const ingredient of product.ingredients){
-        if(dislikedIngredients.has(ingredient.id)) {
-            dislikedProductOverlapScore -= 0.5; // penalize extra for disliked ingredient
-        }
-    }
-
-    lovedProductOverlapScore = Math.min(lovedProductOverlapScore, 2); // cap at 2
-    dislikedProductOverlapScore = Math.max(dislikedProductOverlapScore, -2); // cap at -2
-
-    const bonusScore = lovedProductOverlapScore + dislikedProductOverlapScore;
+    const bonusScore = lovedProductOverlapScore - dislikedProductOverlapScore;
 
     // ========== combine all scores ===========
-    let weights = {}; // can adjust weights further
+    let weights = new Map(); // map is more efficient than object for storing weights
 
     if(product.ingredients.length > 0) {
-        weights['productSkinTypeScore'] = 5;
-        weights['ingredientSkinTypeScore'] = 1;
-        weights['productConcernsScore'] = 2.5;
-        weights['ingredientConcernsScore'] = 0.5;
-        weights['popularityScore'] = 1;
+        weights.set('productSkinTypeScore', 5);
+        weights.set('ingredientSkinTypeScore', 1);
+        weights.set('productConcernsScore', 2.5);
+        weights.set('ingredientConcernsScore', 0.5);
+        weights.set('popularityScore', 1);
     } else {
-        weights['productSkinTypeScore'] = 5.5;
-        weights['ingredientSkinTypeScore'] = 0;
-        weights['productConcernsScore'] = 3;
-        weights['ingredientConcernsScore'] = 0;
-        weights['popularityScore'] = 1.5;
+        weights.set('productSkinTypeScore', 5.5);
+        weights.set('ingredientSkinTypeScore', 0);
+        weights.set('productConcernsScore', 3);
+        weights.set('ingredientConcernsScore', 0);
+        weights.set('popularityScore', 1.5);
     }
-
+    weights.set('bonusScore', 1);
 
     let totalScore = 0;
-    totalScore += productSkinTypeScore * weights['productSkinTypeScore'];
-    totalScore += ingredientSkinTypeScore * weights['ingredientSkinTypeScore'];
-    totalScore += productConcernsScore * weights['productConcernsScore'];
-    totalScore += ingredientConcernsScore * weights['ingredientConcernsScore'];
-    totalScore += popularityScore * weights['popularityScore'];
-    totalScore += bonusScore;
+    const scores = {
+        productSkinTypeScore,
+        ingredientSkinTypeScore,
+        productConcernsScore,
+        ingredientConcernsScore,
+        popularityScore,
+        bonusScore
+    };
+
+    for (const key of weights.keys()) {
+        totalScore += scores[key] * weights.get(key);
+    }
 
     // cap score between 0 and 10
     totalScore = Math.min(totalScore, 10);
