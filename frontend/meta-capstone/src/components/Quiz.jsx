@@ -5,8 +5,10 @@ import { Link, useParams, useNavigate, Form } from 'react-router-dom';
 import '../styles/Quiz.css';
 import WithAuth from './WithAuth'
 import logoIcon from '../assets/logo.png'
+import { useNav } from "../contexts/NavContext";
 
 const Quiz = () => {
+    const { isHome, setIsHome } = useNav();
     const { user, setUser } = useUser();
     const navigate = useNavigate();
     const [message, setMessage] = useState({ type: "none", text: "" });
@@ -15,7 +17,6 @@ const Quiz = () => {
     const [selectedConcerns, setSelectedConcerns] = useState([]);
 
     const loadInitialTypesAndConcerns = async () => {
-        console.log("loading initial types and concerns");
         try{
             const response = await fetch(`${import.meta.env.VITE_BASE_URL}/user-skin-types-and-concerns`, {credentials: "include"});
             if (response.ok) {
@@ -27,13 +28,14 @@ const Quiz = () => {
                     document.getElementById(skinType).classList.add("active");
                 }
                 for (const concern of data.concerns) {
-                    document.getElementById(concern.replace(/\s+/g, '_')).classList.add("active");
+                    document.getElementById(concern.replace(/[\s_&()]+/g, '')).classList.add("active");
                 }
             } else{
                 throw new Error(); // throw error to be caught
             }
 
         } catch (error) {
+            setIsHome(true);
             navigate("/login"); // redirect to login page if error occurs
         }
     }
@@ -59,7 +61,7 @@ const Quiz = () => {
     const handleConcernClick = (event) => {
         event.preventDefault();
         const concern = event.target.name;
-        const button = document.getElementById(concern.replace(/\s+/g, '_'));
+        const button = document.getElementById(concern.replace(/[\s_&()]+/g, ''));
         if (selectedConcerns.includes(concern)) { // remove if already selected
             setSelectedConcerns(selectedConcerns.filter((c) => c !== concern));
             button.classList.remove("active");
@@ -77,18 +79,14 @@ const Quiz = () => {
         if (selectedSkinTypes.length === 0 || selectedConcerns.length === 0) {
             setMessage({ type: "error", text: "you must select at least one of each" });
         } else {
-            // setFormSubmitted(true);
-
             // convert to JSON
             const skinTypesJson = JSON.stringify(selectedSkinTypes);
             const concernsJson = JSON.stringify(selectedConcerns);
-
             updateUserInfo(skinTypesJson, concernsJson);
         }
     }
 
     const updateUserInfo = async (skinTypesJson, concernsJson) => {
-
         //update skin type
         try {
             const response = await fetch(`${import.meta.env.VITE_BASE_URL}/change-skin-type`, {
@@ -130,15 +128,14 @@ const Quiz = () => {
         } catch (error) {
             setMessage({ type: "error", text: "network error, please try again" });
         }
-
         setFormSubmitted(true);
     }
 
     useEffect(() => {
         if(formSubmitted && message.type !== "error"){
+            setIsHome(true);
             navigate("/home");
         }
-
     }, [formSubmitted, message]);
 
     return (
@@ -147,22 +144,25 @@ const Quiz = () => {
                 <img src={logoIcon} alt="logo" className="logo" />
                 <h2 className="quiz-header">tell us about your skinterests, {user.username}</h2>
                 <form onSubmit={handleSubmit}>
-                    <h3>skin type(s) </h3>
-                    {Object.values(SkinTypes).map((skinType) => (
-                        <button id={skinType} className="skin-type-button" onClick={handleSkinTypeClick} key={skinType} name={skinType}>{skinType}</button>
-                    ))}
+                    <h3 className="category-header">skin type(s) </h3>
+                    <div className="skin-type-buttons">
+                        {Object.values(SkinTypes).map((skinType) => (
+                            <button id={skinType} className="skin-type-button" onClick={handleSkinTypeClick} key={skinType} name={skinType}>{skinType}</button>
+                        ))}
+                    </div>
 
-
-                    <h3>concern(s)</h3>
-                    {Object.values(SkinConcerns).map((concern) => (
-                        <button id={concern.replace(/\s+/g, '_')} className="concern-button" onClick={handleConcernClick} key={concern} name={concern}>{concern}</button>
-                    ))}
+                    <h3 className="category-header">concern(s)</h3>
+                    <div className="concern-buttons">
+                        {Object.values(SkinConcerns).map((concern) => (
+                            <button id={concern.replace(/[\s_&()]+/g, '')} className="concern-button" onClick={handleConcernClick} key={concern} name={concern}>{concern}</button>
+                        ))}
+                    </div>
 
                     {message && (
                     <p className={`message ${message.type}`}>{message.text}</p>
                     )}
 
-                    <button type="submit" value="Submit">submit</button>
+                    <button type="submit" value="Submit" className="submit-button">submit</button>
                 </form>
             </div>
 
