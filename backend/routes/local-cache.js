@@ -1,5 +1,5 @@
 const { PriorityQueue } = require('@datastructures-js/priority-queue');
-const {fetchImageFromDB} = require('./server-cache.js')
+const {fetchImageFromDB, placeholderImage} = require('./server-cache.js')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const prisma = new PrismaClient()
 const express = require('express')
@@ -103,14 +103,14 @@ const insertProduct = async (productId) => {
     if (productImageCache.size >= MAX_CACHE_SIZE) {
         flushCache(); // if cache is at capacity, flush FLUSH_SIZE products from cache
     }
-    productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
+    productImageCache.set(productId, { image: await fetchImageFromDB(productId), timestamp: new Date() });
     const priority = await computeInitialPriority(productId);
     productQueue.enqueue({ productId, priority });
 };
 
 const replaceProduct = async (productId) => {
     productQueue.remove((p) => p.productId === productId);
-    productImageCache.set(productId, { image: fetchImageFromDB(productId), timestamp: new Date() });
+    productImageCache.set(productId, { image: await fetchImageFromDB(productId), timestamp: new Date() });
     const priority = await computeInitialPriority(productId);
     productQueue.enqueue({ productId, priority });
 };
@@ -119,20 +119,28 @@ const replaceProduct = async (productId) => {
 // returns the image url of the product, given the product ID
 // TODO: change method to a router GET request
 const getProductImage = async (userId, productId) => {
-    currentUserId = userId; // set the current user id
-    if (productImageCache.has(productId)) {
-        if (Date.now() - productImageCache.get(productId).timestamp.getTime() >= TTL) {
-            await replaceProduct(productId); // if product data is stale, replace it with new data
-        } else {
-            const removed = productQueue.remove((p) => p.productId === productId);
-            if (removed[0]) {
-                productQueue.enqueue({ productId, priority: removed[0].priority + 1 });
-            }
+    try{
+        if(!productImageCache) {
+            createQueueAndCache(); // if queue and cache are not created, create them
         }
-    } else { // if product data is not in cache
-        await insertProduct(productId);
+
+        currentUserId = userId; // set the current user id
+        if (productImageCache.has(productId)) {
+            if (Date.now() - productImageCache.get(productId).timestamp.getTime() >= TTL) {
+                await replaceProduct(productId); // if product data is stale, replace it with new data
+            } else {
+                const removed = productQueue.remove((p) => p.productId === productId);
+                if (removed[0]) {
+                    productQueue.enqueue({ productId, priority: removed[0].priority + 1 });
+                }
+            }
+        } else { // if product data is not in cache
+            await insertProduct(productId);
+        }
+        return productImageCache.get(productId).image;
+    } catch (err) {
+        return placeholderImage; // if there is an error, return a placeholder image
     }
-    return productImageCache.get(productId).image;
 };
 
 

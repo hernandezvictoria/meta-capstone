@@ -1,5 +1,4 @@
 const {flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache}= require('./local-cache.js');
-const wait = async (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const {fetchImageFromAPI, fetchImageFromDB}= require('./server-cache.js');
 
 const testQueueOrdering = async () => {
@@ -107,4 +106,10 @@ const testTTL = async () => {
     console.log("image url: " + image);
 }
 
-testDBCall();
+const testGetProductImage = async () => {
+    const image = await getProductImage(1, 1);
+    console.log("finished executing getProductImage");
+    console.log("image url: " + image);
+}
+
+testGetProductImage();

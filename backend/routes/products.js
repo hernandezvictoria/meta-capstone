@@ -1,7 +1,8 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
-const {cleanSearchQuery, updateProductsWithScore} = require('./scoring-helper-functions.js');
+const {updateProductsWithScore} = require('./scoring-helper-functions.js');
+const {cleanSearchQuery} = require('./search-helper-functions.js');
 const prisma = new PrismaClient()
 const router = express.Router()
 
@@ -102,7 +103,7 @@ router.get('/products', async (req, res) => {
         }
     }
     const users = await prisma.user.findMany();
-    let scoredProducts = updateProductsWithScore(productCandidates, userInfo, users?.length);
+    let scoredProducts = await updateProductsWithScore(productCandidates, userInfo, users?.length);
     scoredProducts = scoredProducts.sort((a, b) => b.score - a.score).slice(offset, offset + limit);
     res.status(200).json({
         totalProducts: scoredProducts.length,

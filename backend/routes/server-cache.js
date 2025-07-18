@@ -1,6 +1,5 @@
 const { PrismaClient } = require('../generated/prisma/index.js')
 const prisma = new PrismaClient()
-const express = require('express')
 
 const placeholderImage = "https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg";
 const TTL = 1000*60*60*24*7; // time to live for each product in DB, 1 week for now
@@ -74,5 +73,4 @@ const updateImageInDb = async (id, image) => {
     }
 };
 
-module.exports = {fetchImageFromDB};
-module.exports = {fetchImageFromDB, fetchImageFromAPI};
+module.exports = {placeholderImage, fetchImageFromDB, fetchImageFromAPI};

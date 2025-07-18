@@ -1,6 +1,5 @@
 var jaccard = require('jaccard');
-
-const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
+const {getProductImage}= require('./local-cache.js');
 
 const parseLikedDislikedProducts = (products) => {
     const brands = products.map(product => product.brand);
@@ -186,67 +185,24 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     return totalScore;
 }
 
-
-const cleanSearchQuery = (searchTerm) => {
-    const termToEnum = {}; // hm to store related terms to skin types and concerns
-
-    // Add key-value pairs
-    termToEnum['combo'] = SkinTypes.COMBINATION;
-    termToEnum['wrinkles'] = SkinConcerns.WRINKLES;
-    termToEnum['fine'] = SkinConcerns.WRINKLES;
-    termToEnum['lines'] = SkinConcerns.WRINKLES;
-    termToEnum['line'] = SkinConcerns.WRINKLES;
-    termToEnum['rough'] = SkinConcerns.TEXTURE;
-    termToEnum['smooth'] = SkinConcerns.TEXTURE;
-    termToEnum['dark'] = SkinConcerns.HYPERPIGMENTATION;
-    termToEnum['spots'] = SkinConcerns.HYPERPIGMENTATION;
-    termToEnum['hyperpigmentation'] = SkinConcerns.HYPERPIGMENTATION;
-    termToEnum['redness'] = SkinConcerns.REDNESS;
-    termToEnum['irritation'] = SkinConcerns.REDNESS;
-    termToEnum['damaged'] = SkinConcerns.REDNESS;
-    termToEnum['red'] = SkinConcerns.REDNESS;
-    termToEnum['acne'] = SkinConcerns.ACNE;
-    termToEnum['blemish'] = SkinConcerns.ACNE;
-    termToEnum['blemishes'] = SkinConcerns.ACNE;
-    termToEnum['pimple'] = SkinConcerns.ACNE;
-    termToEnum['pimples'] = SkinConcerns.ACNE;
-    termToEnum['dull'] = SkinConcerns.DULLNESS;
-    termToEnum['dry'] = SkinConcerns.DRYNESS;
-    termToEnum['lotion'] = ProductTypes.moisturizer;
-    termToEnum['eye'] = ProductTypes.eye_cream; // not a great soln for eye cream rn
-    termToEnum['cream'] = ProductTypes.moisturizer;
-    termToEnum['wash'] = ProductTypes.cleanser;
-    termToEnum['retinoid'] = ProductTypes.retinol;
-    const stopWords = ["skin", "and", "for", "face"];
-
-    let cleanedSearchTerm = searchTerm.replace(/-/g, " ");
-    const queryArray = cleanedSearchTerm.split(" ")
-        .filter((q) => {
-            if(!stopWords.includes(q)){
-                return q;
-            }
-        }) // remove filler words from query, can add more later
-        .map(q => (q in termToEnum) ? termToEnum[q] : q) // map terms to enums
-        .map(q => q.toLowerCase());
-
-    return queryArray;
-}
-
 // returns same array of products, but with scores as a field
-const updateProductsWithScore = (products, user, totalUsers) => {
-    return products.map((product) => {
+const updateProductsWithScore = async (products, user, totalUsers) => {
+    // need to await Promise.all to ensure all images are fetched before returning (otherwise map will return promises)
+    const updatedProducts = await Promise.all(products.map(async (product) => {
         return {
             id: product.id,
             brand: product.brand,
             name: product.name,
-            image: product.image,
+            image: await getProductImage(user.id, product.id), // getProductImage is async, so need to await
             product_type: product.product_type,
             price: product.price,
             concerns: product.concerns,
             skin_type: product.skin_type,
             ingredients: product.ingredients,
-            score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns, totalUsers)};
-    })
+            score: computeProductScore(product, user.loved_products, user.disliked_products, user.skin_type, user.concerns, totalUsers)
+        };
+    }));
+    return updatedProducts;
 }
 
-module.exports = {computeProductScore, cleanSearchQuery, updateProductsWithScore};
+module.exports = {computeProductScore, updateProductsWithScore};
