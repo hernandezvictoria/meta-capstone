@@ -5,6 +5,7 @@ import WithAuth from '../WithAuth'
 import ProductList from './ProductList'
 import Search from './Search'
 import NavBar from '../NavBar';
+import CacheStats from '../CacheStats';
 
 
 const Home = () => {
@@ -17,6 +18,7 @@ const Home = () => {
     return (
         <>
             <NavBar/>
+            <CacheStats/>
             <div className="main-content">
                 <p className="greeting">hello, {user.username}</p>
                 <h1>skinterest</h1>
