@@ -7,6 +7,11 @@ const TTL = 1000*60*60*24*7; // time to live for each product in DB, 1 week for 
 let actualAPICalls = 0;
 let DBHits = 0;
 
+/**
+ * Fetches the image URL from the DB if it exists and is not expired, otherwise fetches it from the API.
+ * @param {number} productId - ID of the product whose image to fetch.
+ * @returns {string} - The image URL.
+ */
 const fetchImageFromDB = async (productId) => {
     const productInfo = await prisma.productInfo.findUnique({
         where: {id: productId}
@@ -36,8 +41,14 @@ const fetchImageFromDB = async (productId) => {
     }
 };
 
+/**
+ * Fetches the image URL from the API.
+ * @param {number} productId - ID of the product whose image to fetch.
+ * @param {string} name - Name of the product whose image to fetch.
+ * @param {string} brand - Brand of the product whose image to fetch.
+ * @returns
+ */
 const fetchImageFromAPI = async (productId, name, brand) => {
-
     const url = `https://real-time-sephora-api.p.rapidapi.com/search-by-keyword?sortBy=BEST_SELLING&keyword=${name}&brandFilter=${brand}`;
       const options = {
         method: 'GET',
@@ -63,6 +74,11 @@ const fetchImageFromAPI = async (productId, name, brand) => {
     }
 };
 
+/**
+ * Updates the image in the DB based on API call result.
+ * @param {number} id - ID of the product whose image to update.
+ * @param {string} image - Updated image URL of product.
+ */
 const updateImageInDb = async (id, image) => {
     try {
         // update the product's image
