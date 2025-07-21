@@ -360,7 +360,7 @@ router.post('/log-interaction/:productId', async (req, res) => {
 
     try {
         // Create a new interaction in the database
-        const newInteraction = await prisma.UserProductInteraction.create({
+        await prisma.userProductInteraction.create({
             data: {
                 product_id: productId,
                 user_id: userId,

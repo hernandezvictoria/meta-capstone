@@ -1,6 +1,7 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
 const { PrismaClient } = require('../generated/prisma/index.js')
+const { ActivityTypes } = require('../enums.js')
 
 const prisma = new PrismaClient()
 const router = express.Router()
@@ -73,7 +74,16 @@ router.post('/login', async (req, res) => {
         req.session.userId = user.id
         req.session.username = user.username
 
-        res.json({ id: user.id, username: user.username }) // Include id and username in the response
+        // Create a new login user activity in the database
+        await prisma.userActivity.create({
+            data: {
+                user_id: user.id,
+                activity_time: new Date(),
+                activity_type: ActivityTypes.LOGIN
+            }
+        })
+
+        res.status(200).json({ id: user.id, username: user.username }) // Include id and username in the response
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: "something went wrong during login" })
@@ -100,14 +110,31 @@ router.get('/me', async (req, res) => {
 })
 
 // Logout Route
-router.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ error: 'failed to log out' });
+router.post('/logout', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ message: "You must be logged in to log out" })
     }
-    res.clearCookie('connect.sid'); // Clear the session cookie
-    res.json({ message: 'Logout successful' });
-  });
+
+    try{
+        // Create a new logout user activity in the database
+        await prisma.userActivity.create({
+            data: {
+                user_id: req.session.userId,
+                activity_time: new Date(),
+                activity_type: ActivityTypes.LOGOUT
+            }
+        })
+    }
+    catch (error) {
+        return res.status(500).json({ error: 'failed to log out' });
+    }
+    req.session.destroy((err) => {
+        if (err) {
+        return res.status(500).json({ error: 'failed to log out' });
+        }
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.json({ message: 'Logout successful' });
+    });
 });
 
 module.exports = router;
