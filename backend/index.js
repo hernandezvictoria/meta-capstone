@@ -21,8 +21,7 @@ app.get("/", (req, res) => {
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user-info");
 const productRoutes = require("./routes/products");
-const { router } = require("./routes/local-cache");
-const cacheRoutes = router;
+const cacheRoutes = require("./routes/cache");
 
 const { ValidationError } = require("./middleware/CustomErrors");
 

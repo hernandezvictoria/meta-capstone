@@ -1,11 +1,9 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
-const {updateProductsWithScore} = require('./scoring-helper-functions.js');
+const {updateProductsWithScore} = require('../helpers/scoring-helper-functions.js');
 const prisma = new PrismaClient()
 const router = express.Router()
 
-
-// http://localhost:3000/change-skin-type
 router.put('/change-skin-type', async (req, res) => {
     const skin_type = req.body
 
@@ -105,7 +103,6 @@ router.get('/user-id', async(req, res) => {
     }
 });
 
-// http://localhost:3000/change-skin-concerns
 router.put('/change-skin-concerns', async (req, res) => {
     const concerns = req.body
 

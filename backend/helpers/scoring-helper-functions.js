@@ -1,5 +1,5 @@
 var jaccard = require('jaccard');
-const {getProductImage}= require('./local-cache.js');
+const {getProductImage}= require('./server-cache.js');
 
 const parseLikedDislikedProducts = (products) => {
     const brands = products.map(product => product.brand);

@@ -84,7 +84,6 @@ const resetCounters = () => {
     DBHits = 0;
 }
 
-// server-cache.js
 const getActualAPICalls = () => actualAPICalls;
 const getDBHits = () => DBHits;
 

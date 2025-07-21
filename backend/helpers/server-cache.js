@@ -1,15 +1,7 @@
 const { PriorityQueue } = require("@datastructures-js/priority-queue");
-const {
-  fetchImageFromDB,
-  placeholderImage,
-  getActualAPICalls,
-  getDBHits,
-  resetCounters
-} = require("./server-cache.js");
+const { fetchImageFromDB, placeholderImage, resetCounters } = require("./db-cache.js");
 const { PrismaClient } = require("../generated/prisma/index.js");
 const prisma = new PrismaClient();
-const express = require("express");
-const router = express.Router();
 const { InteractionTypes } = require("../enums.js");
 
 const MAX_CACHE_SIZE = 50; // max number of products in cache
@@ -17,6 +9,7 @@ const TTL = 1000 * 60 * 60 * 24; // time to live for each product in cache, 1 da
 const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
 let currentUserId = null;
 const hoursInDay = 24;
+const oneDayMilliseconds = 1000 * 60 * 60 * 24;
 
 let potentialAPICalls = 0;
 let cacheHits = 0;
@@ -52,18 +45,16 @@ const computeInitialPriority = async (productId) => {
       return Number.MIN_SAFE_INTEGER; // if product data is stale, return lowest priority (first to be flushed)
     }
 
-    const oneDayMilliseconds = 1000 * 60 * 60 * 24; // 1 day, but can be changed
-    const totalUserClicks = await prisma.userProductInteraction.findMany({
+    const totalProductClicks = await prisma.userProductInteraction.findMany({
       where: {
-        user_id: currentUserId,
         product_id: productId,
       },
     });
 
-    if (totalUserClicks.length === 0) {
+    if (totalProductClicks.length === 0) {
       return 0;
     }
-    const userClicksInLastDay = totalUserClicks.filter(
+    const userClicksInLastDay = totalProductClicks.filter(
       (interaction) =>
         interaction.interaction_time.getTime() >=
         currentTime - oneDayMilliseconds
@@ -71,7 +62,7 @@ const computeInitialPriority = async (productId) => {
 
     const interactionFrequencies = new Map();
 
-    const incrementFrequency = (interactionType) => {
+    const incrementFrequency = (interactionType, userId) => {
       if (interactionFrequencies.has(interactionType)) {
         interactionFrequencies.set(interactionType, interactionFrequencies.get(interactionType) + 1);
       }
@@ -177,20 +168,18 @@ const replaceProduct = async (productId) => {
 };
 
 // returns the image url of the product, given the product ID
-// TODO: change method to a router GET request
 const getProductImage = async (userId, productId) => {
+  if (!currentUserId) { // create cache if it doesn't exist
+      createQueueAndCache();
+      potentialAPICalls = 0;
+      cacheHits = 0;
+      resetCounters();
+  }
+
   potentialAPICalls++;
   try {
     if (!productImageCache) {
       createQueueAndCache(); // if queue and cache are not created, create them
-    }
-
-    //if new user logs in, reset data
-    if (userId !== currentUserId) {
-        createQueueAndCache();
-        potentialAPICalls = 0;
-        cacheHits = 0;
-        resetCounters();
     }
     currentUserId = userId; // set the current user id
     if (productImageCache.has(productId)) {
@@ -219,6 +208,14 @@ const getProductImage = async (userId, productId) => {
   }
 };
 
+const getPotentialAPICalls = () => {
+  return potentialAPICalls;
+}
+
+const getCacheHits = () => {
+  return cacheHits;
+}
+
 // ====================== GETTERS USED FOR TESTING ======================
 const getQueue = () => {
   return productQueue;
@@ -228,16 +225,6 @@ const getCache = () => {
   return productImageCache;
 };
 
-// ====================== ROUTE FOR GETTING STATS ======================
-router.get("/cache-stats", async (req, res) => {
-  res.json({
-    potentialAPICalls,
-    cacheHits,
-    actualAPICalls: getActualAPICalls(),
-    DBHits: getDBHits(),
-  });
-});
-
 module.exports = {
   flushCache,
   insertProduct,
@@ -245,5 +232,6 @@ module.exports = {
   getProductImage,
   getQueue,
   getCache,
-  router,
+  getPotentialAPICalls,
+  getCacheHits
 };

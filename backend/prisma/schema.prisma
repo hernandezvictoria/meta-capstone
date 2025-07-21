@@ -1,12 +1,12 @@
 enum ProductType {
-    serum
-    toner
-    sunscreen
-    moisturizer
-    retinol
-    mask
-    cleanser
-    eye_cream
+  serum
+  toner
+  sunscreen
+  moisturizer
+  retinol
+  mask
+  cleanser
+  eye_cream
 }
 
 enum InteractionType{
@@ -24,6 +24,11 @@ enum SkinType{
   dry
   combination
   oily
+}
+
+enum ActivityType{
+  login
+  logout
 }
 
 generator client {
@@ -56,6 +61,7 @@ model User{
   saved_products ProductInfo[] @relation("saved")
   disliked_products ProductInfo[] @relation("disliked")
   interactions UserProductInteraction[]
+  activity UserActivity[]
 }
 
 model ProductInfo{
@@ -83,4 +89,12 @@ model UserProductInteraction{
   user_id Int
   interaction_time DateTime
   interaction_type InteractionType
+}
+
+model UserActivity{
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [user_id], references: [id])
+  user_id Int
+  activity_time DateTime
+  activity_type ActivityType
 }
