@@ -16,6 +16,7 @@ const MAX_CACHE_SIZE = 50; // max number of products in cache
 const TTL = 1000 * 60 * 60 * 24; // time to live for each product in cache, 1 day for now
 const FLUSH_SIZE = 10; // number of products to flush from cache when cache is at capacity
 let currentUserId = null;
+const hoursInDay = 24;
 
 let potentialAPICalls = 0;
 let cacheHits = 0;
@@ -68,39 +69,47 @@ const computeInitialPriority = async (productId) => {
         currentTime - oneDayMilliseconds
     );
 
-    const openModalVelocity =
-      userClicksInLastDay.filter(
-        (interaction) =>
-          interaction.interaction_type === InteractionTypes.OPEN_MODAL
-      ).length / 24; // total opens per hour
-    const likeVelocity =
-      (userClicksInLastDay.filter(
-        (interaction) => interaction.interaction_type === InteractionTypes.LIKE
-      ).length -
-        userClicksInLastDay.filter(
-          (interaction) =>
-            interaction.interaction_type === InteractionTypes.REMOVE_LIKE
-        ).length) /
-      24; // net likes per hour
-    const saveVelocity =
-      (userClicksInLastDay.filter(
-        (interaction) => interaction.interaction_type === InteractionTypes.SAVE
-      ).length -
-        userClicksInLastDay.filter(
-          (interaction) =>
-            interaction.interaction_type === InteractionTypes.REMOVE_SAVE
-        ).length) /
-      24; // net saves per hour
-    const dislikeVelocity =
-      (userClicksInLastDay.filter(
-        (interaction) =>
-          interaction.interaction_type === InteractionTypes.DISLIKE
-      ).length -
-        userClicksInLastDay.filter(
-          (interaction) =>
-            interaction.interaction_type === InteractionTypes.REMOVE_DISLIKE
-        ).length) /
-      24; // net dislikes per hour
+    const interactionFrequencies = new Map();
+
+    const incrementFrequency = (interactionType) => {
+      if (interactionFrequencies.has(interactionType)) {
+        interactionFrequencies.set(interactionType, interactionFrequencies.get(interactionType) + 1);
+      }
+      else{
+        interactionFrequencies.set(interactionType, 1);
+      }
+    }
+
+    for (const interaction of userClicksInLastDay) {
+      switch (interaction.interaction_type) {
+        case InteractionTypes.OPEN_MODAL:
+          incrementFrequency(InteractionTypes.OPEN_MODAL);
+          break;
+        case InteractionTypes.LIKE:
+          incrementFrequency(InteractionTypes.LIKE);
+          break;
+        case InteractionTypes.REMOVE_LIKE:
+          incrementFrequency(InteractionTypes.REMOVE_LIKE);
+          break;
+        case InteractionTypes.SAVE:
+          incrementFrequency(InteractionTypes.SAVE);
+          break;
+        case InteractionTypes.REMOVE_SAVE:
+          incrementFrequency(InteractionTypes.REMOVE_SAVE);
+          break;
+        case InteractionTypes.DISLIKE:
+          incrementFrequency(InteractionTypes.DISLIKE);
+          break;
+        case InteractionTypes.REMOVE_DISLIKE:
+          incrementFrequency(InteractionTypes.REMOVE_DISLIKE);
+          break;
+      }
+    }
+
+    const openModalVelocity = interactionFrequencies.get(InteractionTypes.OPEN_MODAL) / hoursInDay;
+    const likeVelocity = (interactionFrequencies.get(InteractionTypes.LIKE) - interactionFrequencies.get(InteractionTypes.REMOVE_LIKE)) / hoursInDay;
+    const saveVelocity = (interactionFrequencies.get(InteractionTypes.SAVE) - interactionFrequencies.get(InteractionTypes.REMOVE_SAVE)) / hoursInDay;
+    const dislikeVelocity = (interactionFrequencies.get(InteractionTypes.DISLIKE) - interactionFrequencies.get(InteractionTypes.REMOVE_DISLIKE)) / hoursInDay;
 
     // opening modal carries most weight
     return (
@@ -113,12 +122,11 @@ const computeInitialPriority = async (productId) => {
 
 const flushCache = () => {
   // flush stale data from cache or FLUSH_SIZE products from cache in priority order
-  const totalRemoved = 0;
+  let totalRemoved = 0;
   if (productImageCache.size > 0) {
     // remove all the products with stale data from cache
-    while (
-      computeInitialPriority(productQueue.front()) === Number.MIN_SAFE_INTEGER
-    ) {
+    // products with stale data have priority of Number.MIN_SAFE_INTEGER
+    while ( computeInitialPriority(productQueue.front()) === Number.MIN_SAFE_INTEGER ) {
       const dequeuedProduct = productQueue.dequeue();
       productImageCache.delete(dequeuedProduct.productId);
       totalRemoved++;
@@ -133,7 +141,7 @@ const flushCache = () => {
 
     // remove more items from cache if not enough products with stale data were removed
     for (let i = 0; i < FLUSH_SIZE - totalRemoved; i++) {
-      if (productImageCache.size === 0) {
+      if (productImageCache.size === 0 || productQueue.isEmpty()) {
         return; // if all products are removed, return
       }
       const dequeuedProduct = productQueue.dequeue();
