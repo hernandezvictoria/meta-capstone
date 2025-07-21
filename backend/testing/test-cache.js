@@ -1,5 +1,6 @@
-const {flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache}= require('./local-cache.js');
-const {fetchImageFromAPI, fetchImageFromDB}= require('./server-cache.js');
+const { get } = require('../routes/auth.js');
+const {computeInitialPriority, setUserActivity, flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache}= require('../helpers/server-cache.js');
+const {fetchImageFromAPI, fetchImageFromDB}= require('../helpers/db-cache.js');
 
 const testQueueOrdering = async () => {
     await insertProduct(53); // save, like, open modal #2
@@ -112,4 +113,12 @@ const testGetProductImage = async () => {
     console.log("image url: " + image);
 }
 
-testGetProductImage();
+const testSetUserActivity = async () => {
+    setUserActivity();
+}
+
+const testGetPriority = async () => {
+    const priority = computeInitialPriority(33);
+}
+
+testGetPriority();
