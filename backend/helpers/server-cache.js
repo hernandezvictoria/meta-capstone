@@ -32,93 +32,93 @@ let dynamicCacheSize = MIN_CACHE_SIZE;
  */
 const createQueueAndCache = () => {
   // priority queue for products, less interacted with products have lower priority (first to be flushed from cache)
-	productQueue = new PriorityQueue((a, b) => {
-		if (a.priority === b.priority) {
-			// if they are tied, sort by recency
-			const aTime = productImageCache.has(a.productId)
-				? productImageCache.get(a.productId).timestamp.getTime()
-				: Date.now();
-			const bTime = productImageCache.has(b.productId)
-				? productImageCache.get(b.productId).timestamp.getTime()
-				: Date.now();
-			return aTime - bTime;
-		}
-		return a.priority - b.priority;
-	});
-	productImageCache = new Map(); // productId -> image url, timestamp
+    productQueue = new PriorityQueue((a, b) => {
+        if (a.priority === b.priority) {
+            // if they are tied, sort by recency
+            const aTime = productImageCache.has(a.productId)
+                ? productImageCache.get(a.productId).timestamp.getTime()
+                : Date.now();
+            const bTime = productImageCache.has(b.productId)
+                ? productImageCache.get(b.productId).timestamp.getTime()
+                : Date.now();
+            return aTime - bTime;
+        }
+        return a.priority - b.priority;
+    });
+    productImageCache = new Map(); // productId -> image url, timestamp
 };
 
 /**
  * Resizes cache based on number of active users in last hour.
  */
 const resizeCache = () => {
-	dynamicCacheSize = MIN_CACHE_SIZE + (numActiveUsers * CACHE_SIZE_LIMITOR);
-	dynamicCacheSize = Math.min(dynamicCacheSize, MAX_CACHE_SIZE); // cap the cache size at MAX_CACHE_SIZE
-	dynamicCacheLifetime = ONE_DAY_MILLISECONDS / (dynamicCacheSize / MIN_CACHE_SIZE); // larger caches have shorter lifetimes
-	dynamicFlushSize = Math.floor(dynamicCacheSize / 5); // flush size is 1/5 of cache size
+    dynamicCacheSize = MIN_CACHE_SIZE + (numActiveUsers * CACHE_SIZE_LIMITOR);
+    dynamicCacheSize = Math.min(dynamicCacheSize, MAX_CACHE_SIZE); // cap the cache size at MAX_CACHE_SIZE
+    dynamicCacheLifetime = ONE_DAY_MILLISECONDS / (dynamicCacheSize / MIN_CACHE_SIZE); // larger caches have shorter lifetimes
+    dynamicFlushSize = Math.floor(dynamicCacheSize / 5); // flush size is 1/5 of cache size
 
-	// if existing cache is larger than new cache size
-	if(productImageCache.size > dynamicCacheSize){
-		const sizeDifference = productImageCache.size - dynamicCacheSize;
-		const numFlushes = Math.ceil(sizeDifference / dynamicFlushSize); // use math.ceil to round up to the integer
-		for(let i = 0; i < numFlushes; i++){
-			flushCache(); // flush until below max cache size
-		}
-	}
+    // if existing cache is larger than new cache size
+    if(productImageCache.size > dynamicCacheSize){
+        const sizeDifference = productImageCache.size - dynamicCacheSize;
+        const numFlushes = Math.ceil(sizeDifference / dynamicFlushSize); // use math.ceil to round up to the integer
+        for(let i = 0; i < numFlushes; i++){
+            flushCache(); // flush until below max cache size
+        }
+    }
 }
 
 /**
  * Sets number of active users in past hour (numActiveUsers) and activity scores of each user (userToActivityScore).
  */
 const setUserActivity = async() => {
-	numActiveUsers = 0;
-	userToActivityScore = new Map();
+    numActiveUsers = 0;
+    userToActivityScore = new Map();
 
-	const allUserLogins = await prisma.userActivity.findMany({
-		where: {activity_type : ActivityTypes.LOGIN}
-	});
+    const allUserLogins = await prisma.userActivity.findMany({
+        where: {activity_type : ActivityTypes.LOGIN}
+    });
 
-	const userLoginsInPastWeek = allUserLogins.filter((login) =>
-		(Date.now() - login.activity_time.getTime() <= ONE_WEEK_MILLISECONDS)
-	);
+    const userLoginsInPastWeek = allUserLogins.filter((login) =>
+        (Date.now() - login.activity_time.getTime() <= ONE_WEEK_MILLISECONDS)
+    );
 
-	const allUserLogouts = await prisma.userActivity.findMany({
-		where: { activity_type : ActivityTypes.LOGOUT }
-	});
+    const allUserLogouts = await prisma.userActivity.findMany({
+        where: { activity_type : ActivityTypes.LOGOUT }
+    });
 
-	const userLogoutsInPastHour = allUserLogouts.filter((logout) =>
-		(Date.now() - logout.activity_time.getTime() <= ONE_HOUR_MILLISECONDS)
-	);
+    const userLogoutsInPastHour = allUserLogouts.filter((logout) =>
+        (Date.now() - logout.activity_time.getTime() <= ONE_HOUR_MILLISECONDS)
+    );
 
-	let maxScore = 1;
-	for(const loginActivity of userLoginsInPastWeek){
-		if(Date.now() - loginActivity.activity_time.getTime() <= ONE_HOUR_MILLISECONDS){ // if activity happened in last hour
-			// if the user hasn't logged out yet
-			if(!userLogoutsInPastHour.some((logoutActivity) => {
-				logoutActivity.user_id === loginActivity.user_id
-				&& logoutActivity.activity_time.getTime() > loginActivity.activity_time.getTime() // user logged out after logging in
-			})) {
-				numActiveUsers++;
-			}
-		}
+    let maxScore = 1;
+    for(const loginActivity of userLoginsInPastWeek){
+        if(Date.now() - loginActivity.activity_time.getTime() <= ONE_HOUR_MILLISECONDS){ // if activity happened in last hour
+            // if the user hasn't logged out yet
+            if(!userLogoutsInPastHour.some((logoutActivity) => {
+                logoutActivity.user_id === loginActivity.user_id
+                && logoutActivity.activity_time.getTime() > loginActivity.activity_time.getTime() // user logged out after logging in
+            })) {
+                numActiveUsers++;
+            }
+        }
 
-		// add each login to userActivity score
-		if(userToActivityScore.has(loginActivity.user_id)){
-			userToActivityScore.set(loginActivity.user_id, (userToActivityScore.get(loginActivity.user_id) + 1))
-			if(userToActivityScore.get(loginActivity.user_id) > maxScore){
-				maxScore = userToActivityScore.get(loginActivity.user_id);
-			}
-		}
-		else{
-			userToActivityScore.set(loginActivity.user_id, 1);
-		}
-	}
+        // add each login to userActivity score
+        if(userToActivityScore.has(loginActivity.user_id)){
+            userToActivityScore.set(loginActivity.user_id, (userToActivityScore.get(loginActivity.user_id) + 1))
+            if(userToActivityScore.get(loginActivity.user_id) > maxScore){
+                maxScore = userToActivityScore.get(loginActivity.user_id);
+            }
+        }
+        else{
+            userToActivityScore.set(loginActivity.user_id, 1);
+        }
+    }
 
-	// normalize scores based on the maxScore
-	for(const key of userToActivityScore.keys()){
-		userToActivityScore.set(key, userToActivityScore.get(key) / maxScore) // now score is between 0 and 1
-	}
-	resizeCache(); // update cache size after updating number of active users
+    // normalize scores based on the maxScore
+    for(const key of userToActivityScore.keys()){
+        userToActivityScore.set(key, userToActivityScore.get(key) / maxScore) // now score is between 0 and 1
+    }
+    resizeCache(); // update cache size after updating number of active users
 }
 
 /**
@@ -127,42 +127,42 @@ const setUserActivity = async() => {
  * @returns {map} - Map from interaction type to interaction score (sum of users' activity score whom interacted with the product).
  */
 const getInteractionScores = (userClicksInLastDay) => {
-	const interactionUsers = new Map(); // maps interaction type -> set of unqiue user ids
+    const interactionUsers = new Map(); // maps interaction type -> set of unqiue user ids
     const interactionScores = new Map(); // maps interaction type -> score (sum of each unique user activity score)
 
     const incrementFrequency = (interactionType, userId) => {
-		let userSet;
-		let isUserInSet = false;
-		if (interactionUsers.has(interactionType)) {
-			userSet = interactionUsers.get(interactionType);
-			if(userSet.has(userId)){
-				isUserInSet = true;
-			} else{
-				userSet.add(userId); // use a set to only track distinct users
-			}
-		}
-		else{ // first time interaction is being added to the maps
-			userSet = new Set();
-			userSet.add(userId);
-		}
-		interactionUsers.set(interactionType, userSet);
+        let userSet;
+        let isUserInSet = false;
+        if (interactionUsers.has(interactionType)) {
+            userSet = interactionUsers.get(interactionType);
+            if(userSet.has(userId)){
+                isUserInSet = true;
+            } else{
+                userSet.add(userId); // use a set to only track distinct users
+            }
+        }
+        else{ // first time interaction is being added to the maps
+            userSet = new Set();
+            userSet.add(userId);
+        }
+        interactionUsers.set(interactionType, userSet);
 
-		if(!isUserInSet){ // if user not already documented for this interaction, add user score to interactionScores
-			const userActivityScore = userToActivityScore.get(userId);
-			if (interactionScores.has(interactionType)){
-				interactionScores.set(interactionType, interactionScores.get(interactionType) + userActivityScore) // add user's score to existing score sum
-			} else{
-				interactionScores.set(interactionType, userActivityScore);
-			}
-		}
+        if(!isUserInSet){ // if user not already documented for this interaction, add user score to interactionScores
+            const userActivityScore = userToActivityScore.get(userId);
+            if (interactionScores.has(interactionType)){
+                interactionScores.set(interactionType, interactionScores.get(interactionType) + userActivityScore) // add user's score to existing score sum
+            } else{
+                interactionScores.set(interactionType, userActivityScore);
+            }
+        }
     }
 
     // update interaction frequencies based on all clicks that happened in the last day
     for (const interaction of userClicksInLastDay) {
-		incrementFrequency(interaction.interaction_type, interaction.user_id);
+        incrementFrequency(interaction.interaction_type, interaction.user_id);
     }
 
-	return interactionScores;
+    return interactionScores;
 }
 
 /**
@@ -172,21 +172,21 @@ const getInteractionScores = (userClicksInLastDay) => {
  * @returns {number} - Computed priority score (float).
  */
 const computeInitialPriority = async (productId) => {
-	await setUserActivity();
+    await setUserActivity();
 
     const totalProductClicks = await prisma.userProductInteraction.findMany({
-		where: { product_id: productId }
+        where: { product_id: productId }
     });
 
     if (totalProductClicks.length === 0) {
-      	return 0; // priority is 0 if no interactions
+          return 0; // priority is 0 if no interactions
     }
 
     const userClicksInLastDay = totalProductClicks.filter((interaction) =>
-      	interaction.interaction_time.getTime() >= Date.now() - ONE_DAY_MILLISECONDS
+          interaction.interaction_time.getTime() >= Date.now() - ONE_DAY_MILLISECONDS
     );
 
-	const interactionScores = getInteractionScores(userClicksInLastDay);
+    const interactionScores = getInteractionScores(userClicksInLastDay);
 
     // higher user interaction -> higher priority score -> less likely to be flushed from cache
     const openModalScore = interactionScores.get(InteractionTypes.OPEN_MODAL)
@@ -202,15 +202,15 @@ const computeInitialPriority = async (productId) => {
  * Flushes dynamicFlushSize products from cache in order of priority (lowest to highest).
  */
 const flushCache = () => {
-	if (productImageCache.size > 0) {
-		for (let i = 0; i < dynamicFlushSize; i++) {
-			if (productImageCache.size === 0 || productQueue.isEmpty()) {
-				return; // if all products are removed, return early
-			}
-			const dequeuedProduct = productQueue.dequeue();
-			productImageCache.delete(dequeuedProduct.productId);
-		}
-	}
+    if (productImageCache.size > 0) {
+        for (let i = 0; i < dynamicFlushSize; i++) {
+            if (productImageCache.size === 0 || productQueue.isEmpty()) {
+                return; // if all products are removed, return early
+            }
+            const dequeuedProduct = productQueue.dequeue();
+            productImageCache.delete(dequeuedProduct.productId);
+        }
+    }
 };
 
 /**
@@ -218,19 +218,19 @@ const flushCache = () => {
  * @param {number} productId - ID of the product to be inserted.
  */
 const insertProduct = async (productId) => {
-	if (!productQueue) {
-		createQueueAndCache(); // if queue and cache are not created, create them
-	}
+    if (!productQueue) {
+        createQueueAndCache(); // if queue and cache are not created, create them
+    }
 
-	if (productImageCache.size >= dynamicCacheSize) {
-		flushCache(); // if cache is at capacity, flush FLUSH_SIZE products from cache
-	}
-	productImageCache.set(productId, {
-		image: await fetchImageFromDB(productId),
-		timestamp: new Date(),
-	});
-	const priority = await computeInitialPriority(productId);
-	productQueue.enqueue({ productId, priority });
+    if (productImageCache.size >= dynamicCacheSize) {
+        flushCache(); // if cache is at capacity, flush FLUSH_SIZE products from cache
+    }
+    productImageCache.set(productId, {
+        image: await fetchImageFromDB(productId),
+        timestamp: new Date(),
+    });
+    const priority = await computeInitialPriority(productId);
+    productQueue.enqueue({ productId, priority });
 };
 
 /**
@@ -238,13 +238,13 @@ const insertProduct = async (productId) => {
  * @param {number} productId - ID of product to be replaced.
  */
 const replaceProduct = async (productId) => {
-	productQueue.remove((p) => p.productId === productId);
-	productImageCache.set(productId, {
-		image: await fetchImageFromDB(productId),
-		timestamp: new Date(),
-	});
-	const priority = await computeInitialPriority(productId);
-	productQueue.enqueue({ productId, priority });
+    productQueue.remove((p) => p.productId === productId);
+    productImageCache.set(productId, {
+        image: await fetchImageFromDB(productId),
+        timestamp: new Date(),
+    });
+    const priority = await computeInitialPriority(productId);
+    productQueue.enqueue({ productId, priority });
 };
 
 /**
@@ -254,72 +254,72 @@ const replaceProduct = async (productId) => {
  * @returns {string} - The product image's URL.
  */
 const getProductImage = async (userId, productId) => {
-	if (!currentUserId || !productImageCache || !productQueue) { // create cache if they don't exist
-		createQueueAndCache();
-		potentialAPICalls = 0;
-		cacheHits = 0;
-		resetCounters();
-	}
+    if (!currentUserId || !productImageCache || !productQueue) { // create cache if they don't exist
+        createQueueAndCache();
+        potentialAPICalls = 0;
+        cacheHits = 0;
+        resetCounters();
+    }
 
-	potentialAPICalls++;
-	try {
-		currentUserId = userId; // set the current user id
-		if (productImageCache.has(productId)) {
-			if ( Date.now() - productImageCache.get(productId).timestamp.getTime() >= dynamicCacheLifetime ) {
-				await replaceProduct(productId); // if product data is stale, replace it with new data
-			} else {
-				cacheHits++; // if product data is not stale, increment cache hits
-				const removed = productQueue.remove((p) => p.productId === productId);
-				if (removed[0]) {
-					productQueue.enqueue({
-						productId,
-						priority: removed[0].priority + PRIORITY_BOOST,
-					});
-				}
-			}
-		} else {
-			// if product data is not in cache
-			await insertProduct(productId);
-		}
-		return productImageCache.get(productId).image;
-	} catch (error) {
-		return placeholderImage; // if there is an error, return a placeholder image
-	}
+    potentialAPICalls++;
+    try {
+        currentUserId = userId; // set the current user id
+        if (productImageCache.has(productId)) {
+            if ( Date.now() - productImageCache.get(productId).timestamp.getTime() >= dynamicCacheLifetime ) {
+                await replaceProduct(productId); // if product data is stale, replace it with new data
+            } else {
+                cacheHits++; // if product data is not stale, increment cache hits
+                const removed = productQueue.remove((p) => p.productId === productId);
+                if (removed[0]) {
+                    productQueue.enqueue({
+                        productId,
+                        priority: removed[0].priority + PRIORITY_BOOST,
+                    });
+                }
+            }
+        } else {
+            // if product data is not in cache
+            await insertProduct(productId);
+        }
+        return productImageCache.get(productId).image;
+    } catch (error) {
+        return placeholderImage; // if there is an error, return a placeholder image
+    }
 };
 
 // ====================== GETTERS USED FOR STATS ROUTING CALL ======================
 const getPotentialAPICalls = () => {
-  	return potentialAPICalls;
+      return potentialAPICalls;
 }
 
 const getCacheHits = () => {
-  	return cacheHits;
+      return cacheHits;
 }
 
 // ====================== GETTERS USED FOR TESTING ======================
 const getQueue = () => {
-  	return productQueue;
+      return productQueue;
 };
 
 const getCache = () => {
-  	return productImageCache;
+      return productImageCache;
 };
 
 const getUserActivityScore = () => {
-  	return userToActivityScore;
+      return userToActivityScore;
 }
 
 module.exports = {
-	getUserActivityScore,
-	createQueueAndCache,
-	flushCache,
-	computeInitialPriority,
-	insertProduct,
-	replaceProduct,
-	getProductImage,
-	getQueue,
-	getCache,
-	getPotentialAPICalls,
-	getCacheHits,
-	setUserActivity
+    getUserActivityScore,
+    createQueueAndCache,
+    flushCache,
+    computeInitialPriority,
+    insertProduct,
+    replaceProduct,
+    getProductImage,
+    getQueue,
+    getCache,
+    getPotentialAPICalls,
+    getCacheHits,
+    setUserActivity
 };
