@@ -4,7 +4,8 @@ import {ProfileFilters} from '../../enums.js'
 import { useEffect, useState } from "react";
 import Loading from '../home_components/Loading';
 
-const FilterProfilePage = () => {
+function FilterProfilePage () {
+	
     const [error, setError] = useState(null);
     const [username, setUsername] = useState("");
     const [concerns, setConcerns] = useState([]);
@@ -17,22 +18,19 @@ const FilterProfilePage = () => {
 
     const loadUserInfo = async () => {
         setIsLoading(true);
-        fetch(`${import.meta.env.VITE_BASE_URL}/user-info`, { credentials: "include" })
-        .then((response) => response.json())
-        .then((res) => {
-            setUsername(res.username);
+		try{
+			const response = await fetch(`${import.meta.env.VITE_BASE_URL}/user-info`, { credentials: "include" });
+			const res = await response.json();
+			setUsername(res.username);
             setConcerns(res.concerns);
             setSkinType(res.skin_type);
             setLikedProducts(res.loved_products);
             setSavedProducts(res.saved_products);
             setDislikedProducts(res.disliked_products);
-        })
-        .catch((error) => {
-            setError("unable to fetch user info");
-        })
-        .finally(() => {
-            setTimeout(() => setIsLoading(false), 500);
-        });
+		} catch (error) {
+			setError("unable to fetch user info");
+		}
+		setTimeout(() => setIsLoading(false), 500);
     }
 
     useEffect(() => {

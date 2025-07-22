@@ -6,7 +6,8 @@ import NavBar from '../NavBar'
 import FilterProfilePage from './FilterProfilePage.jsx'
 import CacheStats from '../CacheStats';
 
-const Profile = () => {
+function Profile () {
+
     const { user, setUser } = useUser();
     const navigate = useNavigate();
 

@@ -1,10 +1,8 @@
-import React from "react";
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Product from "../home_components/Product.jsx";
 import "../../styles/ProductList.css";
 import ProductModal from "../home_components/ProductModal.jsx";
 import {ProfileFilters} from '../../enums.js'
-import Profile from "./Profile.jsx";
 
 
 function ProfileProductList({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, filter, setError}) {
@@ -21,7 +19,7 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
             )
     }
 
-    // lots of repeated code here unfortunately
+    // return liked, saved, or disliked products based on filter
     if(filter === ProfileFilters.LIKED){
         if(likedProducts.length === 0){
             return(<p>your loved products will show up here</p>);
@@ -53,8 +51,7 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
             }
             </div>
         </>);
-    }
-    else if(filter === ProfileFilters.SAVED){
+    } else if(filter === ProfileFilters.SAVED){
         if(savedProducts.length === 0){
             return(<p>your saved products will show up here</p>);
         }
@@ -85,8 +82,7 @@ function ProfileProductList({likedProducts, setLikedProducts, savedProducts, set
             }
             </div>
         </>);
-    }
-    else{
+    } else{
         if(dislikedProducts.length === 0){
             return(<p>your disliked products will show up here</p>);
         }

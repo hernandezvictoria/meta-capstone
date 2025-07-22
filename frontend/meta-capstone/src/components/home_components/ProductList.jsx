@@ -94,27 +94,25 @@ function ProductList({error, setError,pageNum, setPageNum, maxPages, setMaxPages
 			setModalProductId={setModalProductId}/>
 			}
 			<div className="product-container">
-			{
-			data.map(prod => {
-				return(<Product
-				likedProducts={likedProducts}
-				setLikedProducts={setLikedProducts}
-				savedProducts={savedProducts}
-				setSavedProducts={setSavedProducts}
-				dislikedProducts={dislikedProducts}
-				setDislikedProducts={setDislikedProducts}
-				setModalProductId={setModalProductId}
-				setError={setError}
-				key={prod.id}
-				id={prod.id}
-				brand={prod.brand}
-				name={prod.name}
-				concerns={prod.concerns}
-				skin_type={prod.skin_type}
-				image={prod.image}
-				score={prod.score}/>);
-			})
-			}
+				{ data.map(prod => {
+					return(<Product
+					likedProducts={likedProducts}
+					setLikedProducts={setLikedProducts}
+					savedProducts={savedProducts}
+					setSavedProducts={setSavedProducts}
+					dislikedProducts={dislikedProducts}
+					setDislikedProducts={setDislikedProducts}
+					setModalProductId={setModalProductId}
+					setError={setError}
+					key={prod.id}
+					id={prod.id}
+					brand={prod.brand}
+					name={prod.name}
+					concerns={prod.concerns}
+					skin_type={prod.skin_type}
+					image={prod.image}
+					score={prod.score}/>);
+				})}
 			</div>
 			{ !maxPages &&
 			<div className="load-more">

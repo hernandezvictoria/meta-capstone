@@ -1,11 +1,10 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import "../../styles/Search.css";
 import clearIcon from "../../assets/clear.png";
 
-
 function Search({setError, setMaxPages, setPageNum, setSearchTerm}) {
+    
     const inputRef = useRef(null);
-    const limit = 10;
 
     const handleSearch = (event) => {
         event.preventDefault();
