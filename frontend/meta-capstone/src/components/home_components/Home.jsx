@@ -7,7 +7,7 @@ import Search from './Search'
 import NavBar from '../NavBar';
 import CacheStats from '../CacheStats';
 
-const Home = () => {
+function Home () {
     const { user, setUser } = useUser();
     const [error, setError] = useState(null);
     const [pageNum, setPageNum] = useState(1);

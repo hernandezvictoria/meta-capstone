@@ -24,7 +24,8 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 
 	const logClickInDb = async(interactionType) => {
 		try{
-			await fetch(`${import.meta.env.VITE_BASE_URL}/log-interaction/${id}`, {
+			await fetch(
+				`${import.meta.env.VITE_BASE_URL}/log-interaction/${id}`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({interactionType: interactionType}),
@@ -49,7 +50,9 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 		}
 
 		try{ // update liked products in database
-			const response = await fetch(`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`, {method: "PUT", credentials: "include"});
+			const response = await fetch(
+				`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
+				{method: "PUT", credentials: "include"});
 			const res = await response.json();
 			const removedLike = res.removedLike;
 			if(removedLike){
@@ -74,7 +77,9 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 		}
 
 		try{ // update saved products in database
-			const response = await fetch(`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`, {method: "PUT", credentials: "include"});
+			const response = await fetch(
+				`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
+				{method: "PUT", credentials: "include"});
 			const res = await response.json();
 			const removedSave = res.removedSave;
 			if(removedSave){
@@ -99,7 +104,9 @@ function Product({likedProducts, setLikedProducts, savedProducts, setSavedProduc
 		}
 
 		try{
-			const response = await fetch(`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`, {method: "PUT", credentials: "include"});
+			const response = await fetch(
+				`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
+				{method: "PUT", credentials: "include"});
 			const res = await response.json();
 			const removedDislike = res.removedDislike;
 			if(removedDislike){
