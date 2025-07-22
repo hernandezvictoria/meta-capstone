@@ -2,7 +2,7 @@ const fs = require('fs');
 const parse = require('csv-parse').parse;
 const { PrismaClient } = require('../generated/prisma/index.js');
 const prisma = new PrismaClient();
-const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
+const { SkinTypes, SkinConcerns, HarshIngredientTypes } = require('../enums.js')
 
 fs.createReadStream('ingredients.csv')
     .pipe(parse({ columns: true, trim: true }))
@@ -65,11 +65,11 @@ fs.createReadStream('ingredients.csv')
         // set the type of the ingredient if it is exfoliant, active, or retinol, else keep as is
         let ingredientType = row.Type.toLowerCase();
         if(ingredientType.includes("exfoliant")){
-            ingredientType = "exfoliant";
+            ingredientType = HarshIngredientTypes.EXFOLIANT;
         } else if(ingredientType.includes("active")){
-            ingredientType = "active";
+            ingredientType = HarshIngredientTypes.ACTIVE;
         } else if(ingredientType.includes("retinol") || ingredientType.includes("vitamin a")){
-            ingredientType = "retinol";
+            ingredientType = HarshIngredientTypes.RETINOL;
         }
 
         // Insert into database

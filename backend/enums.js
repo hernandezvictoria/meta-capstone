@@ -41,4 +41,10 @@ const ActivityTypes = Object.freeze({
     LOGOUT: "logout"
 })
 
-module.exports = { SkinTypes, SkinConcerns, ProductTypes, InteractionTypes, ActivityTypes };
+const HarshIngredientTypes = Object.freeze({
+    EXFOLIANT: "exfoliant",
+    RETINOL: "retinol",
+    ACTIVE: "active"
+})
+
+module.exports = { SkinTypes, SkinConcerns, ProductTypes, InteractionTypes, ActivityTypes, HarshIngredientTypes};
