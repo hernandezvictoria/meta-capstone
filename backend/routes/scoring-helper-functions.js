@@ -1,6 +1,12 @@
 var jaccard = require('jaccard');
 const {getProductImage}= require('./local-cache.js');
 
+/**
+ * Parses user's liked or disliked products to get brands that have been repeated
+ * 3 or more times and ingredients that have been repeated 5 or more times.
+ * @param {list} products - Either user's liked or disliked products.
+ * @returns {object} - Object with two sets: brands (string) and ingredients (string).
+ */
 const parseLikedDislikedProducts = (products) => {
     const brands = products.map(product => product.brand);
     const brandSet = new Set();
@@ -25,6 +31,12 @@ const parseLikedDislikedProducts = (products) => {
     return {brands: brandSet, ingredients: ingredientSet};
 }
 
+/**
+ * Computes skin type score for a product by assessing how many skin types the product and its ingredients satisfy.
+ * @param {object} product - Product to compute skin type score for.
+ * @param {list} userSkinType - List of skin types the user selected.
+ * @returns {object} - Object with two scores: productSkinTypeScore (number) and ingredientSkinTypeScore (number) both between 0 and 1.
+ */
 const computeSkinTypeScore = (product, userSkinType) => {
     let productSkinTypeScore = 0;
     let ingredientSkinTypeScore = 0;
@@ -47,6 +59,12 @@ const computeSkinTypeScore = (product, userSkinType) => {
     return {productSkinTypeScore, ingredientSkinTypeScore};
 }
 
+/**
+ * Computes skin concern score for a product by assessing how many skin concerns the product and its ingredients satisfy.
+ * @param {object} product - Product to compute skin concern score for.
+ * @param {list} userSkinConcerns - List of skin concerns the user selected.
+ * @returns {object} - Object with two scores: productConcernsScore (number) and ingredientConcernsScore (number) both between 0 and 1.
+ */
 const computeConcernScore = (product, userSkinConcerns) => {
     let productConcernsScore = 0;
     let ingredientConcernsScore = 0;
@@ -69,6 +87,13 @@ const computeConcernScore = (product, userSkinConcerns) => {
     return {productConcernsScore, ingredientConcernsScore};
 }
 
+/**
+ * Computes popularity score for a product by assessing how many users have liked or
+ * disliked the product, relative to the total number of users.
+ * @param {object} product - Product to compute popularity score for.
+ * @param {number} totalUsers - Total number of users in DB.
+ * @returns {number} - Popularity score for the given product (between 0 and 1).
+ */
 const computePopularityScore = (product, totalUsers) => {
     let popularityScore = 0;
     const likeCount = product.loved_by_user.length;
@@ -79,6 +104,14 @@ const computePopularityScore = (product, totalUsers) => {
     return popularityScore;
 }
 
+/**
+ * Computes overlap score between a product and the user's liked or disliked products based on product's brand and ingredients.
+ * @param {object} product - Product to compute overlap score for.
+ * @param {list} likedDislikedProducts - Either user's liked or disliked products.
+ * @param {list} likedDislikedBrands - Brands that have been repeated 3 or more times in liked or disliked products.
+ * @param {list} likedDislikedIngredients - Ingredients that have been repeated 5 or more times in liked or disliked products.
+ * @returns {number} - Overlap score between the product and the user's liked or disliked products (between 0 and 2).
+ */
 const likedDislikedOverlapScore = (product, likedDislikedProducts, likedDislikedBrands, likedDislikedIngredients) => {
     // get overlap with loved or disliked products products
     let likedDislikedProductOverlapScore = 0;
@@ -116,7 +149,16 @@ const likedDislikedOverlapScore = (product, likedDislikedProducts, likedDisliked
     return likedDislikedProductOverlapScore;
 }
 
-// given a product, compute its score based on user preferences
+/**
+ * Computes a score for a given product based on user's preferences and product's popularity.
+ * @param {object} product - Product to compute score for.
+ * @param {list} lovedProducts - User's liked products.
+ * @param {list} dislikedProducts - User's disliked products.
+ * @param {list} userSkinType - User's skin type.
+ * @param {list} userSkinConcerns - User's skin concerns.
+ * @param {number} totalUsers - Total number of users in DB.
+ * @returns {number} - Score for the given product (between 0 and 10).
+ */
 const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, totalUsers) => {
     // =========== get overlap between skin types and skin concerns ===========
     const {productSkinTypeScore, ingredientSkinTypeScore} = computeSkinTypeScore(product, userSkinType);
@@ -175,7 +217,13 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     return totalScore;
 }
 
-// returns same array of products, but with scores as a field
+/**
+ * Updates product objects with computed scores and fetched images.
+ * @param {list} products - List of product objects to update.
+ * @param {object} user - User to compute scores for.
+ * @param {number} totalUsers - Total number of users in DB.
+ * @returns
+ */
 const updateProductsWithScore = async (products, user, totalUsers) => {
     // need to await Promise.all to ensure all images are fetched before returning (otherwise map will return promises)
     const updatedProducts = await Promise.all(products.map(async (product) => {
