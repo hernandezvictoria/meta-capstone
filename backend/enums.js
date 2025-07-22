@@ -36,4 +36,9 @@ const InteractionTypes = Object.freeze({
   OPEN_MODAL: "open_modal"
 })
 
-module.exports = { SkinTypes, SkinConcerns, ProductTypes, InteractionTypes };
+const ActivityTypes = Object.freeze({
+    LOGIN: "login",
+    LOGOUT: "logout"
+})
+
+module.exports = { SkinTypes, SkinConcerns, ProductTypes, InteractionTypes, ActivityTypes };

@@ -1,12 +1,11 @@
 const express = require('express')
 const { PrismaClient } = require('../generated/prisma/index.js')
 const { SkinTypes, SkinConcerns, ProductTypes } = require('../enums.js')
-const {updateProductsWithScore} = require('./scoring-helper-functions.js');
-const {cleanSearchQuery} = require('./search-helper-functions.js');
+const {updateProductsWithScore} = require('../helpers/scoring-helper-functions.js');
+const {cleanSearchQuery} = require('../helpers/search-helper-functions.js');
 const prisma = new PrismaClient()
 const router = express.Router()
 
-// http://localhost:3000/products
 router.get('/products', async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
@@ -111,7 +110,6 @@ router.get('/products', async (req, res) => {
     });
 });
 
-// http://localhost:3000/change-product-image
 router.put('/change-product-image/:productId', async (req, res) => {
     const {image} = req.body
     const id = parseInt(req.params.productId)
@@ -192,7 +190,7 @@ router.put('/toggle-like/:productId', async (req, res) => {
         // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isLiked = user.loved_products.some(p => p.id === productId);
 
-        const updatedUser = await prisma.user.update({
+        await prisma.user.update({
             where: { id: userId },
             data: {
                 loved_products: isLiked
@@ -241,7 +239,7 @@ router.put('/toggle-save/:productId', async (req, res) => {
         // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isSaved = user.saved_products.some(p => p.id === productId);
 
-        const updatedUser = await prisma.user.update({
+        await prisma.user.update({
             where: { id: userId },
             data: {
                 saved_products: isSaved
@@ -291,7 +289,7 @@ router.put('/toggle-dislike/:productId', async (req, res) => {
         // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isDisliked = user.disliked_products.some(p => p.id === productId);
 
-        const updatedUser = await prisma.user.update({
+        await prisma.user.update({
             where: { id: userId },
             data: {
                 disliked_products: isDisliked
@@ -362,7 +360,7 @@ router.post('/log-interaction/:productId', async (req, res) => {
 
     try {
         // Create a new interaction in the database
-        const newInteraction = await prisma.UserProductInteraction.create({
+        await prisma.userProductInteraction.create({
             data: {
                 product_id: productId,
                 user_id: userId,
@@ -377,4 +375,5 @@ router.post('/log-interaction/:productId', async (req, res) => {
     }
 
 });
+
 module.exports = router;

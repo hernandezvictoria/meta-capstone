@@ -1,5 +1,5 @@
 var jaccard = require('jaccard');
-const {getProductImage}= require('./local-cache.js');
+const { getProductImage } = require('./server-cache.js');
 
 const MIN_BRANDS = 3; // minimum number of brands to consider for liked/disliked overlap
 const MIN_INGREDIENTS = 5; // minimum number of ingredients to consider for liked/disliked overlap

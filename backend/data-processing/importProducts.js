@@ -63,11 +63,6 @@ fs.createReadStream('seed.csv')
     price = price.slice(1);
     const priceDecimal = parseFloat(price);
 
-    //TODO: handle edge cases for prices input wrongly
-    let price = row.price;
-    price = price.slice(1);
-    const priceDecimal = parseFloat(price);
-
     // Insert into database
     try {
       // Fetch ingredients from the database
