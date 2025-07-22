@@ -10,179 +10,179 @@ import { InteractionTypes } from "../../enums";
 
 function Product({likedProducts, setLikedProducts, savedProducts, setSavedProducts, dislikedProducts, setDislikedProducts, setModalProductId, setError, id, image, brand, name, concerns, skin_type, score}) {
 
-	const [isLoading, setIsLoading] = useState(false);
-	const placeholderImage = "https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg";
+    const [isLoading, setIsLoading] = useState(false);
+    const placeholderImage = "https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg";
 
-	const loadImage = async () => {
-		setIsLoading(true);
-		setTimeout(() => setIsLoading(false), 500); // wait 500ms before setting the image to the display image
-	}
+    const loadImage = async () => {
+        setIsLoading(true);
+        setTimeout(() => setIsLoading(false), 500); // wait 500ms before setting the image to the display image
+    }
 
-	useEffect(() => {
-		loadImage();
-		}, [])
+    useEffect(() => {
+        loadImage();
+        }, [])
 
-	const logClickInDb = async(interactionType) => {
-		try{
-			await fetch(
-				`${import.meta.env.VITE_BASE_URL}/log-interaction/${id}`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({interactionType: interactionType}),
-				credentials: "include",
-			});
-		} catch (error) {
-			setError("an error ocurred when clicking the product")
-		}
-	}
+    const logClickInDb = async(interactionType) => {
+        try{
+            await fetch(
+                `${import.meta.env.VITE_BASE_URL}/log-interaction/${id}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({interactionType: interactionType}),
+                credentials: "include",
+            });
+        } catch (error) {
+            setError("an error ocurred when clicking the product")
+        }
+    }
 
-	const openModal = () => {
-		logClickInDb(InteractionTypes.OPEN_MODAL);
-		setModalProductId(id);
-	}
+    const openModal = () => {
+        logClickInDb(InteractionTypes.OPEN_MODAL);
+        setModalProductId(id);
+    }
 
-	const toggleLike = async(event) => {
-		event.stopPropagation();
-		if(likedProducts.find(p => p.id === id)){ //if product is already liked, remove like
-			logClickInDb(InteractionTypes.REMOVE_LIKE);
-		} else{
-			logClickInDb(InteractionTypes.LIKE);
-		}
+    const toggleLike = async(event) => {
+        event.stopPropagation();
+        if(likedProducts.find(p => p.id === id)){ //if product is already liked, remove like
+            logClickInDb(InteractionTypes.REMOVE_LIKE);
+        } else{
+            logClickInDb(InteractionTypes.LIKE);
+        }
 
-		try{ // update liked products in database
-			const response = await fetch(
-				`${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
-				{method: "PUT", credentials: "include"});
-			const res = await response.json();
-			const removedLike = res.removedLike;
-			if(removedLike){
-				setLikedProducts(likedProducts.filter(p => p.id !== id));
-			}
-			else{
-				setLikedProducts([...likedProducts,
-				{ id, image, brand, name, concerns, skin_type}]);
-			}
-		} catch (error) {
-			setError("error while toggling like")
-		}
-	}
+        try{ // update liked products in database
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/toggle-like/${id}`,
+                {method: "PUT", credentials: "include"});
+            const res = await response.json();
+            const removedLike = res.removedLike;
+            if(removedLike){
+                setLikedProducts(likedProducts.filter(p => p.id !== id));
+            }
+            else{
+                setLikedProducts([...likedProducts,
+                { id, image, brand, name, concerns, skin_type}]);
+            }
+        } catch (error) {
+            setError("error while toggling like")
+        }
+    }
 
-	const toggleSave = async(event) => {
-		event.stopPropagation();
-		if(savedProducts.find(p => p.id === id)){ //if product is already saved, remove save
-			logClickInDb(InteractionTypes.REMOVE_SAVE);
-		}
-		else{
-			logClickInDb(InteractionTypes.SAVE);
-		}
+    const toggleSave = async(event) => {
+        event.stopPropagation();
+        if(savedProducts.find(p => p.id === id)){ //if product is already saved, remove save
+            logClickInDb(InteractionTypes.REMOVE_SAVE);
+        }
+        else{
+            logClickInDb(InteractionTypes.SAVE);
+        }
 
-		try{ // update saved products in database
-			const response = await fetch(
-				`${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
-				{method: "PUT", credentials: "include"});
-			const res = await response.json();
-			const removedSave = res.removedSave;
-			if(removedSave){
-				setSavedProducts(savedProducts.filter(p => p.id !== id));
-			}
-			else{
-				setSavedProducts([...savedProducts,
-				{ id, image, brand, name, concerns, skin_type}]);
-			}
-		} catch (error) {
-			setError("error while toggling save")
-		}
-	}
+        try{ // update saved products in database
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/toggle-save/${id}`,
+                {method: "PUT", credentials: "include"});
+            const res = await response.json();
+            const removedSave = res.removedSave;
+            if(removedSave){
+                setSavedProducts(savedProducts.filter(p => p.id !== id));
+            }
+            else{
+                setSavedProducts([...savedProducts,
+                { id, image, brand, name, concerns, skin_type}]);
+            }
+        } catch (error) {
+            setError("error while toggling save")
+        }
+    }
 
-	const toggleDislike = async(event) => {
-		event.stopPropagation();
-		if(dislikedProducts.find(p => p.id === id)){ //if product is already disliked, remove dislike
-			logClickInDb(InteractionTypes.REMOVE_DISLIKE);
-		}
-		else{
-			logClickInDb(InteractionTypes.DISLIKE);
-		}
+    const toggleDislike = async(event) => {
+        event.stopPropagation();
+        if(dislikedProducts.find(p => p.id === id)){ //if product is already disliked, remove dislike
+            logClickInDb(InteractionTypes.REMOVE_DISLIKE);
+        }
+        else{
+            logClickInDb(InteractionTypes.DISLIKE);
+        }
 
-		try{
-			const response = await fetch(
-				`${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
-				{method: "PUT", credentials: "include"});
-			const res = await response.json();
-			const removedDislike = res.removedDislike;
-			if(removedDislike){
-				setDislikedProducts(dislikedProducts.filter(p => p.id !== id));
-			}
-			else{
-				setDislikedProducts([...dislikedProducts,
-				{ id, image, brand, name, concerns, skin_type}]);
-			}
-		} catch (error) {
-			setError("error while toggling dislike")
-		}
-	}
+        try{
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/toggle-dislike/${id}`,
+                {method: "PUT", credentials: "include"});
+            const res = await response.json();
+            const removedDislike = res.removedDislike;
+            if(removedDislike){
+                setDislikedProducts(dislikedProducts.filter(p => p.id !== id));
+            }
+            else{
+                setDislikedProducts([...dislikedProducts,
+                { id, image, brand, name, concerns, skin_type}]);
+            }
+        } catch (error) {
+            setError("error while toggling dislike")
+        }
+    }
 
-	const getScoreClass = (score) => {
-		const scoreNum = parseFloat(score);
-		if(scoreNum <= 1.5){
-			return "score-1";
-		}
-		else if(scoreNum <= 3){
-			return "score-2";
-		}
-		else if(scoreNum <= 4.5){
-			return "score-3";
-		}
-		else if(scoreNum <= 6){
-			return "score-4";
-		}
-		else if(scoreNum <= 7.5){
-			return "score-5";
-		}
-		else if(scoreNum <= 9){
-			return "score-6";
-		}
-		else {
-			return "score-7";
-		}
-	}
+    const getScoreClass = (score) => {
+        const scoreNum = parseFloat(score);
+        if(scoreNum <= 1.5){
+            return "score-1";
+        }
+        else if(scoreNum <= 3){
+            return "score-2";
+        }
+        else if(scoreNum <= 4.5){
+            return "score-3";
+        }
+        else if(scoreNum <= 6){
+            return "score-4";
+        }
+        else if(scoreNum <= 7.5){
+            return "score-5";
+        }
+        else if(scoreNum <= 9){
+            return "score-6";
+        }
+        else {
+            return "score-7";
+        }
+    }
 
-	return (
-		<div className="product" onClick={openModal}>
-		{ isLoading
-			? <img className="shimmer" alt={name} aria-label={name} src={placeholderImage}/> // loading image with shimmering effect
-			: <img className="product-image" alt={name} aria-label={name} src={image}/>
-		}
+    return (
+        <div className="product" onClick={openModal}>
+        { isLoading
+            ? <img className="shimmer" alt={name} aria-label={name} src={placeholderImage}/> // loading image with shimmering effect
+            : <img className="product-image" alt={name} aria-label={name} src={image}/>
+        }
 
-		<section className="product-info">
-			<p className="product-brand">{brand}</p>
-			<p className="product-name">{name}</p>
-			<p id={getScoreClass(score)} className="product-score">score: {score}</p>
-			<p>skin type(s): {skin_type.join(', ')}</p>
+        <section className="product-info">
+            <p className="product-brand">{brand}</p>
+            <p className="product-name">{name}</p>
+            <p id={getScoreClass(score)} className="product-score">score: {score}</p>
+            <p>skin type(s): {skin_type.join(', ')}</p>
 
-			{concerns.map(concern => {
-				return(<p key={concern} className="concern-box">{concern}</p>)
-				})
-			}
-		</section>
-		<section className="like-and-save">
-			<button className="button-wrapper" onClick={toggleLike}>
-				{likedProducts.find(p => p.id === id)
-				? <img className="button-image" src={closedHeart}></img>
-				: <img className="button-image" src={openHeart}></img>}
-			</button>
-			<button className="button-wrapper" onClick={toggleSave}>
-				{savedProducts.find(p => p.id === id)
-				? <img className="button-image" src={closedBookmark}></img>
-				: <img className="button-image" src={openBookmark}></img>}
-			</button>
-			<button className="button-wrapper" onClick={toggleDislike}>
-				{dislikedProducts.find(p => p.id === id)
-				? <img className="button-image" src={closedDislike}></img>
-				: <img className="button-image" src={openDislike}></img>}
-			</button>
-		</section>
-		</div>
-	);
+            {concerns.map(concern => {
+                return(<p key={concern} className="concern-box">{concern}</p>)
+                })
+            }
+        </section>
+        <section className="like-and-save">
+            <button className="button-wrapper" onClick={toggleLike}>
+                {likedProducts.find(p => p.id === id)
+                ? <img className="button-image" src={closedHeart}></img>
+                : <img className="button-image" src={openHeart}></img>}
+            </button>
+            <button className="button-wrapper" onClick={toggleSave}>
+                {savedProducts.find(p => p.id === id)
+                ? <img className="button-image" src={closedBookmark}></img>
+                : <img className="button-image" src={openBookmark}></img>}
+            </button>
+            <button className="button-wrapper" onClick={toggleDislike}>
+                {dislikedProducts.find(p => p.id === id)
+                ? <img className="button-image" src={closedDislike}></img>
+                : <img className="button-image" src={openDislike}></img>}
+            </button>
+        </section>
+        </div>
+    );
 }
 
 export default Product;
