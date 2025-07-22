@@ -190,7 +190,7 @@ router.put('/toggle-like/:productId', async (req, res) => {
         // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isLiked = user.loved_products.some(p => p.id === productId);
 
-        const updatedUser = await prisma.user.update({
+        await prisma.user.update({
             where: { id: userId },
             data: {
                 loved_products: isLiked
@@ -239,7 +239,7 @@ router.put('/toggle-save/:productId', async (req, res) => {
         // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isSaved = user.saved_products.some(p => p.id === productId);
 
-        const updatedUser = await prisma.user.update({
+        await prisma.user.update({
             where: { id: userId },
             data: {
                 saved_products: isSaved
@@ -289,7 +289,7 @@ router.put('/toggle-dislike/:productId', async (req, res) => {
         // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isDisliked = user.disliked_products.some(p => p.id === productId);
 
-        const updatedUser = await prisma.user.update({
+        await prisma.user.update({
             where: { id: userId },
             data: {
                 disliked_products: isDisliked
