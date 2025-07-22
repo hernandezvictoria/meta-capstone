@@ -1,13 +1,27 @@
 var jaccard = require('jaccard');
 const { getProductImage } = require('./server-cache.js');
 
+const MIN_BRANDS = 3; // minimum number of brands to consider for liked/disliked overlap
+const MIN_INGREDIENTS = 5; // minimum number of ingredients to consider for liked/disliked overlap
+const LIKED_DISLIKED_BOOST = 2; // boost for product already being liked or disliked
+const LIKED_DISLIKED_BRAND_BOOST = 0.1; // boost for product's brand having overlap with liked/disliked products' brands
+const LIKED_DISLIKED_INGREDIENT_BOOST = 0.5; // boost for product's ingredients having overlap with liked/disliked products' ingredients
+const MAX_LIKED_DISLIKED_OVERLAP_SCORE = 2; // maximum score for liked/disliked overlap
+const MAX_SCORE = 10; // maximum score for a product
+
+/**
+ * Parses user's liked or disliked products to get brands that have been repeated
+ * MIN_BRANDS or more times and ingredients that have been repeated MIN_INGREDIENTS or more times.
+ * @param {list} products - Either user's liked or disliked products.
+ * @returns {object} - Object with two sets: brands (string) and ingredients (string).
+ */
 const parseLikedDislikedProducts = (products) => {
     const brands = products.map(product => product.brand);
     const brandSet = new Set();
     const brandFrequencies = {}; // count of each brand
     for (const brand of brands) {
         brandFrequencies[brand] = (brandFrequencies[brand] || 0) + 1;
-        if(brandFrequencies[brand] >= 3) { // if brand appears 3 or more times, add to set
+        if(brandFrequencies[brand] >= MIN_BRANDS) { // if brand appears MIN_BRANDS or more times, add to set
             brandSet.add(brand);
         }
     }
@@ -17,14 +31,20 @@ const parseLikedDislikedProducts = (products) => {
     const ingredientFrequencies = {}; // count of each ingredient
     for (const ingredient of ingredients) {
         ingredientFrequencies[ingredient] = (ingredientFrequencies[ingredient] || 0) + 1;
-        if(ingredientFrequencies[ingredient] >= 5) { // if ingredient appears 5 or more times, add to set
+        if(ingredientFrequencies[ingredient] >= MIN_INGREDIENTS) { // if ingredient appears MIN_INGREDIENTS or more times, add to set
             ingredientSet.add(ingredient);
         }
     }
-    // list of brand names that appeared greater than 3 times, list of ingredient ids that appeared greater than 5 times
+    // list of brand names that appeared greater than MIN_BRANDS times, list of ingredient ids that appeared greater than MIN_INGREDIENTS times
     return {brands: brandSet, ingredients: ingredientSet};
 }
 
+/**
+ * Computes skin type score for a product by assessing how many skin types the product and its ingredients satisfy.
+ * @param {object} product - Product to compute skin type score for.
+ * @param {list} userSkinType - List of skin types the user selected.
+ * @returns {object} - Object with two scores: productSkinTypeScore (number) and ingredientSkinTypeScore (number) both between 0 and 1.
+ */
 const computeSkinTypeScore = (product, userSkinType) => {
     let productSkinTypeScore = 0;
     let ingredientSkinTypeScore = 0;
@@ -47,6 +67,12 @@ const computeSkinTypeScore = (product, userSkinType) => {
     return {productSkinTypeScore, ingredientSkinTypeScore};
 }
 
+/**
+ * Computes skin concern score for a product by assessing how many skin concerns the product and its ingredients satisfy.
+ * @param {object} product - Product to compute skin concern score for.
+ * @param {list} userSkinConcerns - List of skin concerns the user selected.
+ * @returns {object} - Object with two scores: productConcernsScore (number) and ingredientConcernsScore (number) both between 0 and 1.
+ */
 const computeConcernScore = (product, userSkinConcerns) => {
     let productConcernsScore = 0;
     let ingredientConcernsScore = 0;
@@ -69,6 +95,13 @@ const computeConcernScore = (product, userSkinConcerns) => {
     return {productConcernsScore, ingredientConcernsScore};
 }
 
+/**
+ * Computes popularity score for a product by assessing how many users have liked or
+ * disliked the product, relative to the total number of users.
+ * @param {object} product - Product to compute popularity score for.
+ * @param {number} totalUsers - Total number of users in DB.
+ * @returns {number} - Popularity score for the given product (between 0 and 1).
+ */
 const computePopularityScore = (product, totalUsers) => {
     let popularityScore = 0;
     const likeCount = product.loved_by_user.length;
@@ -79,7 +112,17 @@ const computePopularityScore = (product, totalUsers) => {
     return popularityScore;
 }
 
-const likedDislikedOverlapScore = (product, likedDislikedProducts, likedDislikedBrands, likedDislikedIngredients) => {
+/**
+ * Computes overlap score between a product and the user's liked or disliked products based on product's brand and ingredients.
+ * @param {object} product - Product to compute overlap score for.
+ * @param {list} likedDislikedProducts - Either user's liked or disliked products.
+ * @returns {number} - Overlap score between the product and the user's liked or disliked products (between 0 and MAX_LIKED_DISLIKED_OVERLAP_SCORE).
+ */
+const computeLikedDislikedOverlapScore = (product, likedDislikedProducts) => {
+    const parsedBrandsAndIngredients = parseLikedDislikedProducts(likedDislikedProducts);
+    const likedDislikedBrands = parsedBrandsAndIngredients.brands;
+    const likedDislikedIngredients = parsedBrandsAndIngredients.ingredients;
+
     // get overlap with loved or disliked products products
     let likedDislikedProductOverlapScore = 0;
     let likedDislikedProductIngredientSimilarityScore = 0;
@@ -87,12 +130,12 @@ const likedDislikedOverlapScore = (product, likedDislikedProducts, likedDisliked
     for (const lovedProduct of likedDislikedProducts) {
         if(lovedProduct.id === product.id) {
             isProductLikedDisliked = true;
-            likedDislikedProductOverlapScore = 2; // automatically boost for loved/disliked product by 2 points
+            likedDislikedProductOverlapScore = LIKED_DISLIKED_BOOST; // automatically boost for loved/disliked product by LIKED_DISLIKED_BOOST points
             break;
         }
 
         if(lovedProduct.brand === product.brand) {
-            likedDislikedProductOverlapScore += (likedDislikedBrands.has(lovedProduct.brand) ? 0.2 : 0.1); // double boost if brand is well-liked/well-disliked
+            likedDislikedProductOverlapScore += (likedDislikedBrands.has(lovedProduct.brand) ? (LIKED_DISLIKED_BRAND_BOOST * 2) : LIKED_DISLIKED_BRAND_BOOST); // double boost if brand is well-liked/well-disliked
         }
 
         // jaccard index computes similarity between two sets
@@ -108,15 +151,24 @@ const likedDislikedOverlapScore = (product, likedDislikedProducts, likedDisliked
 
     for(const ingredient of product.ingredients){
         if(likedDislikedIngredients.has(ingredient.id)) {
-            likedDislikedProductOverlapScore += 0.5; // extra boost for liked/disliked ingredient
+            likedDislikedProductOverlapScore += LIKED_DISLIKED_INGREDIENT_BOOST; // extra boost for liked/disliked ingredient
         }
     }
 
-    likedDislikedProductOverlapScore = Math.min(likedDislikedProductOverlapScore, 2); // cap at 2
+    likedDislikedProductOverlapScore = Math.min(likedDislikedProductOverlapScore, MAX_LIKED_DISLIKED_OVERLAP_SCORE); // cap at MAX_LIKED_DISLIKED_OVERLAP_SCORE
     return likedDislikedProductOverlapScore;
 }
 
-// given a product, compute its score based on user preferences
+/**
+ * Computes a score for a given product based on user's preferences and product's popularity.
+ * @param {object} product - Product to compute score for.
+ * @param {list} lovedProducts - User's liked products.
+ * @param {list} dislikedProducts - User's disliked products.
+ * @param {list} userSkinType - User's skin type.
+ * @param {list} userSkinConcerns - User's skin concerns.
+ * @param {number} totalUsers - Total number of users in DB.
+ * @returns {number} - Score for the given product (between 0 and MAX_SCORE (10)).
+ */
 const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns, totalUsers) => {
     // =========== get overlap between skin types and skin concerns ===========
     const {productSkinTypeScore, ingredientSkinTypeScore} = computeSkinTypeScore(product, userSkinType);
@@ -126,19 +178,13 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     const popularityScore = computePopularityScore(product, totalUsers);
 
     // ========== bonus points: overlap with loved and disliked products ===========
-    const lovedBrands = parseLikedDislikedProducts(lovedProducts).brands;
-    const lovedIngredients = parseLikedDislikedProducts(lovedProducts).ingredients;
-    let lovedProductOverlapScore = likedDislikedOverlapScore(product, lovedProducts, lovedBrands, lovedIngredients);
-
-    const dislikedBrands = parseLikedDislikedProducts(dislikedProducts).brands;
-    const dislikedIngredients = parseLikedDislikedProducts(dislikedProducts).ingredients;
-    let dislikedProductOverlapScore = likedDislikedOverlapScore(product, dislikedProducts, dislikedBrands, dislikedIngredients);
+    let lovedProductOverlapScore = computeLikedDislikedOverlapScore(product, lovedProducts);
+    let dislikedProductOverlapScore = computeLikedDislikedOverlapScore(product, dislikedProducts);
 
     const bonusScore = lovedProductOverlapScore - dislikedProductOverlapScore;
 
     // ========== combine all scores ===========
-    let weights = new Map(); // map is more efficient than object for storing weights
-
+    let weights = new Map(); // map from score name -> weight
     if(product.ingredients.length > 0) {
         weights.set('productSkinTypeScore', 5);
         weights.set('ingredientSkinTypeScore', 1);
@@ -168,14 +214,20 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
         totalScore += scores[key] * weights.get(key);
     }
 
-    // cap score between 0 and 10
-    totalScore = Math.min(totalScore, 10);
+    // cap score between 0 and MAX_SCORE (10)
+    totalScore = Math.min(totalScore, MAX_SCORE);
     totalScore = Math.max(totalScore, 0);
     totalScore = Math.round(totalScore * 10) / 10; // round to 1 decimal place
     return totalScore;
 }
 
-// returns same array of products, but with scores as a field
+/**
+ * Updates product objects with computed scores and fetched images.
+ * @param {list} products - List of product objects to update.
+ * @param {object} user - User to compute scores for.
+ * @param {number} totalUsers - Total number of users in DB.
+ * @returns
+ */
 const updateProductsWithScore = async (products, user, totalUsers) => {
     // need to await Promise.all to ensure all images are fetched before returning (otherwise map will return promises)
     const updatedProducts = await Promise.all(products.map(async (product) => {
