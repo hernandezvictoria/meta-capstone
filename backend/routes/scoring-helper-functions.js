@@ -1,7 +1,6 @@
 var jaccard = require('jaccard');
 const {getProductImage}= require('./local-cache.js');
 
-let weights = new Map(); // map from score name -> weight
 const MIN_BRANDS = 3; // minimum number of brands to consider for liked/disliked overlap
 const MIN_INGREDIENTS = 5; // minimum number of ingredients to consider for liked/disliked overlap
 const LIKED_DISLIKED_BOOST = 2; // boost for product already being liked or disliked
@@ -117,8 +116,6 @@ const computePopularityScore = (product, totalUsers) => {
  * Computes overlap score between a product and the user's liked or disliked products based on product's brand and ingredients.
  * @param {object} product - Product to compute overlap score for.
  * @param {list} likedDislikedProducts - Either user's liked or disliked products.
- * @param {list} likedDislikedBrands - Brands that have been repeated MIN_BRANDS or more times in liked or disliked products.
- * @param {list} likedDislikedIngredients - Ingredients that have been repeated MIN_INGREDIENTS or more times in liked or disliked products.
  * @returns {number} - Overlap score between the product and the user's liked or disliked products (between 0 and MAX_LIKED_DISLIKED_OVERLAP_SCORE).
  */
 const computeLikedDislikedOverlapScore = (product, likedDislikedProducts) => {
@@ -187,6 +184,7 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     const bonusScore = lovedProductOverlapScore - dislikedProductOverlapScore;
 
     // ========== combine all scores ===========
+    let weights = new Map(); // map from score name -> weight
     if(product.ingredients.length > 0) {
         weights.set('productSkinTypeScore', 5);
         weights.set('ingredientSkinTypeScore', 1);
