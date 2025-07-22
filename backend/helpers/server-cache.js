@@ -129,7 +129,6 @@ const setUserActivity = async() => {
  * @param {number} productId - ID of the product whose priority score to compute.
  * @returns {number} - Computed priority score (float).
  */
-// returns a number representing the priority of the product (based on how used it is)
 const computeInitialPriority = async (productId) => {
   await setUserActivity();
   if (productImageCache.has(productId)) {
