@@ -58,8 +58,8 @@ const resizeCache = () => {
   dynamicFlushSize = Math.floor(dynamicCacheSize / 5); // flush size is 1/5 of cache size
 
   // if existing cache is larger than new cache size
-  if(productImageCache.size() > dynamicCacheSize){
-    const sizeDifference = productImageCache.size() - dynamicCacheSize;
+  if(productImageCache.size > dynamicCacheSize){
+    const sizeDifference = productImageCache.size - dynamicCacheSize;
     const numFlushes = Math.ceil(sizeDifference / dynamicFlushSize); // use math.ceil to round up to the integer
     for(i = 0; i < numFlushes; i++){
       flushCache(); // flush until below max cache size
@@ -349,7 +349,13 @@ const getCache = () => {
   return productImageCache;
 };
 
+const getUserActivityScore = () => {
+  return userToActivityScore;
+}
+
 module.exports = {
+  getUserActivityScore,
+  createQueueAndCache,
   flushCache,
   computeInitialPriority,
   insertProduct,

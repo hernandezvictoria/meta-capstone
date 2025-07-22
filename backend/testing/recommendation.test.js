@@ -1,4 +1,4 @@
-const {computeProductScore} = require('./scoring-helper-functions.js');
+const {computeProductScore} = require('../helpers/scoring-helper-functions.js');
 
 const user1 = { // generic user
 	"username": "victoria1",
@@ -1747,7 +1747,7 @@ const product3 = { // no ingredients
 	"disliked_by_user": []
 }
 
-const testComputeScore = async () => {
+test("test compute score", () => {
 	const userInfo = user1;
     const productToCheck = product1;
     const lovedProducts = userInfo.loved_products;
@@ -1755,9 +1755,16 @@ const testComputeScore = async () => {
     const userSkinType = userInfo.skin_type;
     const userSkinConcerns = userInfo.concerns;
 
-    const score = computeProductScore(productToCheck, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns);
-    console.log('User 1 Score:', score);
-    console.log("Score computed successfully");
-}
+    const score1 = computeProductScore(productToCheck, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns);
 
-testComputeScore();
+	const userInfo2 = user2;
+    const productToCheck2 = product1;
+    const lovedProducts2 = userInfo2.loved_products;
+    const dislikedProducts2 = userInfo2.disliked_products;
+    const userSkinType2 = userInfo2.skin_type;
+    const userSkinConcerns2 = userInfo2.concerns;
+
+    const score2 = computeProductScore(productToCheck2, lovedProducts2, dislikedProducts2, userSkinType2, userSkinConcerns2);
+
+	expect(score2).toBeGreaterThan(score1);
+});
