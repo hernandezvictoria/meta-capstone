@@ -7,7 +7,6 @@ import Search from './Search'
 import NavBar from '../NavBar';
 import CacheStats from '../CacheStats';
 
-
 const Home = () => {
     const { user, setUser } = useUser();
     const [error, setError] = useState(null);
