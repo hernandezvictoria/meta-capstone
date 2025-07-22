@@ -1,138 +1,145 @@
+:root {
+	--red1: #ff0000;
+	--red2: #da0000;
+	--red3: #710000;
+	--red4: #ae0000;
+}
+
 .quiz-background {
-  /* darken image using rgba */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../assets/quiz-background.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  min-height: 100vh;
-  width: 100%;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: trasparent;
+	/* darken image using rgba */
+	background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+		url("../assets/quiz-background.png");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	min-height: 100vh;
+	width: 100%;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: trasparent;
 }
 
 .quiz-body {
-  margin: auto; /* centers the quiz */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 35%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  border-radius: 14px;
-  padding: 2%;
+	margin: auto; /* centers the quiz */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 35%;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+	border-radius: 14px;
+	padding: 2%;
 }
 
 .logo {
-  width: 15%;
-  margin-bottom: 1%;
+	width: 15%;
+	margin-bottom: 1%;
 }
 
 .quiz-header {
-  width: 90%;
-  font-size: 250%;
-  margin-bottom: 2%;
+	width: 90%;
+	font-size: 250%;
+	margin-bottom: 2%;
 }
 
 form {
-  display: flex;
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .skin-type-button,
 .concern-button {
-  position: relative;
-  font-size: 150%;
-  border: 0;
-  border-radius: 10px;
-  padding: 3% 5%;
-  opacity: 0.3;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
-  cursor: pointer;
-  margin: 1%;
-  color: black;
-  transition: all 0.4s ease-in-out;
-  background-position: 100%;
-  background-size: 200% 100%;
-  overflow: hidden;
+	position: relative;
+	font-size: 150%;
+	border: 0;
+	border-radius: 10px;
+	padding: 3% 5%;
+	opacity: 0.3;
+	box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+	margin: 1%;
+	color: black;
+	transition: all 0.4s ease-in-out;
+	background-position: 100%;
+	background-size: 200% 100%;
+	overflow: hidden;
 }
 
 .skin-type-buttons,
 .concern-buttons {
-  width: 90%;
-  margin-bottom: 2%;
+	width: 90%;
+	margin-bottom: 2%;
 }
 
 .category-header {
-  font-size: 170%;
-  color: #676767;
+  	font-size: 170%;
+  	color: #676767;
 }
 
 .skin-type-button:active,
 .concern-button:active,
 .active {
-  color: white;
-  opacity: 1;
-  top: 2px;
-  left: 1px;
-  box-shadow: none;
-  animation: colorSwoosh 0.4s ease-in-out forwards;
+	color: white;
+	opacity: 1;
+	top: 2px;
+	left: 1px;
+	box-shadow: none;
+	animation: colorSwoosh 0.4s ease-in-out forwards;
 }
 
 @keyframes colorSwoosh {
-  0% {
-    background-position: 100%;
-    background-size: 200% 100%;
-  }
-  100% {
-    background-position: 0%;
-    background-size: 100% 100%;
-  }
+	0% {
+		background-position: 100%;
+		background-size: 200% 100%;
+	}
+	100% {
+		background-position: 0%;
+		background-size: 100% 100%;
+	}
 }
 
 #oily, #hyperpigmentationdarkspots {
-  background-image: linear-gradient(
-    to right,
-    #ff0000 100%,
-    rgba(255, 0, 0, 0.3) 0%
-  );
+	background-image: linear-gradient(
+		to right,
+		var(--red1) 100%,
+		rgba(255, 0, 0, 0.3) 0%
+	);
 }
 
 #normal, #dryness, #rednessirritation {
-  background-image: linear-gradient(
-    to right,
-    #da0000 100%,
-    rgba(218, 0, 0, 0.3) 0%
-  );
+	background-image: linear-gradient(
+		to right,
+		var(--red2) 100%,
+		rgba(218, 0, 0, 0.3) 0%
+	);
 }
 
 #dry, #acneblemishes, #texture {
-  background-image: linear-gradient(
-    to right,
-    #ae0000 100%,
-    rgba(174, 0, 0, 0.3) 0%
-  );
+	background-image: linear-gradient(
+		to right,
+		var(--red4) 100%,
+		rgba(174, 0, 0, 0.3) 0%
+	);
 }
 
 #combination, #finelineswrinkles, #dullness {
-  background-image: linear-gradient(
-    to right,
-    #710000 100%,
-    rgba(113, 0, 0, 0.3) 0%
-  );
+	background-image: linear-gradient(
+		to right,
+		var(--red3) 100%,
+		rgba(113, 0, 0, 0.3) 0%
+	);
 }
 
 .submit-button {
-  width: 50%;
-  font-size: 150%;
-  border: none;
-  border-radius: 10px;
-  padding: 3% 5%;
+	width: 50%;
+	font-size: 150%;
+	border: none;
+	border-radius: 10px;
+	padding: 3% 5%;
 }
 
 .submit-button:hover {
-  background-color: #ececec;
-  cursor: pointer;
+	background-color: #ececec;
+	cursor: pointer;
 }

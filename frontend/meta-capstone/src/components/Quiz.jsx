@@ -1,13 +1,13 @@
 import { SkinTypes, SkinConcerns} from '../enums';
 import { useState, useEffect } from "react";
 import { useUser } from '../contexts/UserContext';
-import { Link, useParams, useNavigate, Form } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Quiz.css';
 import WithAuth from './WithAuth'
 import logoIcon from '../assets/logo.png'
 import { useNav } from "../contexts/NavContext";
 
-const Quiz = () => {
+function Quiz () {
     const { isHome, setIsHome } = useNav();
     const { user, setUser } = useUser();
     const navigate = useNavigate();
@@ -74,7 +74,6 @@ const Quiz = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        const form = event.target;
 
         if (selectedSkinTypes.length === 0 || selectedConcerns.length === 0) {
             setMessage({ type: "error", text: "you must select at least one of each" });
@@ -165,10 +164,7 @@ const Quiz = () => {
                     <button type="submit" value="Submit" className="submit-button">submit</button>
                 </form>
             </div>
-
-
         </div>
-
     );
 };
 
