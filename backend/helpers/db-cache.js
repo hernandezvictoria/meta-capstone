@@ -1,4 +1,4 @@
-const { PrismaClient } = require('../generated/prisma/index.js')
+const { PrismaClient } = require('../generated/prisma/index.js');
 const prisma = new PrismaClient()
 
 const placeholderImage = "https://placeholderimagegenerator.com/wp-content/uploads/2024/12/Light-placeholder-image-portrait_jpg_.jpg";
@@ -103,4 +103,4 @@ const resetCounters = () => {
 const getActualAPICalls = () => actualAPICalls;
 const getDBHits = () => DBHits;
 
-module.exports = { placeholderImage, fetchImageFromDB, fetchImageFromAPI, getActualAPICalls, getDBHits, resetCounters};
+module.exports = { fetchImageFromDB, resetCounters, getActualAPICalls, getDBHits };

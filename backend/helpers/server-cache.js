@@ -61,7 +61,7 @@ const resizeCache = () => {
   if(productImageCache.size > dynamicCacheSize){
     const sizeDifference = productImageCache.size - dynamicCacheSize;
     const numFlushes = Math.ceil(sizeDifference / dynamicFlushSize); // use math.ceil to round up to the integer
-    for(i = 0; i < numFlushes; i++){
+    for(let i = 0; i < numFlushes; i++){
       flushCache(); // flush until below max cache size
     }
   }

@@ -1,4 +1,4 @@
-const {computeProductScore} = require('../helpers/scoring-helper-functions.js');
+const {computeProductScore} = require('../helpers/scoring-helper-functions.js').default;
 
 const user1 = { // generic user
 	"username": "victoria1",

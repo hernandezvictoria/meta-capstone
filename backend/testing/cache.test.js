@@ -1,5 +1,5 @@
 const {getUserActivityScore, createQueueAndCache, computeInitialPriority, setUserActivity, flushCache, insertProduct, replaceProduct, getProductImage, getQueue, getCache}= require('../helpers/server-cache.js');
-const {fetchImageFromAPI, fetchImageFromDB}= require('../helpers/db-cache.js');
+const {fetchImageFromAPI, fetchImageFromDB}= require('../helpers/db-cache.js').default;
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms)); // timeout to ensure cache order is correct
 
