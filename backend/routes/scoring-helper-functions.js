@@ -112,7 +112,10 @@ const computePopularityScore = (product, totalUsers) => {
  * @param {list} likedDislikedIngredients - Ingredients that have been repeated 5 or more times in liked or disliked products.
  * @returns {number} - Overlap score between the product and the user's liked or disliked products (between 0 and 2).
  */
-const likedDislikedOverlapScore = (product, likedDislikedProducts, likedDislikedBrands, likedDislikedIngredients) => {
+const computeLikedDislikedOverlapScore = (product, likedDislikedProducts) => {
+    const likedDislikedBrands = parseLikedDislikedProducts(likedDislikedProducts).brands;
+    const likedDislikedIngredients = parseLikedDislikedProducts(likedDislikedProducts).ingredients;
+
     // get overlap with loved or disliked products products
     let likedDislikedProductOverlapScore = 0;
     let likedDislikedProductIngredientSimilarityScore = 0;
@@ -168,13 +171,8 @@ const computeProductScore = (product, lovedProducts, dislikedProducts, userSkinT
     const popularityScore = computePopularityScore(product, totalUsers);
 
     // ========== bonus points: overlap with loved and disliked products ===========
-    const lovedBrands = parseLikedDislikedProducts(lovedProducts).brands;
-    const lovedIngredients = parseLikedDislikedProducts(lovedProducts).ingredients;
-    let lovedProductOverlapScore = likedDislikedOverlapScore(product, lovedProducts, lovedBrands, lovedIngredients);
-
-    const dislikedBrands = parseLikedDislikedProducts(dislikedProducts).brands;
-    const dislikedIngredients = parseLikedDislikedProducts(dislikedProducts).ingredients;
-    let dislikedProductOverlapScore = likedDislikedOverlapScore(product, dislikedProducts, dislikedBrands, dislikedIngredients);
+    let lovedProductOverlapScore = computeLikedDislikedOverlapScore(product, lovedProducts);
+    let dislikedProductOverlapScore = computeLikedDislikedOverlapScore(product, dislikedProducts);
 
     const bonusScore = lovedProductOverlapScore - dislikedProductOverlapScore;
 

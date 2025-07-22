@@ -1748,7 +1748,7 @@ const product3 = { // no ingredients
 }
 
 const testComputeScore = async () => {
-	const userInfo = user1;
+	const userInfo = user3;
     const productToCheck = product1;
     const lovedProducts = userInfo.loved_products;
     const dislikedProducts = userInfo.disliked_products;
@@ -1756,7 +1756,7 @@ const testComputeScore = async () => {
     const userSkinConcerns = userInfo.concerns;
 
     const score = computeProductScore(productToCheck, lovedProducts, dislikedProducts, userSkinType, userSkinConcerns);
-    console.log('User 1 Score:', score);
+    console.log('User 3 Score:', score);
     console.log("Score computed successfully");
 }
 
