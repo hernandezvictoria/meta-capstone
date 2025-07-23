@@ -1,4 +1,3 @@
-const e = require('cors');
 const { isCompatibleIngredients, setIncompatibleProducts, getIncompatibleProducts}= require('../helpers/skincare-routine.js');
 
 const exfoliantIngredients = [
@@ -159,5 +158,4 @@ test ("test setIncompatibleProducts", async () => {
     // actives are still compatible with each other
     expect(incompatibleProducts.get(serum2WithActives).has(serumWithActives)).toBe(false);
     expect(incompatibleProducts.get(serumWithActives).has(serum2WithActives)).toBe(false);
-
 });

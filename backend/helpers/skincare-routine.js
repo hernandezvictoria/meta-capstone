@@ -7,7 +7,7 @@ let incompatibleProducts = new Map(); // Maps product id -> set of product ids t
 /**
  * Returns false if two ingredients are not compatible with each other.
  * Exfoliants are not compatible with other exfoliants, retinols, or actives.
- * Retinos are not compatible with other retinols, exfoliants, or actives.
+ * Retinols are not compatible with other retinols, exfoliants, or actives.
  * Actives are not compatible with other exfoliants or retinols, but are compatible with other actives.
  * @param {list} ingredients1 - List of ingredients objects.
  * @param {list} ingredients2 - List of ingredients objects.
@@ -114,6 +114,5 @@ const setIncompatibleProducts = async () => {
 const getIncompatibleProducts = () => {
 	return incompatibleProducts;
 }
-
 
 module.exports = {isCompatibleIngredients, setIncompatibleProducts, getIncompatibleProducts};
