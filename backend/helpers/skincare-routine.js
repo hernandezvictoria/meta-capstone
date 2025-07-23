@@ -1,4 +1,4 @@
-const { HarshIngredientTypes, ProductTypes } = require('../enums.js');
+const { HarshIngredientTypes, ProductTypes } = require("../enums.js");
 const { PrismaClient } = require("../generated/prisma/index.js");
 const prisma = new PrismaClient();
 
@@ -19,7 +19,11 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
 
     // Check if ingredients1 has exfoliants, retinols, or actives
     for (const ingredient of ingredients1) {
-        if (Object.values(HarshIngredientTypes).includes(ingredient.ingredient_type)) {
+        if (
+            Object.values(HarshIngredientTypes).includes(
+                ingredient.ingredient_type
+            )
+        ) {
             if (ingredient.ingredient_type === HarshIngredientTypes.ACTIVE) {
                 ingredients1HasActive = true;
             } else {
@@ -34,7 +38,11 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
     }
 
     for (const ingredient of ingredients2) {
-        if (Object.values(HarshIngredientTypes).includes(ingredient.ingredient_type)) {
+        if (
+            Object.values(HarshIngredientTypes).includes(
+                ingredient.ingredient_type
+            )
+        ) {
             if (ingredient.ingredient_type === HarshIngredientTypes.ACTIVE) {
                 // actives are not compatible with exfoliants or retinols
                 if (ingredients1HasExfoliantOrRetinol) {
@@ -42,14 +50,17 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
                 }
             } else {
                 // exfoliants and retinols are not compatible with actives or other exfoliants or retinols
-                if (ingredients1HasActive || ingredients1HasExfoliantOrRetinol) {
+                if (
+                    ingredients1HasActive ||
+                    ingredients1HasExfoliantOrRetinol
+                ) {
                     return false;
                 }
             }
         }
     }
     return true;
-}
+};
 
 /**
  * Returns true if two products' types are compatible with each other.
@@ -59,13 +70,13 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
  * @returns {boolean} - True if the two products' types are compatible, false otherwise.
  */
 const isCompatibleProductTypes = (productType1, productType2) => {
-    if(productType1 === ProductTypes.RETINOL) {
-        if(productType2 === ProductTypes.RETINOL) {
+    if (productType1 === ProductTypes.RETINOL) {
+        if (productType2 === ProductTypes.RETINOL) {
             return false;
         }
     }
     return true;
-}
+};
 
 /**
  * Adds product 1 to product 2's incompatible products list and vice versa.
@@ -79,16 +90,22 @@ const addToIncompatibleProducts = (product1Id, product2Id) => {
     if (!incompatibleProducts.has(product2Id)) {
         incompatibleProducts.set(product2Id, new Set());
     }
-    incompatibleProducts.set(product1Id, incompatibleProducts.get(product1Id).add(product2Id));
-    incompatibleProducts.set(product2Id, incompatibleProducts.get(product2Id).add(product1Id))
-}
+    incompatibleProducts.set(
+        product1Id,
+        incompatibleProducts.get(product1Id).add(product2Id)
+    );
+    incompatibleProducts.set(
+        product2Id,
+        incompatibleProducts.get(product2Id).add(product1Id)
+    );
+};
 
 /**
  * Sets the incompatible products for each product in the database.
  */
 const setIncompatibleProducts = async () => {
     const allProducts = await prisma.productInfo.findMany({
-        include: {ingredients: true}
+        include: { ingredients: true },
     });
     for (const product1 of allProducts) {
         for (const product2 of allProducts) {
@@ -98,21 +115,35 @@ const setIncompatibleProducts = async () => {
                 continue;
             }
 
-            if (!isCompatibleProductTypes(product1.product_type, product2.product_type)) {
+            if (
+                !isCompatibleProductTypes(
+                    product1.product_type,
+                    product2.product_type
+                )
+            ) {
                 addToIncompatibleProducts(product1.id, product2.id);
                 continue; // skip checking ingredients
             }
 
-            if (!isCompatibleIngredients(product1.ingredients, product2.ingredients)) {
+            if (
+                !isCompatibleIngredients(
+                    product1.ingredients,
+                    product2.ingredients
+                )
+            ) {
                 addToIncompatibleProducts(product1.id, product2.id);
             }
         }
     }
-}
+};
 
 // ============= GETTERS USED FOR TESTING =============
 const getIncompatibleProducts = () => {
     return incompatibleProducts;
-}
+};
 
-module.exports = {isCompatibleIngredients, setIncompatibleProducts, getIncompatibleProducts};
+module.exports = {
+    isCompatibleIngredients,
+    setIncompatibleProducts,
+    getIncompatibleProducts,
+};
