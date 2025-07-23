@@ -5,13 +5,48 @@ const prisma = new PrismaClient();
 const { SkinTypes, SkinConcerns } = require("../enums.js");
 
 const concernRelatedWords = new Map();
-concernRelatedWords.set(SkinConcerns.ACNE, ["acne", "oiliness", "antimicrobial"]);
-concernRelatedWords.set(SkinConcerns.WRINKLES, ["wrinkles", "fine lines", "aging"]);
-concernRelatedWords.set(SkinConcerns.HYPERPIGMENTATION, ["dark", "discoloration", "hyperpigmentation", "sun", "uv"]);
-concernRelatedWords.set(SkinConcerns.TEXTURE, ["exfoliate", "roughness", "smooth", "condition"]);
-concernRelatedWords.set(SkinConcerns.REDNESS, ["redness", "irritation", "sooth", "strength", "inflam", "barrier"]);
-concernRelatedWords.set(SkinConcerns.DULLNESS, ["dullness", "exfoliate", "brighten"]);
-concernRelatedWords.set(SkinConcerns.DRYNESS, ["dryness", "moist", "hydrat", "plump"]);
+concernRelatedWords.set(SkinConcerns.ACNE, [
+    "acne",
+    "oiliness",
+    "antimicrobial",
+]);
+concernRelatedWords.set(SkinConcerns.WRINKLES, [
+    "wrinkles",
+    "fine lines",
+    "aging",
+]);
+concernRelatedWords.set(SkinConcerns.HYPERPIGMENTATION, [
+    "dark",
+    "discoloration",
+    "hyperpigmentation",
+    "sun",
+    "uv",
+]);
+concernRelatedWords.set(SkinConcerns.TEXTURE, [
+    "exfoliate",
+    "roughness",
+    "smooth",
+    "condition",
+]);
+concernRelatedWords.set(SkinConcerns.REDNESS, [
+    "redness",
+    "irritation",
+    "sooth",
+    "strength",
+    "inflam",
+    "barrier",
+]);
+concernRelatedWords.set(SkinConcerns.DULLNESS, [
+    "dullness",
+    "exfoliate",
+    "brighten",
+]);
+concernRelatedWords.set(SkinConcerns.DRYNESS, [
+    "dryness",
+    "moist",
+    "hydrat",
+    "plump",
+]);
 fs.createReadStream("seed.csv")
     .pipe(parse({ columns: true, trim: true }))
     .on("data", async (row) => {
@@ -54,8 +89,10 @@ fs.createReadStream("seed.csv")
         const concernsArray = getConcernsArray(row.concerns);
         const skinTypeArray = getSkinTypesArray(row.skin_type);
         let price = row.price;
-        price = price.slice(1);
+        price = price.slice(1); // remove the dollar sign
         const priceDecimal = parseFloat(price);
+        const productType =
+            row.product_type === "eye cream" ? "eye_cream" : row.product_type;
 
         // Insert into database
         try {
@@ -70,11 +107,7 @@ fs.createReadStream("seed.csv")
                 data: {
                     brand: row.brand,
                     name: row.name,
-                    product_type:
-                        row.product_type === "eye cream"
-                            ? "eye_cream"
-                            : row.product_type,
-
+                    product_type: productType,
                     price: priceDecimal,
                     ingredients: {
                         connect: ingredientRecords.map((ingredient) => ({
