@@ -37,12 +37,16 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
 
     // Check if ingredients1 has exfoliants, retinols, or actives
     for (const ingredient of ingredients1) {
-        const { hasActive, hasExfoliantOrRetinol } = parseIngredientForHarsh(ingredient.ingredient_type);
+        const { hasActive, hasExfoliantOrRetinol } = parseIngredientForHarsh(
+            ingredient.ingredient_type
+        );
         if (hasActive) {
             ingredients1HasActive = hasActive ? true : false;
         }
         if (hasExfoliantOrRetinol) {
-            ingredients1HasExfoliantOrRetinol = hasExfoliantOrRetinol ? true : false;
+            ingredients1HasExfoliantOrRetinol = hasExfoliantOrRetinol
+                ? true
+                : false;
         }
     }
 
@@ -52,7 +56,9 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
     }
 
     for (const ingredient of ingredients2) {
-        const { hasActive, hasExfoliantOrRetinol } = parseIngredientForHarsh(ingredient.ingredient_type);
+        const { hasActive, hasExfoliantOrRetinol } = parseIngredientForHarsh(
+            ingredient.ingredient_type
+        );
         if (hasActive) {
             // actives are not compatible with exfoliants or retinols
             if (ingredients1HasExfoliantOrRetinol) {
@@ -76,12 +82,10 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
  * @returns {boolean} - True if the two products' types are compatible, false otherwise.
  */
 const isCompatibleProductTypes = (productType1, productType2) => {
-    if (productType1 === ProductTypes.RETINOL) {
-        if (productType2 === ProductTypes.RETINOL) {
-            return false;
-        }
-    }
-    return true;
+    return !(
+        productType1 === ProductTypes.RETINOL &&
+        productType2 === ProductTypes.RETINOL
+    );
 };
 
 /**
@@ -96,14 +100,8 @@ const addToIncompatibleProducts = (product1Id, product2Id) => {
     if (!incompatibleProducts.has(product2Id)) {
         incompatibleProducts.set(product2Id, new Set());
     }
-    incompatibleProducts.set(
-        product1Id,
-        incompatibleProducts.get(product1Id).add(product2Id)
-    );
-    incompatibleProducts.set(
-        product2Id,
-        incompatibleProducts.get(product2Id).add(product1Id)
-    );
+    incompatibleProducts.get(product1Id).add(product2Id);
+    incompatibleProducts.get(product2Id).add(product1Id);
 };
 
 /**
