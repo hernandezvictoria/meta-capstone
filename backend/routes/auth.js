@@ -1,139 +1,149 @@
-const express = require('express')
-const bcrypt = require('bcrypt')
-const { PrismaClient } = require('../generated/prisma/index.js')
-const { ActivityTypes } = require('../enums.js')
+const express = require("express");
+const bcrypt = require("bcrypt");
+const { PrismaClient } = require("../generated/prisma/index.js");
+const { ActivityTypes } = require("../enums.js");
 
-const prisma = new PrismaClient()
-const router = express.Router()
-
+const prisma = new PrismaClient();
+const router = express.Router();
 
 // Signup Route: http://localhost:3000/signup
-router.post('/signup', async (req, res) => {
-    const { username, password } = req.body
+router.post("/signup", async (req, res) => {
+    const { username, password } = req.body;
 
     try {
         if (!username || !password) {
-            return res.status(400).json({ error: "username and password are required" })
+            return res
+                .status(400)
+                .json({ error: "username and password are required" });
         }
 
         // can add more password requirements in the future
         if (password.length < 8) {
-            return res.status(400).json({ error: "password must be at least 8 characters long" })
+            return res
+                .status(400)
+                .json({ error: "password must be at least 8 characters long" });
         }
 
         // Check if username is already taken
         const existingUser = await prisma.user.findUnique({
             where: { username },
-        })
+        });
 
         if (existingUser) {
-            return res.status(400).json({ error: "username already exists" })
+            return res.status(400).json({ error: "username already exists" });
         }
 
         // Hash the password before storing it
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create a new user in the database
         const newUser = await prisma.user.create({
             data: {
                 username,
-                password: hashedPassword
-            }
-        })
+                password: hashedPassword,
+            },
+        });
 
-        res.status(201).json({ username: username})
+        res.status(201).json({ username: username });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ error: "something went wrong during signup" })
+        console.error(error);
+        res.status(500).json({ error: "something went wrong during signup" });
     }
-})
+});
 
 // Login Route: http://localhost:3000/login
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body
+router.post("/login", async (req, res) => {
+    const { username, password } = req.body;
     try {
         if (!username || !password) {
-            return res.status(400).json({ error: "username and password are required" })
+            return res
+                .status(400)
+                .json({ error: "username and password are required" });
         }
 
         const user = await prisma.user.findUnique({
-            where: { username }
-        })
+            where: { username },
+        });
 
         if (!user) {
-            return res.status(401).json({ error: "invalid username or password" })
+            return res
+                .status(401)
+                .json({ error: "invalid username or password" });
         }
 
-        const isValidPassword = await bcrypt.compare(password, user.password)
+        const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
-            return res.status(401).json({ error: "invalid username or password" })
+            return res
+                .status(401)
+                .json({ error: "invalid username or password" });
         }
 
         // Store user ID and username in the session
-        req.session.userId = user.id
-        req.session.username = user.username
+        req.session.userId = user.id;
+        req.session.username = user.username;
 
         // Create a new login user activity in the database
         await prisma.userActivity.create({
             data: {
                 user_id: user.id,
                 activity_time: new Date(),
-                activity_type: ActivityTypes.LOGIN
-            }
-        })
+                activity_type: ActivityTypes.LOGIN,
+            },
+        });
 
-        res.status(200).json({ id: user.id, username: user.username }) // Include id and username in the response
+        res.status(200).json({ id: user.id, username: user.username }); // Include id and username in the response
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ error: "something went wrong during login" })
+        console.error(error);
+        res.status(500).json({ error: "something went wrong during login" });
     }
-})
+});
 
 // Check if user is logged in
-router.get('/me', async (req, res) => {
+router.get("/me", async (req, res) => {
     if (!req.session.userId) {
-        return res.status(401).json({ message: "not logged in" })
+        return res.status(401).json({ message: "not logged in" });
     }
 
     try {
         const user = await prisma.user.findUnique({
             where: { id: req.session.userId },
-            select: { username: true }
-        })
+            select: { username: true },
+        });
 
-        res.json({ id: req.session.userId, username: user.username })
+        res.json({ id: req.session.userId, username: user.username });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "error fetching user session data" })
+        res.status(500).json({ error: "error fetching user session data" });
     }
-})
+});
 
 // Logout Route
-router.post('/logout', async (req, res) => {
+router.post("/logout", async (req, res) => {
     if (!req.session.userId) {
-        return res.status(401).json({ message: "You must be logged in to log out" })
+        return res
+            .status(401)
+            .json({ message: "You must be logged in to log out" });
     }
 
-    try{
+    try {
         // Create a new logout user activity in the database
         await prisma.userActivity.create({
             data: {
                 user_id: req.session.userId,
                 activity_time: new Date(),
-                activity_type: ActivityTypes.LOGOUT
-            }
-        })
-    }
-    catch (error) {
-        return res.status(500).json({ error: 'failed to log out' });
+                activity_type: ActivityTypes.LOGOUT,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({ error: "failed to log out" });
     }
     req.session.destroy((err) => {
         if (err) {
-        return res.status(500).json({ error: 'failed to log out' });
+            return res.status(500).json({ error: "failed to log out" });
         }
-        res.clearCookie('connect.sid'); // Clear the session cookie
-        res.json({ message: 'Logout successful' });
+        res.clearCookie("connect.sid"); // Clear the session cookie
+        res.json({ message: "Logout successful" });
     });
 });
 

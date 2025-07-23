@@ -16,14 +16,14 @@ const SkinConcerns = Object.freeze({
 })
 
 const ProductTypes = Object.freeze({
-    serum: "serum",
-    toner: "toner",
-    sunscreen: "sunscreen",
-    moisturizer: "moisturizer",
-    retinol: "retinol",
-    mask: "mask",
-    cleanser: "cleanser",
-    eye_cream: "eye_cream"
+    SERUM: "serum",
+    TONER: "toner",
+    SUNSCREEN: "sunscreen",
+    MOISTURIZER: "moisturizer",
+    RETINOL: "retinol",
+    MASK: "mask",
+    CLEANSER: "cleanser",
+    EYE_CREAM: "eye_cream"
 })
 
 const InteractionTypes = Object.freeze({
@@ -41,4 +41,10 @@ const ActivityTypes = Object.freeze({
     LOGOUT: "logout"
 })
 
-module.exports = { SkinTypes, SkinConcerns, ProductTypes, InteractionTypes, ActivityTypes };
+const HarshIngredientTypes = Object.freeze({
+    EXFOLIANT: "exfoliant",
+    RETINOL: "retinol",
+    ACTIVE: "active"
+})
+
+module.exports = { SkinTypes, SkinConcerns, ProductTypes, InteractionTypes, ActivityTypes, HarshIngredientTypes};

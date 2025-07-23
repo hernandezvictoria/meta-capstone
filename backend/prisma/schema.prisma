@@ -1,100 +1,102 @@
 enum ProductType {
-  serum
-  toner
-  sunscreen
-  moisturizer
-  retinol
-  mask
-  cleanser
-  eye_cream
+    serum
+    toner
+    sunscreen
+    moisturizer
+    retinol
+    mask
+    cleanser
+    eye_cream
 }
 
 enum InteractionType{
-  like
-  dislike
-  save
-  remove_like
-  remove_dislike
-  remove_save
-  open_modal
+    like
+    dislike
+    save
+    remove_like
+    remove_dislike
+    remove_save
+    open_modal
 }
 
 enum SkinType{
-  normal
-  dry
-  combination
-  oily
+    normal
+    dry
+    combination
+    oily
 }
 
 enum ActivityType{
-  login
-  logout
+    login
+    logout
 }
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Ingredient{
-  id Int @id @default(autoincrement())
-  name String @unique
-  ingredient_type String
-  purpose String
-  skin_type SkinType[] @default([])
-  concerns String[] @default([])
-  products ProductInfo[] @relation("ingredients")
+    id Int @id @default(autoincrement())
+    name String @unique
+    ingredient_type String
+    purpose String
+    skin_type SkinType[] @default([])
+    concerns String[] @default([])
+    products ProductInfo[] @relation("ingredients")
 }
 
 model User{
-  id Int @id @default(autoincrement())
-  username String @unique
-  password String
-  concerns String[] @default([])
-  skin_type SkinType[] @default([])
-  loved_products ProductInfo[] @relation("loved")
-  saved_products ProductInfo[] @relation("saved")
-  disliked_products ProductInfo[] @relation("disliked")
-  interactions UserProductInteraction[]
-  activity UserActivity[]
+    id Int @id @default(autoincrement())
+    username String @unique
+    password String
+    concerns String[] @default([])
+    skin_type SkinType[] @default([])
+    loved_products ProductInfo[] @relation("loved")
+    saved_products ProductInfo[] @relation("saved")
+    disliked_products ProductInfo[] @relation("disliked")
+    skincare_routine ProductInfo[] @relation("skincare_routine")
+    interactions UserProductInteraction[]
+    activity UserActivity[]
 }
 
 model ProductInfo{
-  id Int @id @default(autoincrement()) //id in the database
-  brand String
-  name String
-  image String?
-  product_type ProductType
-  price Decimal
-  ingredients Ingredient[] @relation("ingredients")
-  concerns String[]
-  skin_type SkinType[]
-  loved_by_user User[] @relation("loved")
-  saved_by_user User[] @relation("saved")
-  disliked_by_user User[] @relation("disliked")
-  interactions UserProductInteraction[]
-  image_fetch_time DateTime?
+    id Int @id @default(autoincrement()) //id in the database
+    brand String
+    name String
+    image String?
+    product_type ProductType
+    price Decimal
+    ingredients Ingredient[] @relation("ingredients")
+    concerns String[]
+    skin_type SkinType[]
+    loved_by_user User[] @relation("loved")
+    saved_by_user User[] @relation("saved")
+    disliked_by_user User[] @relation("disliked")
+    skincare_routine_user User[] @relation("skincare_routine")
+    interactions UserProductInteraction[]
+    image_fetch_time DateTime?
 }
 
 model UserProductInteraction{
-  id Int @id @default(autoincrement())
-  product ProductInfo @relation(fields: [product_id], references: [id])
-  product_id Int
-  user User @relation(fields: [user_id], references: [id])
-  user_id Int
-  interaction_time DateTime
-  interaction_type InteractionType
+    id Int @id @default(autoincrement())
+    product ProductInfo @relation(fields: [product_id], references: [id])
+    product_id Int
+    user User @relation(fields: [user_id], references: [id])
+    user_id Int
+    interaction_time DateTime
+    interaction_type InteractionType
 }
 
 model UserActivity{
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [user_id], references: [id])
-  user_id Int
-  activity_time DateTime
-  activity_type ActivityType
+    id Int @id @default(autoincrement())
+    user User @relation(fields: [user_id], references: [id])
+    user_id Int
+    activity_time DateTime
+    activity_type ActivityType
 }
