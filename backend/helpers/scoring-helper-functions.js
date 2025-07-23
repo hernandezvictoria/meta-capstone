@@ -296,4 +296,9 @@ const updateProductsWithScore = async (products, user, totalUsers) => {
     return updatedProducts;
 };
 
-module.exports = { computeProductScore, updateProductsWithScore };
+module.exports = {
+    computeProductScore,
+    updateProductsWithScore,
+    computeConcernScore,
+    computeSkinTypeScore,
+};
