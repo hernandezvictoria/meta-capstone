@@ -1,124 +1,124 @@
 :root {
-  --red1: #b80000;
-  --red2: #da0000;
-  --red3: #710000;
-  --red4: #460000;
+    --red1: #b80000;
+    --red2: #da0000;
+    --red3: #710000;
+    --red4: #460000;
 }
 
 .cache-stats-container {
-  position: fixed;
-  bottom: 2%;
-  right: 1%;
-  z-index: 1000; /* position stats on top of everything */
-  background-color: var(--red2);
-  padding: 1%;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-  font-size: 85%;
+    position: fixed;
+    bottom: 2%;
+    right: 1%;
+    z-index: 1000; /* position stats on top of everything */
+    background-color: var(--red2);
+    padding: 1%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 85%;
 }
 
 .cache-stats-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2%;
-  background-color: var(--red2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2%;
+    background-color: var(--red2);
 }
 
 .cache-stats-container h3 {
-  margin: 0;
-  font-size: 150%;
-  color: white;
-  background-color: var(--red2);
+    margin: 0;
+    font-size: 150%;
+    color: white;
+    background-color: var(--red2);
 }
 
 .hide-button {
-  background-color: transparent;
-  color: white;
-  border: none;
-  font-size: 70%;
-  cursor: pointer;
-  text-align: right;
-  width:100%;
-  margin:0;
+    background-color: transparent;
+    color: white;
+    border: none;
+    font-size: 70%;
+    cursor: pointer;
+    text-align: right;
+    width:100%;
+    margin:0;
 }
 
 .hide-button:hover {
-  color: #ffcccc;
+      color: #ffcccc;
 }
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
-  background-color: var(--red2);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+    background-color: var(--red2);
 }
 
 .stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-  background-color: var(--red2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    background-color: var(--red2);
 }
 
 .stat-label {
-  color: white;
-  background-color: var(--red2);;
-  margin-right: 10px;
+    color: white;
+    background-color: var(--red2);;
+    margin-right: 10px;
 }
 
 .stat-value {
-  font-weight: 600; /* bold */
-  color: white;
-  background-color: var(--red2);;
+    font-weight: 600; /* bold */
+    color: white;
+    background-color: var(--red2);;
 }
 
 .refresh-button {
-  width: 100%;
-  padding: 6px;
-  background-color: var(--red3);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 100%;
-  transition: background-color 0.2s;
+    width: 100%;
+    padding: 6px;
+    background-color: var(--red3);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 100%;
+    transition: background-color 0.2s;
 }
 
 .refresh-button:hover {
-  background-color: var(--red4);
+      background-color: var(--red4);
 }
 
 .refresh-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
+      background-color: #cccccc;
+      cursor: not-allowed;
 }
 
 .error {
-  color: white;
-  font-size: 100%;
-  margin: 2% 0%;
-  text-align: center;
+    color: white;
+    font-size: 100%;
+    margin: 2% 0%;
+    text-align: center;
 }
 
 .show-stats-button {
-  position: fixed;
-  bottom: 2%;
-  right: 1%;
-  z-index: 1000;
-  background-color: var(--red2);;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 100%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s;
+    position: fixed;
+    bottom: 2%;
+    right: 1%;
+    z-index: 1000;
+    background-color: var(--red2);;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
 }
 
 .show-stats-button:hover {
-  background-color: var(--red1);
+      background-color: var(--red1);
 }
