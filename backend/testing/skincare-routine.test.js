@@ -1,4 +1,5 @@
-const { isCompatibleIngredients }= require('../helpers/skincare-routine.js');
+const e = require('cors');
+const { isCompatibleIngredients, setIncompatibleProducts, getIncompatibleProducts}= require('../helpers/skincare-routine.js');
 
 const exfoliantIngredients = [
     {
@@ -124,4 +125,39 @@ test("test isCompatibleIngredients", async () => {
     expect(isCompatibleIngredients(noHarshIngredients, exfoliantIngredients)).toBe(true);
     expect(isCompatibleIngredients(noHarshIngredients, activeIngredients)).toBe(true);
     expect(isCompatibleIngredients(noHarshIngredients, retinolIngredients)).toBe(true);
-})
+});
+
+test ("test setIncompatibleProducts", async () => {
+    await setIncompatibleProducts();
+    const incompatibleProducts = getIncompatibleProducts();
+
+    const serumWithActives = 36;
+    const serum2WithActives = 1;
+    const retinol = 7;
+    const tonerWithExfoliant = 14;
+    const noHarshIngredients = 4;
+
+    // products don't have themselves
+    expect(incompatibleProducts.get(retinol).has(retinol)).toBe(false);
+    expect(incompatibleProducts.get(serumWithActives).has(serumWithActives)).toBe(false);
+    expect(incompatibleProducts.get(tonerWithExfoliant).has(tonerWithExfoliant)).toBe(false);
+
+    // product with no harsh ingredients is compatible with all
+    expect(incompatibleProducts.has(noHarshIngredients)).toBe(false);
+    expect(incompatibleProducts.get(retinol).has(noHarshIngredients)).toBe(false);
+    expect(incompatibleProducts.get(serumWithActives).has(noHarshIngredients)).toBe(false);
+    expect(incompatibleProducts.get(serumWithActives).has(noHarshIngredients)).toBe(false);
+
+    // two-way incompatibility
+    expect(incompatibleProducts.get(retinol).has(serumWithActives)).toBe(true);
+    expect(incompatibleProducts.get(serumWithActives).has(retinol)).toBe(true);
+    expect(incompatibleProducts.get(retinol).has(tonerWithExfoliant)).toBe(true);
+    expect(incompatibleProducts.get(tonerWithExfoliant).has(retinol)).toBe(true);
+    expect(incompatibleProducts.get(serumWithActives).has(tonerWithExfoliant)).toBe(true);
+    expect(incompatibleProducts.get(tonerWithExfoliant).has(serumWithActives)).toBe(true);
+
+    // actives are still compatible with each other
+    expect(incompatibleProducts.get(serum2WithActives).has(serumWithActives)).toBe(false);
+    expect(incompatibleProducts.get(serumWithActives).has(serum2WithActives)).toBe(false);
+
+});

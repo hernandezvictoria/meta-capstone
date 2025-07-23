@@ -66,7 +66,7 @@ fs.createReadStream('ingredients.csv')
         let ingredientType = row.Type.toLowerCase();
         if(ingredientType.includes("exfoliant")){
             ingredientType = HarshIngredientTypes.EXFOLIANT;
-        } else if(ingredientType.includes("active")){
+        } else if(ingredientType.includes("active") || ingredientType.includes("vitamin c")){
             ingredientType = HarshIngredientTypes.ACTIVE;
         } else if(ingredientType.includes("retinol") || ingredientType.includes("vitamin a")){
             ingredientType = HarshIngredientTypes.RETINOL;
