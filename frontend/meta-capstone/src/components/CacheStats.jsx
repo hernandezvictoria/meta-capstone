@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import "../styles/CacheStats.css";
 import Loading from "./home_components/Loading";
 
-function CacheStats () {
-
+function CacheStats() {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -37,7 +36,8 @@ function CacheStats () {
             <button
                 className="hide-button"
                 onClick={() => setIsVisible(false)}
-                aria-label="Hide cache stats">
+                aria-label="Hide cache stats"
+            >
                 ✕
             </button>
             <h3>cache stats</h3>
@@ -66,24 +66,34 @@ function CacheStats () {
                     <div className="stat-item">
                         <p className="stat-label">local cache hit rate:</p>
                         <p className="stat-value">
-                        {stats.potentialAPICalls > 0
-                            ? `${(
-                                (stats.cacheHits / stats.potentialAPICalls) *
-                                100
-                            ).toFixed(1)}%` // Round to 1 decimal place
-                            : "0%"}
+                            {stats.potentialAPICalls > 0
+                                ? `${(
+                                      (stats.cacheHits /
+                                          stats.potentialAPICalls) *
+                                      100
+                                  ).toFixed(1)}%` // Round to 1 decimal place
+                                : "0%"}
                         </p>
                     </div>
                 </div>
             )}
 
-            <button className="refresh-button" onClick={fetchStats} disabled={loading}>refresh</button>
-        </div> )
-        : (
-            <button className="show-stats-button" onClick={() => setIsVisible(true)}>
-                show cache stats
+            <button
+                className="refresh-button"
+                onClick={fetchStats}
+                disabled={loading}
+            >
+                refresh
             </button>
-        );
-};
+        </div>
+    ) : (
+        <button
+            className="show-stats-button"
+            onClick={() => setIsVisible(true)}
+        >
+            show cache stats
+        </button>
+    );
+}
 
 export default CacheStats;

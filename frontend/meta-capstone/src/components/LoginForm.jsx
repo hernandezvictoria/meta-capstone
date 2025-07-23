@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from '../contexts/UserContext';
-import { Link } from 'react-router-dom';
-import '../styles/LoginForm.css';
+import { useUser } from "../contexts/UserContext";
+import { Link } from "react-router-dom";
+import "../styles/LoginForm.css";
 import { useNav } from "../contexts/NavContext";
 
-function LoginForm  () {
+function LoginForm() {
     const { isHome, setIsHome } = useNav();
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [message, setMessage] = useState("");
@@ -24,12 +24,15 @@ function LoginForm  () {
         event.preventDefault();
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-                credentials: "include",
-            });
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/login`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData),
+                    credentials: "include",
+                }
+            );
 
             const data = await response.json();
 
@@ -39,10 +42,16 @@ function LoginForm  () {
                 setIsHome(true);
                 navigate("/home"); // Redirect to the homepage
             } else {
-                setMessage({ type: "error", text: data.error || "login failed" });
+                setMessage({
+                    type: "error",
+                    text: data.error || "login failed",
+                });
             }
         } catch (error) {
-            setMessage({ type: "error", text: "network error, please try again" });
+            setMessage({
+                type: "error",
+                text: "network error, please try again",
+            });
         }
     };
 
@@ -78,9 +87,11 @@ function LoginForm  () {
                 <p className={`message ${message.type}`}>{message.text}</p>
             )}
 
-            <p>new to skinterest? <Link to="/signup">sign up</Link></p>
+            <p>
+                new to skinterest? <Link to="/signup">sign up</Link>
+            </p>
         </form>
     );
-};
+}
 
 export default LoginForm;
