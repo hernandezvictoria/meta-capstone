@@ -1,7 +1,7 @@
 const {
     isCompatibleIngredients,
     setIncompatibleProducts,
-    getIncompatibleProducts,
+    getIncompatibleProductsMap,
     computeMissingProductsMultiplier,
     computeIncompatibleProductsDeduction,
     computeUnnecessaryProductsDeduction,
@@ -11,294 +11,383 @@ const {
 } = require("../helpers/skincare-routine.js");
 const { ProductTypes, SkinTypes, SkinConcerns } = require("../enums.js");
 
-// const exfoliantIngredients = [
-//     {
-//         id: 1411,
-//         name: "avocado oil",
-//         ingredient_type: "plant-derived oil",
-//         purpose: "moisturizing, nourishing, anti-aging",
-//         skin_type: ["dry"],
-//         concerns: ["fine lines & wrinkles", "dryness"],
-//     },
-//     {
-//         id: 1447,
-//         name: "retinol",
-//         ingredient_type: "retinol",
-//         purpose: "anti-aging, reduces wrinkles",
-//         skin_type: ["dry", "oily", "combination", "normal"],
-//         concerns: ["fine lines & wrinkles"],
-//     },
-// ];
+const exfoliantIngredients = [
+    {
+        id: 1411,
+        name: "avocado oil",
+        ingredient_type: "plant-derived oil",
+        purpose: "moisturizing, nourishing, anti-aging",
+        skin_type: ["dry"],
+        concerns: ["fine lines & wrinkles", "dryness"],
+    },
+    {
+        id: 1447,
+        name: "retinol",
+        ingredient_type: "retinol",
+        purpose: "anti-aging, reduces wrinkles",
+        skin_type: ["dry", "oily", "combination", "normal"],
+        concerns: ["fine lines & wrinkles"],
+    },
+];
 
-// const activeIngredients = [
-//     {
-//         id: 499,
-//         name: "niacinamide",
-//         ingredient_type: "active",
-//         purpose: "anti-inflammatory, brightening",
-//         skin_type: ["dry", "oily", "combination", "normal"],
-//         concerns: ["redness & irritation", "dullness"],
-//     },
-//     {
-//         id: 1807,
-//         name: "zinc pca",
-//         ingredient_type: "zinc compound",
-//         purpose: "controls oil production, anti-inflammatory, regulates sebum",
-//         skin_type: ["oily"],
-//         concerns: ["redness & irritation"],
-//     },
-// ];
+const activeIngredients = [
+    {
+        id: 499,
+        name: "niacinamide",
+        ingredient_type: "active",
+        purpose: "anti-inflammatory, brightening",
+        skin_type: ["dry", "oily", "combination", "normal"],
+        concerns: ["redness & irritation", "dullness"],
+    },
+    {
+        id: 1807,
+        name: "zinc pca",
+        ingredient_type: "zinc compound",
+        purpose: "controls oil production, anti-inflammatory, regulates sebum",
+        skin_type: ["oily"],
+        concerns: ["redness & irritation"],
+    },
+];
 
-// const retinolIngredients = [
-//     {
-//         id: 348,
-//         name: "squalane",
-//         ingredient_type: "moisturizing, skin softening",
-//         purpose: "deeply moisturizes and softens skin",
-//         skin_type: ["dry"],
-//         concerns: ["dryness"],
-//     },
-//     {
-//         id: 1447,
-//         name: "retinol",
-//         ingredient_type: "retinol",
-//         purpose: "anti-aging, reduces wrinkles",
-//         skin_type: ["dry", "oily", "combination", "normal"],
-//         concerns: ["fine lines & wrinkles"],
-//     },
-// ];
+const retinolIngredients = [
+    {
+        id: 348,
+        name: "squalane",
+        ingredient_type: "moisturizing, skin softening",
+        purpose: "deeply moisturizes and softens skin",
+        skin_type: ["dry"],
+        concerns: ["dryness"],
+    },
+    {
+        id: 1447,
+        name: "retinol",
+        ingredient_type: "retinol",
+        purpose: "anti-aging, reduces wrinkles",
+        skin_type: ["dry", "oily", "combination", "normal"],
+        concerns: ["fine lines & wrinkles"],
+    },
+];
 
-// const noHarshIngredients = [
-//     {
-//         id: 298,
-//         name: "sodium chloride",
-//         ingredient_type: "salt, thickening agent",
-//         purpose: "adds thickness and stabilizes formulas",
-//         skin_type: ["dry", "oily", "combination", "normal"],
-//     },
-// ];
+const noHarshIngredients = [
+    {
+        id: 298,
+        name: "sodium chloride",
+        ingredient_type: "salt, thickening agent",
+        purpose: "adds thickness and stabilizes formulas",
+        skin_type: ["dry", "oily", "combination", "normal"],
+    },
+];
 
-// test("test isCompatibleIngredients", async () => {
-//     expect(
-//         isCompatibleIngredients(retinolIngredients, retinolIngredients)
-//     ).toBe(false);
-//     expect(
-//         isCompatibleIngredients(retinolIngredients, exfoliantIngredients)
-//     ).toBe(false);
-//     expect(isCompatibleIngredients(retinolIngredients, activeIngredients)).toBe(
-//         false
-//     );
+test("test isCompatibleIngredients", async () => {
+    expect(
+        isCompatibleIngredients(retinolIngredients, retinolIngredients)
+    ).toBe(false);
+    expect(
+        isCompatibleIngredients(retinolIngredients, exfoliantIngredients)
+    ).toBe(false);
+    expect(isCompatibleIngredients(retinolIngredients, activeIngredients)).toBe(
+        false
+    );
 
-//     expect(
-//         isCompatibleIngredients(exfoliantIngredients, retinolIngredients)
-//     ).toBe(false);
-//     expect(
-//         isCompatibleIngredients(exfoliantIngredients, exfoliantIngredients)
-//     ).toBe(false);
-//     expect(
-//         isCompatibleIngredients(exfoliantIngredients, activeIngredients)
-//     ).toBe(false);
+    expect(
+        isCompatibleIngredients(exfoliantIngredients, retinolIngredients)
+    ).toBe(false);
+    expect(
+        isCompatibleIngredients(exfoliantIngredients, exfoliantIngredients)
+    ).toBe(false);
+    expect(
+        isCompatibleIngredients(exfoliantIngredients, activeIngredients)
+    ).toBe(false);
 
-//     expect(isCompatibleIngredients(activeIngredients, retinolIngredients)).toBe(
-//         false
-//     );
-//     expect(
-//         isCompatibleIngredients(activeIngredients, exfoliantIngredients)
-//     ).toBe(false);
-//     expect(isCompatibleIngredients(activeIngredients, activeIngredients)).toBe(
-//         true
-//     );
+    expect(isCompatibleIngredients(activeIngredients, retinolIngredients)).toBe(
+        false
+    );
+    expect(
+        isCompatibleIngredients(activeIngredients, exfoliantIngredients)
+    ).toBe(false);
+    expect(isCompatibleIngredients(activeIngredients, activeIngredients)).toBe(
+        true
+    );
 
-//     expect(
-//         isCompatibleIngredients(noHarshIngredients, noHarshIngredients)
-//     ).toBe(true);
-//     expect(
-//         isCompatibleIngredients(noHarshIngredients, exfoliantIngredients)
-//     ).toBe(true);
-//     expect(isCompatibleIngredients(noHarshIngredients, activeIngredients)).toBe(
-//         true
-//     );
-//     expect(
-//         isCompatibleIngredients(noHarshIngredients, retinolIngredients)
-//     ).toBe(true);
-// });
+    expect(
+        isCompatibleIngredients(noHarshIngredients, noHarshIngredients)
+    ).toBe(true);
+    expect(
+        isCompatibleIngredients(noHarshIngredients, exfoliantIngredients)
+    ).toBe(true);
+    expect(isCompatibleIngredients(noHarshIngredients, activeIngredients)).toBe(
+        true
+    );
+    expect(
+        isCompatibleIngredients(noHarshIngredients, retinolIngredients)
+    ).toBe(true);
+});
 
-// test("test setIncompatibleProducts", async () => {
-//     await setIncompatibleProducts();
-//     const incompatibleProducts = getIncompatibleProducts();
+test("test setIncompatibleProducts", async () => {
+    await setIncompatibleProductsMap();
+    const incompatibleProducts = getIncompatibleProducts();
 
-//     const serumWithActives = 36;
-//     const serum2WithActives = 1;
-//     const retinol = 7;
-//     const tonerWithExfoliant = 14;
-//     const noHarshIngredients = 4;
+    const serumWithActives = 36;
+    const serum2WithActives = 1;
+    const retinol = 7;
+    const tonerWithExfoliant = 14;
+    const noHarshIngredients = 4;
 
-//     // products don't have themselves
-//     expect(incompatibleProducts.get(retinol).has(retinol)).toBe(false);
-//     expect(
-//         incompatibleProducts.get(serumWithActives).has(serumWithActives)
-//     ).toBe(false);
-//     expect(
-//         incompatibleProducts.get(tonerWithExfoliant).has(tonerWithExfoliant)
-//     ).toBe(false);
+    // products don't have themselves
+    expect(incompatibleProducts.get(retinol).has(retinol)).toBe(false);
+    expect(
+        incompatibleProducts.get(serumWithActives).has(serumWithActives)
+    ).toBe(false);
+    expect(
+        incompatibleProducts.get(tonerWithExfoliant).has(tonerWithExfoliant)
+    ).toBe(false);
 
-//     // product with no harsh ingredients is compatible with all
-//     expect(incompatibleProducts.has(noHarshIngredients)).toBe(false);
-//     expect(incompatibleProducts.get(retinol).has(noHarshIngredients)).toBe(
-//         false
-//     );
-//     expect(
-//         incompatibleProducts.get(serumWithActives).has(noHarshIngredients)
-//     ).toBe(false);
-//     expect(
-//         incompatibleProducts.get(serumWithActives).has(noHarshIngredients)
-//     ).toBe(false);
+    // product with no harsh ingredients is compatible with all
+    expect(incompatibleProducts.has(noHarshIngredients)).toBe(false);
+    expect(incompatibleProducts.get(retinol).has(noHarshIngredients)).toBe(
+        false
+    );
+    expect(
+        incompatibleProducts.get(serumWithActives).has(noHarshIngredients)
+    ).toBe(false);
+    expect(
+        incompatibleProducts.get(serumWithActives).has(noHarshIngredients)
+    ).toBe(false);
 
-//     // two-way incompatibility
-//     expect(incompatibleProducts.get(retinol).has(serumWithActives)).toBe(true);
-//     expect(incompatibleProducts.get(serumWithActives).has(retinol)).toBe(true);
-//     expect(incompatibleProducts.get(retinol).has(tonerWithExfoliant)).toBe(
-//         true
-//     );
-//     expect(incompatibleProducts.get(tonerWithExfoliant).has(retinol)).toBe(
-//         true
-//     );
-//     expect(
-//         incompatibleProducts.get(serumWithActives).has(tonerWithExfoliant)
-//     ).toBe(true);
-//     expect(
-//         incompatibleProducts.get(tonerWithExfoliant).has(serumWithActives)
-//     ).toBe(true);
+    // two-way incompatibility
+    expect(incompatibleProducts.get(retinol).has(serumWithActives)).toBe(true);
+    expect(incompatibleProducts.get(serumWithActives).has(retinol)).toBe(true);
+    expect(incompatibleProducts.get(retinol).has(tonerWithExfoliant)).toBe(
+        true
+    );
+    expect(incompatibleProducts.get(tonerWithExfoliant).has(retinol)).toBe(
+        true
+    );
+    expect(
+        incompatibleProducts.get(serumWithActives).has(tonerWithExfoliant)
+    ).toBe(true);
+    expect(
+        incompatibleProducts.get(tonerWithExfoliant).has(serumWithActives)
+    ).toBe(true);
 
-//     // actives are still compatible with each other
-//     expect(
-//         incompatibleProducts.get(serum2WithActives).has(serumWithActives)
-//     ).toBe(false);
-//     expect(
-//         incompatibleProducts.get(serumWithActives).has(serum2WithActives)
-//     ).toBe(false);
-// });
+    // actives are still compatible with each other
+    expect(
+        incompatibleProducts.get(serum2WithActives).has(serumWithActives)
+    ).toBe(false);
+    expect(
+        incompatibleProducts.get(serumWithActives).has(serum2WithActives)
+    ).toBe(false);
+});
 
-// test("test computeMissingProductsMultiplier", () => {
-//     const meetsAllRequirements = new Set([
-//         ProductTypes.SERUM,
-//         ProductTypes.TONER,
-//         ProductTypes.MOISTURIZER,
-//         ProductTypes.SUNSCREEN,
-//         ProductTypes.CLEANSER,
-//     ]);
-//     const meetsAllRequirementsExceptSunscreen = new Set([
-//         ProductTypes.MOISTURIZER,
-//         ProductTypes.CLEANSER,
-//     ]);
-//     const meetsAllRequirementsExceptMoisturizer = new Set([
-//         ProductTypes.SERUM,
-//         ProductTypes.CLEANSER,
-//         ProductTypes.SUNSCREEN,
-//     ]);
-//     const meetsAllRequirementsExceptCleanser = new Set([
-//         ProductTypes.CLEANSER,
-//         ProductTypes.SUNSCREEN,
-//     ]);
-//     const missingTwo = new Set([ProductTypes.SERUM, ProductTypes.MOISTURIZER]);
-//     const missingThree = new Set([ProductTypes.SERUM, ProductTypes.TONER]);
+test("test computeMissingProductsMultiplier", () => {
+    const meetsAllRequirements = new Set([
+        ProductTypes.SERUM,
+        ProductTypes.TONER,
+        ProductTypes.MOISTURIZER,
+        ProductTypes.SUNSCREEN,
+        ProductTypes.CLEANSER,
+    ]);
+    const meetsAllRequirementsExceptSunscreen = new Set([
+        ProductTypes.MOISTURIZER,
+        ProductTypes.CLEANSER,
+    ]);
+    const meetsAllRequirementsExceptMoisturizer = new Set([
+        ProductTypes.SERUM,
+        ProductTypes.CLEANSER,
+        ProductTypes.SUNSCREEN,
+    ]);
+    const meetsAllRequirementsExceptCleanser = new Set([
+        ProductTypes.CLEANSER,
+        ProductTypes.SUNSCREEN,
+    ]);
+    const missingTwo = new Set([ProductTypes.SERUM, ProductTypes.MOISTURIZER]);
+    const missingThree = new Set([ProductTypes.SERUM, ProductTypes.TONER]);
 
-//     expect(
-//         computeMissingProductsMultiplier(meetsAllRequirements).multiplier
-//     ).toBe(1);
-//     expect(computeMissingProductsMultiplier(meetsAllRequirements).message).toBe(
-//         ""
-//     );
-//     expect(
-//         computeMissingProductsMultiplier(meetsAllRequirementsExceptSunscreen)
-//             .multiplier
-//     ).toBe(2 / 3);
-//     expect(
-//         computeMissingProductsMultiplier(meetsAllRequirementsExceptSunscreen)
-//             .message
-//     ).toBe(
-//         "make sure your routine has a cleanser, moisturizer, and sunscreen!"
-//     );
-//     expect(
-//         computeMissingProductsMultiplier(meetsAllRequirementsExceptMoisturizer)
-//             .multiplier
-//     ).toBe(2 / 3);
-//     expect(
-//         computeMissingProductsMultiplier(meetsAllRequirementsExceptCleanser)
-//             .multiplier
-//     ).toBe(2 / 3);
-//     expect(computeMissingProductsMultiplier(missingTwo).multiplier).toBe(1 / 3);
-//     expect(computeMissingProductsMultiplier(missingThree).multiplier).toBe(0);
-// });
+    expect(
+        computeMissingProductsMultiplier(meetsAllRequirements).multiplier
+    ).toBe(1);
+    expect(computeMissingProductsMultiplier(meetsAllRequirements).message).toBe(
+        ""
+    );
+    expect(
+        computeMissingProductsMultiplier(meetsAllRequirementsExceptSunscreen)
+            .multiplier
+    ).toBe(2 / 3);
+    expect(
+        computeMissingProductsMultiplier(meetsAllRequirementsExceptSunscreen)
+            .message
+    ).toBe(
+        "make sure your routine has a cleanser, moisturizer, and sunscreen!"
+    );
+    expect(
+        computeMissingProductsMultiplier(meetsAllRequirementsExceptMoisturizer)
+            .multiplier
+    ).toBe(2 / 3);
+    expect(
+        computeMissingProductsMultiplier(meetsAllRequirementsExceptCleanser)
+            .multiplier
+    ).toBe(2 / 3);
+    expect(computeMissingProductsMultiplier(missingTwo).multiplier).toBe(1 / 3);
+    expect(computeMissingProductsMultiplier(missingThree).multiplier).toBe(0);
+});
 
-// test("test computeIncompatibleProductsDeduction", async () => {
-//     await setIncompatibleProducts();
-//     const serumWithActives = 36;
-//     const serum2WithActives = 1;
-//     const retinol = 7;
-//     const tonerWithExfoliant = 14;
-//     const noHarshIngredients = 4;
+test("test computeIncompatibleProductsDeduction", async () => {
+    await setIncompatibleProductsMap();
+    const serumWithActives = 36;
+    const serum2WithActives = 1;
+    const retinol = 7;
+    const tonerWithExfoliant = 14;
+    const noHarshIngredients = 4;
 
-//     const compatible = [
-//         serum2WithActives,
-//         serumWithActives,
-//         noHarshIngredients,
-//     ];
-//     const incompatible = [retinol, tonerWithExfoliant, serumWithActives];
-//     const incompatible3 = [retinol, serumWithActives];
+    const compatible = [
+        serum2WithActives,
+        serumWithActives,
+        noHarshIngredients,
+    ];
+    const incompatible = [retinol, tonerWithExfoliant, serumWithActives];
+    const incompatible3 = [retinol, serumWithActives];
 
-//     expect(computeIncompatibleProductsDeduction(compatible).deduction).toBe(0);
-//     expect(computeIncompatibleProductsDeduction(compatible).message).toBe("");
-//     expect(computeIncompatibleProductsDeduction(incompatible).deduction).toBe(
-//         5
-//     );
-//     expect(computeIncompatibleProductsDeduction(incompatible).message).toBe(
-//         "your routine has too many products with harsh ingredients!"
-//     );
-//     expect(computeIncompatibleProductsDeduction(incompatible3).deduction).toBe(
-//         5
-//     );
-// });
+    expect(computeIncompatibleProductsDeduction(compatible).deduction).toBe(0);
+    expect(computeIncompatibleProductsDeduction(compatible).message).toBe("");
+    expect(computeIncompatibleProductsDeduction(incompatible).deduction).toBe(
+        5
+    );
+    expect(computeIncompatibleProductsDeduction(incompatible).message).toBe(
+        "your routine has too many products with harsh ingredients!"
+    );
+    expect(computeIncompatibleProductsDeduction(incompatible3).deduction).toBe(
+        5
+    );
+});
 
-// //fake user
-// const userSkinTypes = [SkinTypes.DRY, SkinTypes.NORMAL];
-// const userSkinConcerns = [SkinConcerns.DRYNESS, SkinConcerns.FINE_LINES];
+//fake user
+const userSkinTypes = [SkinTypes.DRY, SkinTypes.NORMAL];
+const userSkinConcerns = [SkinConcerns.DRYNESS, SkinConcerns.FINE_LINES];
 
-// // fake products
-// const meetsDryAndNormal = {concerns: [], skin_type: [SkinTypes.DRY, SkinTypes.NORMAL], ingredients: []};
-// const meetsDrynessAndDryAndNormal = {concerns: [SkinConcerns.DRYNESS, SkinConcerns.REDNESS], skin_type: [SkinTypes.DRY, SkinTypes.NORMAL], ingredients: []};
-// const meetsDrynessAndNormal = {concerns: [SkinConcerns.DRYNESS], skin_type: [SkinTypes.NORMAL], ingredients: []};
-// const meetsFineLines = {concerns: [SkinConcerns.FINE_LINES], skin_type: [SkinTypes.OILY], ingredients: []};
-// const meetsNone = {concerns: [SkinConcerns.ACNE], skin_type: [SkinTypes.OILY, SkinTypes], ingredients: []};
+// fake products
+const meetsDryAndNormal = {
+    concerns: [],
+    skin_type: [SkinTypes.DRY, SkinTypes.NORMAL],
+    ingredients: [],
+};
+const meetsDrynessAndDryAndNormal = {
+    concerns: [SkinConcerns.DRYNESS, SkinConcerns.REDNESS],
+    skin_type: [SkinTypes.DRY, SkinTypes.NORMAL],
+    ingredients: [],
+};
+const meetsDrynessAndNormal = {
+    concerns: [SkinConcerns.DRYNESS],
+    skin_type: [SkinTypes.NORMAL],
+    ingredients: [],
+};
+const meetsFineLines = {
+    concerns: [SkinConcerns.FINE_LINES],
+    skin_type: [SkinTypes.OILY],
+    ingredients: [],
+};
+const meetsNone = {
+    concerns: [SkinConcerns.ACNE],
+    skin_type: [SkinTypes.OILY, SkinTypes],
+    ingredients: [],
+};
 
-// // fake routines
-// const meetsAll = [meetsDrynessAndDryAndNormal, meetsFineLines];
-// const meetsAll2 = [meetsDrynessAndDryAndNormal, meetsDrynessAndNormal, meetsFineLines];
-// const meets1 = [meetsFineLines, meetsNone];
-// const meets0 = [meetsNone];
-// const meets3 = [meetsDrynessAndDryAndNormal, meetsDrynessAndNormal, meetsNone];
+// fake routines
+const meetsAll = [meetsDrynessAndDryAndNormal, meetsFineLines];
+const meetsAll2 = [
+    meetsDrynessAndDryAndNormal,
+    meetsDrynessAndNormal,
+    meetsFineLines,
+];
+const meets1 = [meetsFineLines, meetsNone];
+const meets0 = [meetsNone];
+const meets3 = [meetsDrynessAndDryAndNormal, meetsDrynessAndNormal, meetsNone];
 
-// test("test computeUnnecessaryProductsDeduction", () => {
-//     expect(computeUnnecessaryProductsDeduction(meetsAll, userSkinTypes, userSkinConcerns).deduction).toBe(0);
-//     expect(computeUnnecessaryProductsDeduction(meetsAll2, userSkinTypes, userSkinConcerns).deduction).toBe(0);
-//     expect(computeUnnecessaryProductsDeduction(meets1, userSkinTypes, userSkinConcerns).deduction).toBe(0.5);
-//     expect(computeUnnecessaryProductsDeduction(meets0, userSkinTypes, userSkinConcerns).deduction).toBe(0.5);
-//     expect(computeUnnecessaryProductsDeduction(meets3, userSkinTypes, userSkinConcerns).deduction).toBe(0.5);
-// });
+test("test computeUnnecessaryProductsDeduction", () => {
+    expect(
+        computeUnnecessaryProductsDeduction(
+            meetsAll,
+            userSkinTypes,
+            userSkinConcerns
+        ).deduction
+    ).toBe(0);
+    expect(
+        computeUnnecessaryProductsDeduction(
+            meetsAll2,
+            userSkinTypes,
+            userSkinConcerns
+        ).deduction
+    ).toBe(0);
+    expect(
+        computeUnnecessaryProductsDeduction(
+            meets1,
+            userSkinTypes,
+            userSkinConcerns
+        ).deduction
+    ).toBe(0.5);
+    expect(
+        computeUnnecessaryProductsDeduction(
+            meets0,
+            userSkinTypes,
+            userSkinConcerns
+        ).deduction
+    ).toBe(0.5);
+    expect(
+        computeUnnecessaryProductsDeduction(
+            meets3,
+            userSkinTypes,
+            userSkinConcerns
+        ).deduction
+    ).toBe(0.5);
+});
 
-// test("test computePureScore", () => {
-//     const parsedMeetsAll = parseSkincareRoutine(meetsAll);
-//     parsedMeetsAll2 = parseSkincareRoutine(meetsAll2);
-//     const parsedMeets0 = parseSkincareRoutine(meets0);
-//     const parsedMeets1 = parseSkincareRoutine(meets1);
-//     const parsedMeets3 = parseSkincareRoutine(meets3);
+test("test computePureScore", () => {
+    const parsedMeetsAll = parseSkincareRoutine(meetsAll);
+    parsedMeetsAll2 = parseSkincareRoutine(meetsAll2);
+    const parsedMeets0 = parseSkincareRoutine(meets0);
+    const parsedMeets1 = parseSkincareRoutine(meets1);
+    const parsedMeets3 = parseSkincareRoutine(meets3);
 
-//     expect(computePureScore(parsedMeetsAll.skinTypesSet, parsedMeetsAll.skinConcernsSet, userSkinTypes, userSkinConcerns)).toBe(10);
-//     expect(computePureScore(parsedMeetsAll2.skinTypesSet, parsedMeetsAll2.skinConcernsSet, userSkinTypes, userSkinConcerns)).toBe(10);
-//     expect(computePureScore(parsedMeets1.skinTypesSet, parsedMeets1.skinConcernsSet, userSkinTypes, userSkinConcerns)).toBe(10 / 4);
-//     expect(computePureScore(parsedMeets0.skinTypesSet, parsedMeets0.skinConcernsSet, userSkinTypes, userSkinConcerns)).toBe(0);
-//     expect(computePureScore(parsedMeets3.skinTypesSet, parsedMeets3.skinConcernsSet, userSkinTypes, userSkinConcerns)).toBe(10 * 3 / 4);
-// });
+    expect(
+        computePureScore(
+            parsedMeetsAll.skinTypesSet,
+            parsedMeetsAll.skinConcernsSet,
+            userSkinTypes,
+            userSkinConcerns
+        )
+    ).toBe(10);
+    expect(
+        computePureScore(
+            parsedMeetsAll2.skinTypesSet,
+            parsedMeetsAll2.skinConcernsSet,
+            userSkinTypes,
+            userSkinConcerns
+        )
+    ).toBe(10);
+    expect(
+        computePureScore(
+            parsedMeets1.skinTypesSet,
+            parsedMeets1.skinConcernsSet,
+            userSkinTypes,
+            userSkinConcerns
+        )
+    ).toBe(10 / 4);
+    expect(
+        computePureScore(
+            parsedMeets0.skinTypesSet,
+            parsedMeets0.skinConcernsSet,
+            userSkinTypes,
+            userSkinConcerns
+        )
+    ).toBe(0);
+    expect(
+        computePureScore(
+            parsedMeets3.skinTypesSet,
+            parsedMeets3.skinConcernsSet,
+            userSkinTypes,
+            userSkinConcerns
+        )
+    ).toBe((10 * 3) / 4);
+});
 
 const user = {
     username: "victoria",

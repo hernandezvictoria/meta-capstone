@@ -7,7 +7,7 @@ const {
 } = require("./scoring-helper-functions.js");
 
 let incompatibleProductsMap = new Map(); // Maps product id -> set of product ids that it is incompatible with
-const INCOMPATIBLE_PRODUCTS_DEDUCTION = 5; // deduction for having incompatible products
+const INCOMPATIBLE_PRODUCTS_DEDUCTION = 5; // skincare routine score deduction for having incompatible products
 const MAX_ROUTINE_LENGTH = 6; // maximum number of products in a skincare routine
 
 /**
@@ -172,8 +172,8 @@ const parseSkincareRoutine = (routine) => {
 /**
  * Returns a multiplier based on the number of missing products in the skincare routine.
  * Every skincare routine should have at least one cleanser, moisturizer, and sunscreen.
- * @param {set} productTypesSet
- * @returns
+ * @param {set} productTypesSet - Unique product types in the skincare routine.
+ * @returns {object} - Object with the missing products multiplier and message.
  */
 const computeMissingProductsMultiplier = (productTypesSet) => {
     // set.has has O(1) time complexity
@@ -193,8 +193,8 @@ const computeMissingProductsMultiplier = (productTypesSet) => {
 /**
  * Returns a deduction based on whether the skincare routine has incompatible products.
  * Same deduction for having any incompatible products, regardless of how many.
- * @param {list} productIds
- * @returns {number} - The deduction for having any incompatible products.
+ * @param {list} productIds - List of product ids in the skincare routine.
+ * @returns {object} - The deduction for having any incompatible products and message.
  */
 const computeIncompatibleProductsDeduction = (productIds) => {
     let allIncompatibleProductsSet = new Set(); // use set to avoid duplicates, efficient for O(1) lookup
@@ -231,7 +231,7 @@ const computeIncompatibleProductsDeduction = (productIds) => {
 /**
  * Half point deduction for each product added after the MAX_ROUTINE_LENGTHth product.
  * @param {number} routineLength - The length of the skincare routine.
- * @returns {number} - The deduction for having too many products.
+ * @returns {object} - The deduction for having too many products and message.
  */
 const computeExcessiveProductsDeduction = (routineLength) => {
     if (routineLength > MAX_ROUTINE_LENGTH) {
@@ -249,7 +249,7 @@ const computeExcessiveProductsDeduction = (routineLength) => {
  * @param {list} routine - List of product objects in the user's skincare routine.
  * @param {list} userSkinType - List of user's skin types.
  * @param {list} userSkinConcerns - List of user's skin concerns.
- * @returns
+ * @returns {object} - The deduction for having unnecessary products and message.
  */
 const computeUnnecessaryProductsDeduction = (
     routine,
@@ -259,11 +259,17 @@ const computeUnnecessaryProductsDeduction = (
     let numUnnecessaryProducts = 0;
     for (const product of routine) {
         const skinTypeScore = computeSkinTypeScore(product, userSkinType);
-        if (skinTypeScore.productSkinTypeScore > 0 || skinTypeScore.ingredientSkinTypeScore) {
+        if (
+            skinTypeScore.productSkinTypeScore > 0 ||
+            skinTypeScore.ingredientSkinTypeScore
+        ) {
             continue; // short circuit if product meets at least one of user's skin types
         } else {
             const concernScore = computeConcernScore(product, userSkinConcerns);
-            if (concernScore.productConcernsScore === 0 && concernScore.ingredientConcernsScore === 0) {
+            if (
+                concernScore.productConcernsScore === 0 &&
+                concernScore.ingredientConcernsScore === 0
+            ) {
                 numUnnecessaryProducts++;
             }
         }
@@ -287,7 +293,7 @@ const computeUnnecessaryProductsDeduction = (
  * @param {set} skinConcernsSet
  * @param {list} userSkinType
  * @param {list} userSkinConcerns
- * @returns
+ * @returns {object} - Pure score and message.
  */
 const computePureScore = (
     skinTypesSet,
@@ -310,12 +316,19 @@ const computePureScore = (
         }
     }
 
+    // proportion of skin types and skin concerns satisfied normalized to a 10 point scale
     return (
         (10 * (numSkinTypesSatisfied + numSkinConcernsSatisfied)) /
         (userSkinType.length + userSkinConcerns.length)
     );
 };
 
+/**
+ * Returns a score based on how compatible a user's skincare routine is with their skin type and skin concerns.
+ * @param {list} routine - List of product objects in the user's skincare routine.
+ * @param {object} user - User object to compute skincare routine score for.
+ * @returns {object} - Object with the skincare routine score and message.
+ */
 const computeSkincareRoutineScore = async (routine, user) => {
     if (routine.length === 0) {
         return {
@@ -335,12 +348,13 @@ const computeSkincareRoutineScore = async (routine, user) => {
         await setIncompatibleProductsMap();
     }
 
-
-    // missing products message has highest precedence, with decreasing precedence for each deduction's message
+    // =============== Missing Products ===============
     const missingProducts = computeMissingProductsMultiplier(productTypesSet);
     const missingProductsMultiplier = missingProducts.multiplier;
+    // missing products message has highest precedence, with decreasing precedence for each deduction's message
     message = missingProducts.message;
 
+    // =============== Incompatible Products ===============
     const incompatibleProducts =
         computeIncompatibleProductsDeduction(productIds);
     const incompatibleProductsDeduction = incompatibleProducts.deduction;
@@ -349,12 +363,14 @@ const computeSkincareRoutineScore = async (routine, user) => {
         message = incompatibleProducts.message;
     }
 
+    // =============== Excessive Products ===============
     const excessiveProducts = computeExcessiveProductsDeduction(routine.length);
     const excessiveProductsDeduction = excessiveProducts.deduction;
     if (message === "") {
         message = excessiveProducts.message;
     }
 
+    // =============== Unnecessary Products ===============
     const unnecessaryProducts = computeUnnecessaryProductsDeduction(
         routine,
         user.skin_type,
@@ -365,6 +381,7 @@ const computeSkincareRoutineScore = async (routine, user) => {
         message = unnecessaryProducts.message;
     }
 
+    // =============== Pure Score ===============
     const pureScore = computePureScore(
         skinTypesSet,
         skinConcernsSet,
@@ -372,8 +389,9 @@ const computeSkincareRoutineScore = async (routine, user) => {
         user.concerns
     );
 
+    // =============== Total Score ===============
     let totalScore =
-        (pureScore * missingProductsMultiplier) -
+        pureScore * missingProductsMultiplier -
         incompatibleProductsDeduction -
         excessiveProductsDeduction -
         unnecessaryProductsDeduction;
@@ -381,8 +399,8 @@ const computeSkincareRoutineScore = async (routine, user) => {
     totalScore = Math.max(totalScore, 0); // ensure score is non-negative
     totalScore = Math.round(totalScore * 10) / 10; // round to 1 decimal place
 
-
     if (message === "") {
+        // set message if no message has been set yet
         if (totalScore >= 8) {
             message = "your routine is great for your skin's needs!";
         } else if (totalScore >= 6) {
@@ -404,12 +422,12 @@ const getIncompatibleProducts = () => {
 
 module.exports = {
     isCompatibleIngredients,
-    setIncompatibleProducts: setIncompatibleProductsMap,
+    setIncompatibleProductsMap,
     getIncompatibleProducts,
     computeMissingProductsMultiplier,
     computeIncompatibleProductsDeduction,
     computeUnnecessaryProductsDeduction,
     computePureScore,
     parseSkincareRoutine,
-    computeSkincareRoutineScore
+    computeSkincareRoutineScore,
 };
