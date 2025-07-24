@@ -206,6 +206,13 @@ router.get("/user-liked-saved-disliked", async (req, res) => {
                         disliked_by_user: true,
                     },
                 },
+                skincare_routine: {
+                    include: {
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true,
+                    },
+                },
             },
         });
         const users = await prisma.user.findMany();
@@ -222,6 +229,11 @@ router.get("/user-liked-saved-disliked", async (req, res) => {
             ),
             disliked_products: await updateProductsWithScore(
                 user.disliked_products,
+                user,
+                users?.length
+            ),
+            skincare_routine: await updateProductsWithScore(
+                user.skincare_routine,
                 user,
                 users?.length
             ),
