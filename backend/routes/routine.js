@@ -5,6 +5,9 @@ const prisma = new PrismaClient();
 const {
     updateProductsWithScore,
 } = require("../helpers/scoring-helper-functions.js");
+const {
+    computeSkincareRoutineScore,
+} = require("../helpers/skincare-routine.js");
 
 // add/remove product to user's skincare routine
 router.put("/toggle-add/:productId", async (req, res) => {
@@ -99,6 +102,8 @@ router.get("/user-routine", async (req, res) => {
             },
         });
 
+        const computedScore = await computeSkincareRoutineScore(user.skincare_routine, user);
+
         const users = await prisma.user.findMany();
         res.status(200).json({
             skincare_routine: await updateProductsWithScore(
@@ -106,6 +111,8 @@ router.get("/user-routine", async (req, res) => {
                 user,
                 users?.length
             ),
+            score: computedScore.score,
+            scoreMessage: computedScore.message,
         });
     } catch (error) {
         console.error(error);
