@@ -110,7 +110,10 @@ function RoutinePage() {
                                 setError={setError}
                             />
                             <div className="score-and-message">
-                                <h2 className="routine-score" id={getScoreClass(routineScore)}>
+                                <h2
+                                    className="routine-score"
+                                    id={getScoreClass(routineScore)}
+                                >
                                     overall score: {routineScore}/10
                                 </h2>
                                 <h2 className="message">{routineMessage}</h2>

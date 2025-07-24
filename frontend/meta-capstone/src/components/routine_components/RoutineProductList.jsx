@@ -54,7 +54,11 @@ function RoutineProductList({
                             skin_type={prod.skin_type}
                             image={prod.image}
                             score={prod.score}
-                            skincareRoutineScore={isSuggestedProducts ? prod.skincareRoutineScore : null}
+                            skincareRoutineScore={
+                                isSuggestedProducts
+                                    ? prod.skincareRoutineScore
+                                    : null
+                            }
                         />
                     );
                 })}
