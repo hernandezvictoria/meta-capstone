@@ -163,8 +163,8 @@ const parseSkincareRoutine = (routine) => {
 
     for (const product of routine) {
         productTypes.push(product.product_type);
-        skinTypes = [...skinTypes, ...product.skin_type];
-        skinConcerns = [...skinConcerns, ...product.concerns];
+        skinTypes.push(...product.skin_type);
+        skinConcerns.push(...product.concerns);
         productIds.push(product.id);
     }
 
