@@ -6,7 +6,9 @@ const { ActivityTypes } = require("../enums.js");
 const prisma = new PrismaClient();
 const router = express.Router();
 
-// Signup Route: http://localhost:3000/signup
+/**
+ * Sign up a new user.
+ */
 router.post("/signup", async (req, res) => {
     const { username, password } = req.body;
 
@@ -51,7 +53,9 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// Login Route: http://localhost:3000/login
+/**
+ * Log in an existing user.
+ */
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -99,7 +103,9 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// Check if user is logged in
+/**
+ * Check if the user is logged in.
+ */
 router.get("/me", async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ message: "not logged in" });
@@ -118,7 +124,9 @@ router.get("/me", async (req, res) => {
     }
 });
 
-// Logout Route
+/**
+ * Log out the current user.
+ */
 router.post("/logout", async (req, res) => {
     if (!req.session.userId) {
         return res

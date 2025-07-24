@@ -15,7 +15,9 @@ const { ProductTypes } = require("../enums.js");
 
 const SUGGESTED_PRODUCT_LIMIT = 50; // maximum number of suggested products to calculate scores for
 
-// add/remove product to user's skincare routine
+/**
+ * Add/remove product to user's skincare routine.
+ */
 router.put("/toggle-add/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
@@ -70,6 +72,9 @@ router.put("/toggle-add/:productId", async (req, res) => {
     }
 });
 
+/**
+ * Returns user's routine, score, message, and suggested products.
+ */
 router.get("/user-routine-and-recommendations", async (req, res) => {
     const userId = req.session.userId;
 

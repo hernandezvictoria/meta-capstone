@@ -10,6 +10,11 @@ const router = express.Router();
 
 const PRODUCT_CANDIDATE_LIMIT = 200; // maximum number of products to calculate scores for
 
+/**
+ * Retrieve products to display on the home page.
+ * Handle case of if user is searching.
+ * Handles pagination and product recommendations.
+ */
 router.get("/products", async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
@@ -161,6 +166,9 @@ router.put("/change-product-image/:productId", async (req, res) => {
     }
 });
 
+/**
+ * Get a specific product by its ID.
+ */
 router.get("/products/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId);
 
@@ -184,7 +192,9 @@ router.get("/products/:productId", async (req, res) => {
     }
 });
 
-// like/unlike products
+/**
+ * Like/unlike a product for a user.
+ */
 router.put("/toggle-like/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
@@ -236,7 +246,9 @@ router.put("/toggle-like/:productId", async (req, res) => {
     }
 });
 
-// save/unsave products
+/**
+ * Save/unsave a product for a user.
+ */
 router.put("/toggle-save/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId); // Corrected from postId to productId
     const userId = req.session.userId;
@@ -288,7 +300,9 @@ router.put("/toggle-save/:productId", async (req, res) => {
     }
 });
 
-// dislike products
+/**
+ * Dislike/remove dislike a product for a user.
+ */
 router.put("/toggle-dislike/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId); // Corrected from postId to productId
     const userId = req.session.userId;
@@ -342,7 +356,6 @@ router.put("/toggle-dislike/:productId", async (req, res) => {
     }
 });
 
-// get liked and saved status of product
 router.get("/get-liked-and-saved-status/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId); // Corrected from postId to productId
     const userId = req.session.userId;
@@ -387,6 +400,9 @@ router.get("/get-liked-and-saved-status/:productId", async (req, res) => {
     }
 });
 
+/**
+ * Log user clicks in UserProductInteraction table.
+ */
 router.post("/log-interaction/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
