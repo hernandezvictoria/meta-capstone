@@ -1,7 +1,7 @@
 const {
     isCompatibleIngredients,
-    setIncompatibleProducts,
-    getIncompatibleProductsMap,
+    setIncompatibleProductsMap,
+    getIncompatibleProducts,
     computeMissingProductsMultiplier,
     computeIncompatibleProductsDeduction,
     computeUnnecessaryProductsDeduction,

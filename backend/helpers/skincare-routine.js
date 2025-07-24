@@ -88,12 +88,10 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
  * @returns {boolean} - True if the two products' types are compatible, false otherwise.
  */
 const isCompatibleProductTypes = (productType1, productType2) => {
-    if (productType1 === ProductTypes.RETINOL) {
-        if (productType2 === ProductTypes.RETINOL) {
-            return false;
-        }
-    }
-    return true;
+    return !(
+        productType1 === ProductTypes.RETINOL &&
+        productType2 === ProductTypes.RETINOL
+    );
 };
 
 /**
@@ -108,14 +106,8 @@ const addToIncompatibleProducts = (product1Id, product2Id) => {
     if (!incompatibleProductsMap.has(product2Id)) {
         incompatibleProductsMap.set(product2Id, new Set());
     }
-    incompatibleProductsMap.set(
-        product1Id,
-        incompatibleProductsMap.get(product1Id).add(product2Id)
-    );
-    incompatibleProductsMap.set(
-        product2Id,
-        incompatibleProductsMap.get(product2Id).add(product1Id)
-    );
+    incompatibleProductsMap.get(product1Id).add(product2Id);
+    incompatibleProductsMap.get(product2Id).add(product1Id);
 };
 
 /**
