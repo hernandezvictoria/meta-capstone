@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("../generated/prisma/index.js");
 const prisma = new PrismaClient();
+const {
+    updateProductsWithScore,
+} = require("../helpers/scoring-helper-functions.js");
 
 // add/remove product to user's skincare routine
 router.put("/toggle-add/:productId", async (req, res) => {
@@ -54,6 +57,60 @@ router.put("/toggle-add/:productId", async (req, res) => {
         res.status(500).send({
             message:
                 "An error occurred while toggling the add to routine status.",
+        });
+    }
+});
+
+router.get("/user-routine", async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res
+            .status(401)
+            .json({ error: "you must be logged in to perform this action" });
+    }
+
+    try {
+        // Retrieve the current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                loved_products: {
+                    include: {
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true,
+                    },
+                },
+                disliked_products: {
+                    include: {
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true,
+                    },
+                },
+                skincare_routine: {
+                    include: {
+                        ingredients: true,
+                        loved_by_user: true,
+                        disliked_by_user: true,
+                    },
+                },
+            },
+        });
+
+        const users = await prisma.user.findMany();
+        res.status(200).json({
+            skincare_routine: await updateProductsWithScore(
+                user.skincare_routine,
+                user,
+                users?.length
+            ),
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: "An error occurred while fetching user's skincare routine",
         });
     }
 });
