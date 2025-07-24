@@ -1,12 +1,13 @@
 import { createContext, useState, useContext } from "react";
+import { Pages } from "../enums";
 
 const NavContext = createContext();
 
 export const NavProvider = ({ children }) => {
-    const [isHome, setIsHome] = useState(true);
+    const [currentPage, setCurrentPage] = useState(Pages.HOME);
 
     return (
-        <NavContext.Provider value={{ isHome, setIsHome }}>
+        <NavContext.Provider value={{ currentPage, setCurrentPage }}>
             {children}
         </NavContext.Provider>
     );

@@ -4,9 +4,10 @@ import { useUser } from "../contexts/UserContext";
 import { Link } from "react-router-dom";
 import "../styles/LoginForm.css";
 import { useNav } from "../contexts/NavContext";
+import { Pages } from "../enums.js";
 
 function LoginForm() {
-    const { isHome, setIsHome } = useNav();
+    const { currentPage, setCurrentPage } = useNav();
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
@@ -39,7 +40,7 @@ function LoginForm() {
             if (response.ok) {
                 setMessage({ type: "success", text: "login successful!" });
                 setUser(data); // Set the user in context with id and username
-                setIsHome(true);
+                setCurrentPage(Pages.HOME);
                 navigate("/home"); // Redirect to the homepage
             } else {
                 setMessage({
