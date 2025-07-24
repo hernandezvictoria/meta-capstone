@@ -8,54 +8,53 @@
     mask: linear-gradient(-60deg, #000 30%, #0005, #000 70%) right/350% 100%;
     animation: shimmer 1s infinite;
     font-size: 50px;
-  }
+}
 
-  @keyframes shimmer {
+@keyframes shimmer {
     100% {
-      mask-position: left
+        mask-position: left;
     }
-  }
-.product{
+}
+.product {
     break-inside: avoid;
     margin-bottom: 16px;
-    border-radius:14px;
+    border-radius: 14px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.product:hover{
+.product:hover {
     filter: brightness(0.8);
-    cursor:pointer;
+    cursor: pointer;
 }
 
-.product-info{
-    display:flex;
+.product-info {
+    display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.product-image{
+.product-image {
     margin: 0;
     position: relative;
     width: 100%;
     border-radius: 14px;
 }
 
-
-.product-brand{
+.product-brand {
     font-size: 100%;
     color: #676767;
 }
 
-.concerns-and-type{
-    display:flex;
+.concerns-and-type {
+    display: flex;
     overflow: wrap;
 }
 
-.product-name{
-    font-size:120%;
+.product-name {
+    font-size: 120%;
 }
 
-.type-box .concern-box{
+.type-box .concern-box {
     padding: 10px;
 }
 
@@ -82,54 +81,53 @@
     animation: fadeIn 0.3s ease-out;
 }
 
-.product-score{
-    font-size:110%;
-    padding:2%;
+.product-score {
+    font-size: 110%;
+    padding: 2%;
     color: white;
-    width:30%;
+    width: 30%;
     border-radius: 10px;
-    margin:2% 0px;
+    margin: 2% 0px;
 }
 
-#score-1{
-    background-color: #B60101;
+#score-1 {
+    background-color: #b60101;
 }
 
-#score-2{
-    background-color: #FC6F33
+#score-2 {
+    background-color: #fc6f33;
 }
 
-#score-3{
-   background-color: #D59C57
+#score-3 {
+    background-color: #d59c57;
 }
 
-#score-4{
-    background-color: #EACA12
+#score-4 {
+    background-color: #eaca12;
 }
 
-#score-5{
-    background-color: #8BC500
+#score-5 {
+    background-color: #8bc500;
 }
 
-#score-6{
-    background-color: #4B8A10;
+#score-6 {
+    background-color: #4b8a10;
 }
 
-#score-7{
+#score-7 {
     background-color: #006824;
 }
 
-.button-image{
-    width:100%;
+.button-image {
+    width: 100%;
 }
 
-.button-wrapper{
-
-    width:50%;
+.button-wrapper {
+    width: 50%;
     border: 0px solid black;
 }
 
-.like-and-save{
+.like-and-save {
     display: flex;
     align-items: center;
     justify-content: space-between;

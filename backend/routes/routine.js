@@ -18,7 +18,7 @@ const SUGGESTED_PRODUCT_LIMIT = 50; // maximum number of suggested products to c
 /**
  * Add/remove product to user's skincare routine.
  */
-router.put("/toggle-add/:productId", async (req, res) => {
+router.put("/toggle-add-to-routine/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
 
