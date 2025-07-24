@@ -5,6 +5,8 @@ const {
     computeConcernScore,
     computeSkinTypeScore,
 } = require("./scoring-helper-functions.js");
+const { getProductImage } = require("./server-cache.js");
+const { computeProductScore } = require("./scoring-helper-functions.js");
 
 let incompatibleProductsMap = new Map(); // Maps product id -> set of product ids that it is incompatible with
 const INCOMPATIBLE_PRODUCTS_DEDUCTION = 5; // skincare routine score deduction for having incompatible products
@@ -191,7 +193,13 @@ const computeMissingProductsMultiplier = (productTypesSet) => {
             ? ""
             : "make sure your routine has a cleanser, moisturizer, and sunscreen!";
 
-    return { multiplier: sum / 3, message };
+    return {
+        multiplier: sum / 3,
+        message,
+        hasSunscreen: sunscreen,
+        hasCleanser: cleanser,
+        hasMoisturizer: moisturizer,
+    };
 };
 
 /**
@@ -419,6 +427,53 @@ const computeSkincareRoutineScore = async (routine, user) => {
     return { score: totalScore, message };
 };
 
+/**
+ * Adds score, skincarRoutineScore, and image to each product in the list of products.
+ * @param {list} products - List of products to update.
+ * @param {object} user - User object to compute scores for.
+ * @param {*} totalUsers - Total number of users in the database.
+ * @returns {list} - List of products with updated scores and images.
+ */
+const updateProductsWithSkincareRoutineScore = async (
+    products,
+    user,
+    totalUsers
+) => {
+    const updatedProducts = await Promise.all(
+        products.map(async (product) => {
+            const prospectiveSkincareRoutineScore =
+                await computeSkincareRoutineScore(
+                    [...user.skincare_routine, product],
+                    user
+                );
+            const image = await getProductImage(user.id, product.id);
+            const computedProductScore = computeProductScore(
+                product,
+                user.loved_products,
+                user.disliked_products,
+                user.skin_type,
+                user.concerns,
+                totalUsers
+            );
+
+            return {
+                id: product.id,
+                brand: product.brand,
+                name: product.name,
+                image,
+                product_type: product.product_type,
+                price: product.price,
+                concerns: product.concerns,
+                skin_type: product.skin_type,
+                ingredients: product.ingredients,
+                score: computedProductScore,
+                skincareRoutineScore: prospectiveSkincareRoutineScore.score,
+            };
+        })
+    );
+    return updatedProducts;
+};
+
 // ============= GETTERS USED FOR TESTING =============
 const getIncompatibleProducts = () => {
     return incompatibleProductsMap;
@@ -434,4 +489,5 @@ module.exports = {
     computePureScore,
     parseSkincareRoutine,
     computeSkincareRoutineScore,
+    updateProductsWithSkincareRoutineScore,
 };

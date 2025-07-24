@@ -7,7 +7,13 @@ const {
 } = require("../helpers/scoring-helper-functions.js");
 const {
     computeSkincareRoutineScore,
+    computeMissingProductsMultiplier,
+    parseSkincareRoutine,
+    updateProductsWithSkincareRoutineScore,
 } = require("../helpers/skincare-routine.js");
+const { ProductTypes } = require("../enums.js");
+
+const SUGGESTED_PRODUCT_LIMIT = 50; // maximun number of suggested products to calculate scores for
 
 // add/remove product to user's skincare routine
 router.put("/toggle-add/:productId", async (req, res) => {
@@ -64,7 +70,7 @@ router.put("/toggle-add/:productId", async (req, res) => {
     }
 });
 
-router.get("/user-routine", async (req, res) => {
+router.get("/user-routine-and-recommendations", async (req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
@@ -102,17 +108,33 @@ router.get("/user-routine", async (req, res) => {
             },
         });
 
-        const computedScore = await computeSkincareRoutineScore(user.skincare_routine, user);
+        // compute score for current skincare routine
+        const computedScore = await computeSkincareRoutineScore(
+            user.skincare_routine,
+            user
+        );
 
+        // get user's skincare routine with product scores
         const users = await prisma.user.findMany();
+        const numUsers = users?.length;
+        const skincareRoutine = await updateProductsWithScore(
+            user.skincare_routine,
+            user,
+            numUsers
+        );
+
+        // get suggested products to fill gaps in the routine
+        const suggestedProducts = await getSuggestedProducts(
+            user,
+            user.skincare_routine,
+            numUsers
+        );
+
         res.status(200).json({
-            skincare_routine: await updateProductsWithScore(
-                user.skincare_routine,
-                user,
-                users?.length
-            ),
-            score: computedScore.score,
-            scoreMessage: computedScore.message,
+            currentSkincareRoutine: skincareRoutine,
+            currentSkincareRoutineScore: computedScore.score,
+            message: computedScore.message,
+            suggestedProducts: suggestedProducts,
         });
     } catch (error) {
         console.error(error);
@@ -121,5 +143,91 @@ router.get("/user-routine", async (req, res) => {
         });
     }
 });
+
+/**
+ * Helper function to get suggested products to fill gaps in the routine.
+ * @param {object} user - Current user to suggest products for.
+ * @param {list} skincareRoutine - Current skincare routine to suggest products for.
+ * @returns {list} - List of suggested products in order of skincare routine score.
+ */
+const getSuggestedProducts = async (user, skincareRoutine, numUsers) => {
+    const parsedSkincareRoutine = parseSkincareRoutine(skincareRoutine);
+
+    // see if skincare routine is missing any core products (cleanser, moisturizer, or sunscreen)
+    const missingProducts = computeMissingProductsMultiplier(
+        parsedSkincareRoutine.productTypesSet,
+        skincareRoutine,
+        user.id
+    );
+    const missingProductTypes = [];
+    missingProducts.hasSunscreen
+        ? null
+        : missingProductTypes.push(ProductTypes.SUNSCREEN);
+    missingProducts.hasMoisturizer
+        ? null
+        : missingProductTypes.push(ProductTypes.MOISTURIZER);
+    missingProducts.hasCleanser
+        ? null
+        : missingProductTypes.push(ProductTypes.CLEANSER);
+
+    let suggestedProducts = [];
+
+    // if routine is missing cleanser, moisturizer, or sunscreen
+    if (missingProductTypes.length > 0) {
+        suggestedProducts = await prisma.productInfo.findMany({
+            where: {
+                // filter for products types that are not already in routine
+                product_type: { in: missingProductTypes },
+            },
+            include: {
+                ingredients: true,
+                loved_by_user: true,
+                disliked_by_user: true,
+            },
+            take: SUGGESTED_PRODUCT_LIMIT,
+        });
+    }
+
+    // if routine is complete or no products found for missing product types
+    if (suggestedProducts.length === 0) {
+        suggestedProducts = await prisma.productInfo.findMany({
+            where: {
+                OR: [
+                    // filter for products that match at least one of the user's skin needs
+                    { skin_type: { hasSome: user.skin_type } },
+                    { concerns: { hasSome: user.concerns } },
+                ],
+            },
+            include: {
+                ingredients: true,
+                loved_by_user: true,
+                disliked_by_user: true,
+            },
+            take: SUGGESTED_PRODUCT_LIMIT,
+        });
+    }
+
+    // filter out products that are already in routine or disliked by the user
+    suggestedProducts = suggestedProducts.filter((p) => {
+        if (
+            !user.disliked_products.some((d) => d.id === p.id) ||
+            !parsedSkincareRoutine.productIds.includes(p.id)
+        ) {
+            return p;
+        }
+    });
+
+    // compute scores for suggested products
+    let scoredProducts = await updateProductsWithSkincareRoutineScore(
+        suggestedProducts,
+        user,
+        numUsers
+    );
+
+    // sort products by skincare routine score
+    return scoredProducts.sort(
+        (a, b) => b.skincareRoutineScore - a.skincareRoutineScore
+    );
+};
 
 module.exports = router;

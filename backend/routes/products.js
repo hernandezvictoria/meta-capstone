@@ -8,6 +8,8 @@ const { cleanSearchQuery } = require("../helpers/search-helper-functions.js");
 const prisma = new PrismaClient();
 const router = express.Router();
 
+const PRODUCT_CANDIDATE_LIMIT = 200; // maximum number of products to calculate scores for
+
 router.get("/products", async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
@@ -64,7 +66,7 @@ router.get("/products", async (req, res) => {
                     loved_by_user: true,
                     disliked_by_user: true,
                 },
-                take: 200, // limit to 200 products for now (though there are only 70)
+                take: PRODUCT_CANDIDATE_LIMIT,
             });
             productCandidates = productCandidates.filter((p) => {
                 if (!userInfo.disliked_products.some((d) => d.id === p.id)) {
@@ -102,7 +104,7 @@ router.get("/products", async (req, res) => {
                     loved_by_user: true,
                     disliked_by_user: true,
                 },
-                take: 200, // limit to 200 products for now (though there are only 70)
+                take: PRODUCT_CANDIDATE_LIMIT,
             });
 
             // Remove duplicates based on product ID
