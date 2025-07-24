@@ -8,67 +8,74 @@ const {
     HarshIngredientTypes,
 } = require("../enums.js");
 
+const concernRelatedWords = new Map(); // Map of skin concern to related words
+concernRelatedWords.set(SkinConcerns.ACNE, [
+    "acne",
+    "oiliness",
+    "antimicrobial",
+]);
+concernRelatedWords.set(SkinConcerns.WRINKLES, [
+    "wrinkles",
+    "fine lines",
+    "aging",
+]);
+concernRelatedWords.set(SkinConcerns.HYPERPIGMENTATION, [
+    "dark",
+    "discoloration",
+    "hyperpigmentation",
+    "sun",
+    "uv",
+]);
+concernRelatedWords.set(SkinConcerns.TEXTURE, [
+    "exfoliate",
+    "roughness",
+    "smooth",
+    "condition",
+]);
+concernRelatedWords.set(SkinConcerns.REDNESS, [
+    "redness",
+    "irritation",
+    "sooth",
+    "strength",
+    "inflam",
+    "barrier",
+]);
+concernRelatedWords.set(SkinConcerns.DULLNESS, [
+    "dullness",
+    "exfoliate",
+    "brighten",
+]);
+concernRelatedWords.set(SkinConcerns.DRYNESS, [
+    "dryness",
+    "moist",
+    "hydrat",
+    "plump",
+]);
+
+const ingredientRelatedWords = new Map(); // Map of ingredient type to related words
+ingredientRelatedWords.set(HarshIngredientTypes.EXFOLIANT, ["exfoliant"]);
+ingredientRelatedWords.set(HarshIngredientTypes.ACTIVE, [
+    "active",
+    "vitamin c",
+]);
+ingredientRelatedWords.set(HarshIngredientTypes.RETINOL, [
+    "retinol",
+    "vitamin a",
+]);
+
 fs.createReadStream("ingredients.csv")
     .pipe(parse({ columns: true, trim: true }))
     .on("data", async (row) => {
         const getConcernsArray = (str) => {
             let concerns = str.toLowerCase();
             let concernsArray = [];
-            if (
-                concerns.includes("acne") ||
-                concerns.includes("oiliness") ||
-                concerns.includes("antimicrobial")
-            ) {
-                concernsArray.push(SkinConcerns.ACNE);
-            }
-            if (
-                concerns.includes("wrinkles") ||
-                concerns.includes("fine lines") ||
-                concerns.includes("aging")
-            ) {
-                concernsArray.push(SkinConcerns.WRINKLES);
-            }
-            if (
-                concerns.includes("dark") ||
-                concerns.includes("discoloration") ||
-                concerns.includes("hyperpigmentation") ||
-                concerns.includes("sun") ||
-                concerns.includes("uv")
-            ) {
-                concernsArray.push(SkinConcerns.HYPERPIGMENTATION);
-            }
-            if (
-                concerns.includes("exfoliate") ||
-                concerns.includes("roughness") ||
-                concerns.includes("smooth") ||
-                concerns.includes("condition")
-            ) {
-                concernsArray.push(SkinConcerns.TEXTURE);
-            }
-            if (
-                concerns.includes("redness") ||
-                concerns.includes("irritation") ||
-                concerns.includes("sooth") ||
-                concerns.includes("strength") ||
-                concerns.includes("inflam") ||
-                concerns.includes("barrier")
-            ) {
-                concernsArray.push(SkinConcerns.REDNESS);
-            }
-            if (
-                concerns.includes("dullness") ||
-                concerns.includes("exfoliate") ||
-                concerns.includes("brighten")
-            ) {
-                concernsArray.push(SkinConcerns.DULLNESS);
-            }
-            if (
-                concerns.includes("dryness") ||
-                concerns.includes("moist") ||
-                concerns.includes("hydrat") ||
-                concerns.includes("plump")
-            ) {
-                concernsArray.push(SkinConcerns.DRYNESS);
+            for (const [concern, words] of concernRelatedWords.entries()) {
+                for (const word of words) {
+                    if (concerns.includes(word)) {
+                        concernsArray.push(concern);
+                        break; // Break to avoid adding the same concern multiple times
+                    }
+                }
             }
             return concernsArray;
         };
@@ -103,18 +110,13 @@ fs.createReadStream("ingredients.csv")
         // ingredientType is initially a string of types (e.g. "exfoliant, skin softener")
         // set the type of the ingredient if it is exfoliant, active, or retinol, else keep as is
         let ingredientType = row.Type.toLowerCase();
-        if (ingredientType.includes("exfoliant")) {
-            ingredientType = HarshIngredientTypes.EXFOLIANT;
-        } else if (
-            ingredientType.includes("active") ||
-            ingredientType.includes("vitamin c")
-        ) {
-            ingredientType = HarshIngredientTypes.ACTIVE;
-        } else if (
-            ingredientType.includes("retinol") ||
-            ingredientType.includes("vitamin a")
-        ) {
-            ingredientType = HarshIngredientTypes.RETINOL;
+        for (const [type, words] of ingredientRelatedWords.entries()) {
+            for (const word of words) {
+                if (ingredientType.includes(word)) {
+                    ingredientType = type;
+                    break; // Break to avoid checking other words once a match is found
+                }
+            }
         }
 
         // Insert into database

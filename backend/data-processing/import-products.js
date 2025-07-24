@@ -4,49 +4,62 @@ const { PrismaClient } = require("../generated/prisma/index.js");
 const prisma = new PrismaClient();
 const { SkinTypes, SkinConcerns } = require("../enums.js");
 
+const concernRelatedWords = new Map();
+concernRelatedWords.set(SkinConcerns.ACNE, [
+    "acne",
+    "oiliness",
+    "antimicrobial",
+]);
+concernRelatedWords.set(SkinConcerns.WRINKLES, [
+    "wrinkles",
+    "fine lines",
+    "aging",
+]);
+concernRelatedWords.set(SkinConcerns.HYPERPIGMENTATION, [
+    "dark",
+    "discoloration",
+    "hyperpigmentation",
+    "sun",
+    "uv",
+]);
+concernRelatedWords.set(SkinConcerns.TEXTURE, [
+    "exfoliate",
+    "roughness",
+    "smooth",
+    "condition",
+]);
+concernRelatedWords.set(SkinConcerns.REDNESS, [
+    "redness",
+    "irritation",
+    "sooth",
+    "strength",
+    "inflam",
+    "barrier",
+]);
+concernRelatedWords.set(SkinConcerns.DULLNESS, [
+    "dullness",
+    "exfoliate",
+    "brighten",
+]);
+concernRelatedWords.set(SkinConcerns.DRYNESS, [
+    "dryness",
+    "moist",
+    "hydrat",
+    "plump",
+]);
 fs.createReadStream("seed.csv")
     .pipe(parse({ columns: true, trim: true }))
     .on("data", async (row) => {
         const getConcernsArray = (str) => {
             let concerns = str.toLowerCase();
             let concernsArray = [];
-            if (concerns.includes("acne") || concerns.includes("oiliness")) {
-                concernsArray.push(SkinConcerns.ACNE);
-            }
-            if (
-                concerns.includes("wrinkles") ||
-                concerns.includes("fine lines") ||
-                concerns.includes("aging")
-            ) {
-                concernsArray.push(SkinConcerns.WRINKLES);
-            }
-            if (
-                concerns.includes("dark spots") ||
-                concerns.includes("discoloration") ||
-                concerns.includes("hyperpigmentation") ||
-                concerns.includes("sun")
-            ) {
-                concernsArray.push(SkinConcerns.HYPERPIGMENTATION);
-            }
-            if (
-                concerns.includes("texture") ||
-                concerns.includes("roughness") ||
-                concerns.includes("smooth")
-            ) {
-                concernsArray.push(SkinConcerns.TEXTURE);
-            }
-            if (
-                concerns.includes("redness") ||
-                concerns.includes("irritation") ||
-                concerns.includes("sooth")
-            ) {
-                concernsArray.push(SkinConcerns.REDNESS);
-            }
-            if (concerns.includes("dullness")) {
-                concernsArray.push(SkinConcerns.DULLNESS);
-            }
-            if (concerns.includes("dryness") || concerns.includes("moist")) {
-                concernsArray.push(SkinConcerns.DRYNESS);
+            for (const [concern, words] of concernRelatedWords.entries()) {
+                for (const word of words) {
+                    if (concerns.includes(word)) {
+                        concernsArray.push(concern);
+                        break; // Break to avoid adding the same concern multiple times
+                    }
+                }
             }
             return concernsArray;
         };
@@ -76,8 +89,10 @@ fs.createReadStream("seed.csv")
         const concernsArray = getConcernsArray(row.concerns);
         const skinTypeArray = getSkinTypesArray(row.skin_type);
         let price = row.price;
-        price = price.slice(1);
+        price = price.slice(1); // remove the dollar sign
         const priceDecimal = parseFloat(price);
+        const productType =
+            row.product_type === "eye cream" ? "eye_cream" : row.product_type;
 
         // Insert into database
         try {
@@ -92,11 +107,7 @@ fs.createReadStream("seed.csv")
                 data: {
                     brand: row.brand,
                     name: row.name,
-                    product_type:
-                        row.product_type === "eye cream"
-                            ? "eye_cream"
-                            : row.product_type,
-
+                    product_type: productType,
                     price: priceDecimal,
                     ingredients: {
                         connect: ingredientRecords.map((ingredient) => ({
