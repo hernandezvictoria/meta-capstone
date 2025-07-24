@@ -53,7 +53,7 @@ function RoutinePage() {
         setIsLoading(true);
         await fetchRoutine();
         await fetchLikedSavedDisliked();
-        setTimeout(() => setIsLoading(false), 500);
+        setTimeout(() => setIsLoading(false), 300);
     };
 
     useEffect(() => {
