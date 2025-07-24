@@ -22,6 +22,7 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user-info");
 const productRoutes = require("./routes/products");
 const cacheRoutes = require("./routes/cache");
+const routineRoutes = require("./routes/routine");
 
 const { ValidationError } = require("./middleware/CustomErrors");
 
@@ -60,6 +61,7 @@ app.use(authRoutes);
 app.use(userRoutes);
 app.use(productRoutes);
 app.use(cacheRoutes);
+app.use(routineRoutes);
 
 app.use((err, req, res, next) => {
   if (err instanceof ValidationError) {
