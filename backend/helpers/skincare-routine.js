@@ -11,6 +11,24 @@ const INCOMPATIBLE_PRODUCTS_DEDUCTION = 5; // skincare routine score deduction f
 const MAX_ROUTINE_LENGTH = 6; // maximum number of products in a skincare routine
 
 /**
+ * Parses ingredient type to determine if it is an active, exfoliant, or retinol.
+ * @param {String} ingredientType - Type of ingredient.
+ * @returns {Object} - Object with boolean values for hasActive, hasExfoliantOrRetinol.
+ */
+const parseIngredientForHarsh = (ingredientType) => {
+    let hasActive = false;
+    let hasExfoliantOrRetinol = false;
+    if (Object.values(HarshIngredientTypes).includes(ingredientType)) {
+        if (ingredientType === HarshIngredientTypes.ACTIVE) {
+            hasActive = true;
+        } else {
+            hasExfoliantOrRetinol = true;
+        }
+    }
+    return { hasActive, hasExfoliantOrRetinol };
+};
+
+/**
  * Returns false if two ingredients are not compatible with each other.
  * Exfoliants are not compatible with other exfoliants, retinols, or actives.
  * Retinols are not compatible with other retinols, exfoliants, or actives.
@@ -25,16 +43,16 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
 
     // Check if ingredients1 has exfoliants, retinols, or actives
     for (const ingredient of ingredients1) {
-        if (
-            Object.values(HarshIngredientTypes).includes(
-                ingredient.ingredient_type
-            )
-        ) {
-            if (ingredient.ingredient_type === HarshIngredientTypes.ACTIVE) {
-                ingredients1HasActive = true;
-            } else {
-                ingredients1HasExfoliantOrRetinol = true;
-            }
+        const { hasActive, hasExfoliantOrRetinol } = parseIngredientForHarsh(
+            ingredient.ingredient_type
+        );
+        if (hasActive) {
+            ingredients1HasActive = hasActive ? true : false;
+        }
+        if (hasExfoliantOrRetinol) {
+            ingredients1HasExfoliantOrRetinol = hasExfoliantOrRetinol
+                ? true
+                : false;
         }
     }
 
@@ -44,24 +62,18 @@ const isCompatibleIngredients = (ingredients1, ingredients2) => {
     }
 
     for (const ingredient of ingredients2) {
-        if (
-            Object.values(HarshIngredientTypes).includes(
-                ingredient.ingredient_type
-            )
-        ) {
-            if (ingredient.ingredient_type === HarshIngredientTypes.ACTIVE) {
-                // actives are not compatible with exfoliants or retinols
-                if (ingredients1HasExfoliantOrRetinol) {
-                    return false;
-                }
-            } else {
-                // exfoliants and retinols are not compatible with actives or other exfoliants or retinols
-                if (
-                    ingredients1HasActive ||
-                    ingredients1HasExfoliantOrRetinol
-                ) {
-                    return false;
-                }
+        const { hasActive, hasExfoliantOrRetinol } = parseIngredientForHarsh(
+            ingredient.ingredient_type
+        );
+        if (hasActive) {
+            // actives are not compatible with exfoliants or retinols
+            if (ingredients1HasExfoliantOrRetinol) {
+                return false;
+            }
+        } else if (hasExfoliantOrRetinol) {
+            // exfoliants and retinols are not compatible with actives or other exfoliants or retinols
+            if (ingredients1HasActive || ingredients1HasExfoliantOrRetinol) {
+                return false;
             }
         }
     }
