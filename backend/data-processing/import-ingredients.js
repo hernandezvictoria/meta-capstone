@@ -9,19 +9,60 @@ const {
 } = require("../enums.js");
 
 const concernRelatedWords = new Map(); // Map of skin concern to related words
-concernRelatedWords.set(SkinConcerns.ACNE, ["acne", "oiliness", "antimicrobial"]);
-concernRelatedWords.set(SkinConcerns.WRINKLES, ["wrinkles", "fine lines", "aging"]);
-concernRelatedWords.set(SkinConcerns.HYPERPIGMENTATION, ["dark", "discoloration", "hyperpigmentation", "sun", "uv"]);
-concernRelatedWords.set(SkinConcerns.TEXTURE, ["exfoliate", "roughness", "smooth", "condition"]);
-concernRelatedWords.set(SkinConcerns.REDNESS, ["redness", "irritation", "sooth", "strength", "inflam", "barrier"]);
-concernRelatedWords.set(SkinConcerns.DULLNESS, ["dullness", "exfoliate", "brighten"]);
-concernRelatedWords.set(SkinConcerns.DRYNESS, ["dryness", "moist", "hydrat", "plump"]);
+
+concernRelatedWords.set(SkinConcerns.ACNE, [
+    "acne",
+    "oiliness",
+    "antimicrobial",
+]);
+concernRelatedWords.set(SkinConcerns.WRINKLES, [
+    "wrinkles",
+    "fine lines",
+    "aging",
+]);
+concernRelatedWords.set(SkinConcerns.HYPERPIGMENTATION, [
+    "dark",
+    "discoloration",
+    "hyperpigmentation",
+    "sun",
+    "uv",
+]);
+concernRelatedWords.set(SkinConcerns.TEXTURE, [
+    "exfoliate",
+    "roughness",
+    "smooth",
+    "condition",
+]);
+concernRelatedWords.set(SkinConcerns.REDNESS, [
+    "redness",
+    "irritation",
+    "sooth",
+    "strength",
+    "inflam",
+    "barrier",
+]);
+concernRelatedWords.set(SkinConcerns.DULLNESS, [
+    "dullness",
+    "exfoliate",
+    "brighten",
+]);
+concernRelatedWords.set(SkinConcerns.DRYNESS, [
+    "dryness",
+    "moist",
+    "hydrat",
+    "plump",
+]);
 
 const ingredientRelatedWords = new Map(); // Map of ingredient type to related words
 ingredientRelatedWords.set(HarshIngredientTypes.EXFOLIANT, ["exfoliant"]);
-ingredientRelatedWords.set(HarshIngredientTypes.ACTIVE, ["active", "vitamin c"]);
-ingredientRelatedWords.set(HarshIngredientTypes.RETINOL, ["retinol", "vitamin a"]);
-
+ingredientRelatedWords.set(HarshIngredientTypes.ACTIVE, [
+    "active",
+    "vitamin c",
+]);
+ingredientRelatedWords.set(HarshIngredientTypes.RETINOL, [
+    "retinol",
+    "vitamin a",
+]);
 
 fs.createReadStream("ingredients.csv")
     .pipe(parse({ columns: true, trim: true }))
