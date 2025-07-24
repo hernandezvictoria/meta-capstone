@@ -8,7 +8,7 @@ import NavBar from "../NavBar";
 import CacheStats from "../CacheStats";
 
 function Home() {
-    const { user, setUser } = useUser();
+    const { user } = useUser();
     const [error, setError] = useState(null);
     const [pageNum, setPageNum] = useState(1);
     const [maxPages, setMaxPages] = useState(false); //boolean indicating whether or not there are more pages to load

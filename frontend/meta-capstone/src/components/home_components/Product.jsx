@@ -29,6 +29,7 @@ function Product({
     concerns,
     skin_type,
     score,
+    skincareRoutineScore,
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const placeholderImage =
@@ -218,9 +219,18 @@ function Product({
             <section className="product-info">
                 <p className="product-brand">{brand}</p>
                 <p className="product-name">{name}</p>
-                <p id={getScoreClass(score)} className="product-score">
-                    score: {score}
-                </p>
+                {skincareRoutineScore ? (
+                    <p
+                        id={getScoreClass(skincareRoutineScore)}
+                        className="product-score"
+                    >
+                        skincare routine score: {skincareRoutineScore}
+                    </p>
+                ) : (
+                    <p id={getScoreClass(score)} className="product-score">
+                        score: {score}
+                    </p>
+                )}
                 <p>skin type(s): {skin_type.join(", ")}</p>
 
                 {concerns.map((concern) => {

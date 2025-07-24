@@ -9,18 +9,12 @@ import closedStar from "../assets/closed-star.png";
 import logo from "../assets/logo.png";
 import { useNav } from "../contexts/NavContext";
 import { Pages } from "../enums.js";
-import { useEffect } from "react";
 
 function NavBar() {
     const { currentPage, setCurrentPage } = useNav();
 
-    useEffect(() => {
-        console.log("Current page: " + currentPage);
-    }, [currentPage])
-
     return (
         <div className="nav-bar">
-
             <Link
                 to="/home"
                 aria-label="home"
@@ -36,7 +30,7 @@ function NavBar() {
             >
                 <img
                     className="nav-icon"
-                    src={(currentPage === Pages.HOME) ? closedHome : openHome}
+                    src={currentPage === Pages.HOME ? closedHome : openHome}
                 ></img>
             </Link>
 
@@ -50,13 +44,13 @@ function NavBar() {
                 <img
                     className="nav-icon"
                     src={
-                        (currentPage === Pages.PROFILE)
+                        currentPage === Pages.PROFILE
                             ? closedProfile
                             : openProfile
                     }
                 ></img>
             </Link>
-            
+
             <Link
                 to="/routine"
                 aria-label="routine"
@@ -66,14 +60,9 @@ function NavBar() {
             >
                 <img
                     className="nav-icon"
-                    src={
-                        (currentPage === Pages.ROUTINE)
-                            ? closedStar
-                            : openStar
-                    }
+                    src={currentPage === Pages.ROUTINE ? closedStar : openStar}
                 ></img>
             </Link>
-
         </div>
     );
 }
