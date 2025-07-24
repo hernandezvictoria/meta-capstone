@@ -29,6 +29,24 @@ const parseIngredientForHarsh = (ingredientType) => {
 };
 
 /**
+ * Parses ingredient type to determine if it is an active, exfoliant, or retinol.
+ * @param {String} ingredientType - Type of ingredient.
+ * @returns {Object} - Object with boolean values for hasActive, hasExfoliantOrRetinol.
+ */
+const parseIngredientForHarsh = (ingredientType) => {
+    let hasActive = false;
+    let hasExfoliantOrRetinol = false;
+    if (Object.values(HarshIngredientTypes).includes(ingredientType)) {
+        if (ingredientType === HarshIngredientTypes.ACTIVE) {
+            hasActive = true;
+        } else {
+            hasExfoliantOrRetinol = true;
+        }
+    }
+    return { hasActive, hasExfoliantOrRetinol };
+};
+
+/**
  * Returns false if two ingredients are not compatible with each other.
  * Exfoliants are not compatible with other exfoliants, retinols, or actives.
  * Retinols are not compatible with other retinols, exfoliants, or actives.
@@ -106,6 +124,7 @@ const addToIncompatibleProducts = (product1Id, product2Id) => {
     if (!incompatibleProductsMap.has(product2Id)) {
         incompatibleProductsMap.set(product2Id, new Set());
     }
+
     incompatibleProductsMap.get(product1Id).add(product2Id);
     incompatibleProductsMap.get(product2Id).add(product1Id);
 };

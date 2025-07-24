@@ -9,6 +9,7 @@ const {
 } = require("../enums.js");
 
 const concernRelatedWords = new Map(); // Map of skin concern to related words
+
 concernRelatedWords.set(SkinConcerns.ACNE, [
     "acne",
     "oiliness",

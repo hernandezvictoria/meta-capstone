@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { useUser } from '../../contexts/UserContext';
-import '../../styles/Home.css';
-import WithAuth from '../WithAuth'
-import ProductList from './ProductList'
-import Search from './Search'
-import NavBar from '../NavBar';
-import CacheStats from '../CacheStats';
+import { useUser } from "../../contexts/UserContext";
+import "../../styles/Home.css";
+import WithAuth from "../WithAuth";
+import ProductList from "./ProductList";
+import Search from "./Search";
+import NavBar from "../NavBar";
+import CacheStats from "../CacheStats";
 
-
-const Home = () => {
+function Home() {
     const { user, setUser } = useUser();
     const [error, setError] = useState(null);
     const [pageNum, setPageNum] = useState(1);
@@ -17,8 +16,8 @@ const Home = () => {
 
     return (
         <>
-            <NavBar/>
-            <CacheStats/>
+            <NavBar />
+            <CacheStats />
             <div className="main-content">
                 <p className="greeting">hello, {user.username}</p>
                 <h1>skinterest</h1>
@@ -26,7 +25,8 @@ const Home = () => {
                     setError={setError}
                     setMaxPages={setMaxPages}
                     setPageNum={setPageNum}
-                    setSearchTerm={setSearchTerm}/>
+                    setSearchTerm={setSearchTerm}
+                />
                 <div className="body">
                     <ProductList
                         error={error}
@@ -35,11 +35,12 @@ const Home = () => {
                         setPageNum={setPageNum}
                         maxPages={maxPages}
                         setMaxPages={setMaxPages}
-                        searchTerm={searchTerm}/>
+                        searchTerm={searchTerm}
+                    />
                 </div>
             </div>
         </>
     );
-};
+}
 
 export default WithAuth(Home);

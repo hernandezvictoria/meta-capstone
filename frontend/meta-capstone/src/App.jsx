@@ -9,24 +9,24 @@ import Profile from "./components/profile_components/Profile";
 import { NavProvider } from "./contexts/NavContext";
 
 function App() {
-  const ProtectedHome = WithAuth(Home);
-  const ProtectedQuiz = WithAuth(Quiz);
-  const ProtectedProfile = WithAuth(Profile);
+	const ProtectedHome = WithAuth(Home);
+	const ProtectedQuiz = WithAuth(Quiz);
+	const ProtectedProfile = WithAuth(Profile);
 
-  return (
-    <NavProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LoginForm />} />
-          <Route path="/signup" element={<SignupForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/home" element={<ProtectedHome />} />
-          <Route path="/quiz" element={<ProtectedQuiz />} />
-          <Route path="/profile" element={<ProtectedProfile />} />
-        </Routes>
-      </Router>
-    </NavProvider>
-  );
+	return (
+		<NavProvider>
+		<Router>
+			<Routes>
+			<Route path="/" element={<LoginForm />} />
+			<Route path="/signup" element={<SignupForm />} />
+			<Route path="/login" element={<LoginForm />} />
+			<Route path="/home" element={<ProtectedHome />} />
+			<Route path="/quiz" element={<ProtectedQuiz />} />
+			<Route path="/profile" element={<ProtectedProfile />} />
+			</Routes>
+		</Router>
+		</NavProvider>
+	);
 }
 
 export default App;
