@@ -183,7 +183,6 @@ const parseSkincareRoutine = (routine) => {
  * @returns {object} - Object with the missing products multiplier and message.
  */
 const computeMissingProductsMultiplier = (productTypesSet) => {
-    // set.has has O(1) time complexity
     const sunscreen = productTypesSet.has(ProductTypes.SUNSCREEN) ? 1 : 0;
     const cleanser = productTypesSet.has(ProductTypes.CLEANSER) ? 1 : 0;
     const moisturizer = productTypesSet.has(ProductTypes.MOISTURIZER) ? 1 : 0;
