@@ -29,7 +29,6 @@ router.put("/toggle-add-to-routine/:productId", async (req, res) => {
     }
 
     try {
-        // Retrieve the current product
         const product = await prisma.productInfo.findUnique({
             where: { id: productId },
         });
@@ -38,7 +37,6 @@ router.put("/toggle-add-to-routine/:productId", async (req, res) => {
             return res.status(404).send({ message: "product not found" });
         }
 
-        // Retrieve the current user
         const user = await prisma.user.findUnique({
             where: { id: userId },
             include: { skincare_routine: true },
@@ -48,7 +46,6 @@ router.put("/toggle-add-to-routine/:productId", async (req, res) => {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isInRoutine = user.skincare_routine.some(
             (p) => p.id === productId
         );
@@ -85,7 +82,6 @@ router.get("/user-routine-and-recommendations", async (req, res) => {
     }
 
     try {
-        // Retrieve the current user
         const user = await prisma.user.findUnique({
             where: { id: userId },
             include: {

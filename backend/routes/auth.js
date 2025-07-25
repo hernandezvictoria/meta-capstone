@@ -19,7 +19,6 @@ router.post("/signup", async (req, res) => {
                 .json({ error: "username and password are required" });
         }
 
-        // can add more password requirements in the future
         if (password.length < 8) {
             return res
                 .status(400)
@@ -38,8 +37,7 @@ router.post("/signup", async (req, res) => {
         // Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create a new user in the database
-        const newUser = await prisma.user.create({
+        await prisma.user.create({
             data: {
                 username,
                 password: hashedPassword,
@@ -87,7 +85,6 @@ router.post("/login", async (req, res) => {
         req.session.userId = user.id;
         req.session.username = user.username;
 
-        // Create a new login user activity in the database
         await prisma.userActivity.create({
             data: {
                 user_id: user.id,
@@ -135,7 +132,6 @@ router.post("/logout", async (req, res) => {
     }
 
     try {
-        // Create a new logout user activity in the database
         await prisma.userActivity.create({
             data: {
                 user_id: req.session.userId,

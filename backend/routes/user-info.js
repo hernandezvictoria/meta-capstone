@@ -6,6 +6,58 @@ const {
 const prisma = new PrismaClient();
 const router = express.Router();
 
+/**
+ * Retrieves the current user from the database.
+ * @param {number} id - The id of the user to retrieve.
+ * @returns {object} - The user object.
+ */
+const getCurrentUser = async (id) => {
+    return await prisma.user.findUnique({
+        where: { id: id },
+    });
+};
+
+/**
+ * Retrieves the current user and their products from the database.
+ * @param {number} id - The id of the user to retrieve.
+ * @returns {object} - The user object.
+ */
+const getUserAndProducts = async (id) => {
+    return await prisma.user.findUnique({
+        where: { id: id },
+        include: {
+            saved_products: {
+                include: {
+                    ingredients: true,
+                    loved_by_user: true,
+                    disliked_by_user: true,
+                },
+            },
+            loved_products: {
+                include: {
+                    ingredients: true,
+                    loved_by_user: true,
+                    disliked_by_user: true,
+                },
+            },
+            disliked_products: {
+                include: {
+                    ingredients: true,
+                    loved_by_user: true,
+                    disliked_by_user: true,
+                },
+            },
+            skincare_routine: {
+                include: {
+                    ingredients: true,
+                    loved_by_user: true,
+                    disliked_by_user: true,
+                },
+            },
+        },
+    });
+};
+
 router.put("/change-skin-type", async (req, res) => {
     const skin_type = req.body;
 
@@ -17,16 +69,12 @@ router.put("/change-skin-type", async (req, res) => {
     }
 
     try {
-        // Retrieve the user
-        const user = await prisma.user.findUnique({
-            where: { id: id },
-        });
+        const user = await getCurrentUser(id);
 
         if (!user) {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // update the user's skin type
         const updatedUser = await prisma.user.update({
             where: { id: id },
             data: {
@@ -53,39 +101,7 @@ router.get("/user-info", async (req, res) => {
     // Retrieve the user
     let user;
     try {
-        user = await prisma.user.findUnique({
-            where: { id: id },
-            include: {
-                saved_products: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-                loved_products: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-                disliked_products: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-                skincare_routine: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-            },
-        });
+        user = await getUserAndProducts(id);
     } catch (error) {
         console.error(error);
         res.status(500).send({
@@ -98,7 +114,7 @@ router.get("/user-info", async (req, res) => {
     }
 
     const users = await prisma.user.findMany();
-    // do not include user id or user hashed password
+
     res.status(200).json({
         username: user.username,
         concerns: user.concerns,
@@ -147,16 +163,12 @@ router.put("/change-skin-concerns", async (req, res) => {
     }
 
     try {
-        // Retrieve the user
-        const user = await prisma.user.findUnique({
-            where: { id: id },
-        });
+        const user = await getCurrentUser(id);
 
         if (!user) {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // update the user's skin concern
         const updatedUser = await prisma.user.update({
             where: { id: id },
             data: {
@@ -182,39 +194,7 @@ router.get("/user-liked-saved-disliked", async (req, res) => {
 
     try {
         // Retrieve the current user
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: {
-                saved_products: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-                loved_products: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-                disliked_products: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-                skincare_routine: {
-                    include: {
-                        ingredients: true,
-                        loved_by_user: true,
-                        disliked_by_user: true,
-                    },
-                },
-            },
-        });
+        const user = await getUserAndProducts(userId);
         const users = await prisma.user.findMany();
         res.status(200).json({
             loved_products: await updateProductsWithScore(
@@ -255,9 +235,7 @@ router.get("/user-skin-types-and-concerns", async (req, res) => {
             .json({ error: "you must be logged in to perform this action" });
     }
     try {
-        const user = await prisma.user.findUnique({
-            where: { id: id },
-        });
+        const user = await getCurrentUser(id);
         res.status(200).json({
             skinTypes: user.skin_type,
             concerns: user.concerns,
