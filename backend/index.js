@@ -6,7 +6,7 @@ const session = require("express-session");
 const PORT = 3000;
 
 app.get("/", (req, res) => {
-  res.send("Welcome to my app!");
+  res.send("welcome to skinterest!");
 });
 
 const authRoutes = require("./routes/auth");
