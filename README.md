@@ -1,6 +1,4 @@
-# <App Name Here>
-
-**Deployed site**: <add a link to your deployment here, if you create one>
+# <Skinterest>
 
 ## Overview
 <Add a quick description of your app here>
@@ -14,4 +12,4 @@
 <add any other links here as you work on your project>
 
 ## Demo Video
-[TBD](<insert link in Week 9!>)
+[demo]((https://www.loom.com/share/a526709c6c854a39982a4696411b9fd2?sid=08492a03-9cf0-4518-a5a8-a9a815d2fafe))
