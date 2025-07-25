@@ -49,6 +49,32 @@ const Pages = Object.freeze({
     ROUTINE: "routine",
 });
 
+const ActivityTypes = Object.freeze({
+    LOGIN: "login",
+    LOGOUT: "logout",
+});
+
+const HarshIngredientTypes = Object.freeze({
+    EXFOLIANT: "exfoliant",
+    RETINOL: "retinol",
+    ACTIVE: "active",
+});
+
+// Export for CommonJS
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        SkinTypes,
+        SkinConcerns,
+        ProductTypes,
+        ProfileFilters,
+        InteractionTypes,
+        Pages,
+        ActivityTypes,
+        HarshIngredientTypes,
+    };
+}
+
+// Export for ES Modules
 export {
     SkinTypes,
     SkinConcerns,
@@ -56,4 +82,6 @@ export {
     ProfileFilters,
     InteractionTypes,
     Pages,
+    ActivityTypes,
+    HarshIngredientTypes,
 };

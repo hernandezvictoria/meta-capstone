@@ -6,7 +6,7 @@ const {
 } = require("./db-cache.js");
 const { PrismaClient } = require("../generated/prisma/index.js");
 const prisma = new PrismaClient();
-const { InteractionTypes, ActivityTypes } = require("../enums.js");
+const { InteractionTypes, ActivityTypes } = require("../../common-enums.js");
 
 // ============ CONSTANTS ============
 const MAX_CACHE_SIZE = 70; // largest size dynamic cache can reach

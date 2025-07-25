@@ -2,7 +2,7 @@ import { useState } from "react";
 import Product from "../home_components/Product.jsx";
 import "../../styles/ProductList.css";
 import ProductModal from "../home_components/ProductModal.jsx";
-import { ProfileFilters } from "../../enums.js";
+import { ProfileFilters } from "../../../../../common-enums.js";
 
 function ProfileProductList({
     likedProducts,

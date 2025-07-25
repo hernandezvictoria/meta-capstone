@@ -1,6 +1,6 @@
 import ProfileProductList from "./ProfileProductList.jsx";
 import UserInfo from "./UserInfo.jsx";
-import { ProfileFilters } from "../../enums.js";
+import { ProfileFilters } from "../../../../../common-enums.js";
 import { useEffect, useState } from "react";
 import Loading from "../home_components/Loading";
 

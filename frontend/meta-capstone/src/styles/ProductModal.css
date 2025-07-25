@@ -21,11 +21,11 @@
     animation: fadeIn 0.3s ease-out;
 }
 
-.ingredient{
-    display:flex;
+.ingredient {
+    display: flex;
 }
 .ingredient-tooltip {
-    position:relative;
+    position: relative;
 }
 
 .ingredient-tooltip:before {

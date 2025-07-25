@@ -1,6 +1,9 @@
 const express = require("express");
 const { PrismaClient } = require("../generated/prisma/index.js");
-const { SkinTypes, SkinConcerns, ProductTypes } = require("../enums.js");
+const {
+    SkinTypes,
+    ProductTypes,
+} = require("../../common-enums.js");
 const {
     updateProductsWithScore,
 } = require("../helpers/scoring-helper-functions.js");
