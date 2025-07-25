@@ -11,11 +11,107 @@ const router = express.Router();
 const PRODUCT_CANDIDATE_LIMIT = 200; // maximum number of products to calculate scores for
 
 /**
+ * Retrieve the current user's information by their ID.
+ * @param {number} id - User ID.
+ * @returns {object} - User object containing current user's information.
+ */
+const getCurrentUser = async (id) => {
+    return await prisma.user.findUnique({
+        where: { id: id },
+        include: {
+            loved_products: {
+                include: {
+                    ingredients: true,
+                },
+            },
+            saved_products: {
+                include: {
+                    ingredients: true,
+                },
+            },
+            disliked_products: {
+                include: {
+                    ingredients: true,
+                },
+            },
+        },
+    });
+};
+
+/**
+ * Retrieve all products to display on the home page.
+ * Filter out products that the user has already disliked and products that don't match the user's skin type or concerns.
+ * @param {object} userInfo - User object containing current user's information.
+ * @returns - Array of product objects to display on the home page.
+ */
+const getAllProducts = async (userInfo) => {
+    const dislikedProductIds = userInfo.disliked_products.map((p) => p.id);
+    return await prisma.productInfo.findMany({
+        where: {
+            OR: [
+                { skin_type: { hasSome: userInfo.skin_type } },
+                { concerns: { hasSome: userInfo.concerns } },
+            ],
+            AND: [{ id: { notIn: dislikedProductIds } }],
+        },
+        include: {
+            ingredients: true,
+            loved_by_user: true,
+            disliked_by_user: true,
+        },
+        take: PRODUCT_CANDIDATE_LIMIT,
+    });
+};
+
+/**
+ * Retrieve products matching the query to display on the home page.
+ * @param {string} searchTerm - Search term to filter products by.
+ * @returns - Array of product objects matching the query.
+ */
+const getSearchedProducts = async (searchTerm) => {
+    const queryArray = cleanSearchQuery(searchTerm); // tokenize search term
+    let productCandidates = await prisma.productInfo.findMany({
+        where: {
+            AND: queryArray.map((q) => ({
+                OR: [
+                    { brand: { contains: q, mode: "insensitive" } },
+                    { name: { contains: q, mode: "insensitive" } },
+                    {
+                        product_type: {
+                            equals: ProductTypes[q.toUpperCase()],
+                        },
+                    },
+                    { concerns: { has: q } },
+                    {
+                        skin_type: {
+                            has: SkinTypes[q.toUpperCase()]
+                                ? SkinTypes[q.toUpperCase()]
+                                : null,
+                        },
+                    },
+                ],
+            })),
+        },
+        include: {
+            ingredients: true,
+            loved_by_user: true,
+            disliked_by_user: true,
+        },
+        take: PRODUCT_CANDIDATE_LIMIT,
+    });
+    // Remove duplicates
+    productCandidates = productCandidates.filter(
+        (product, index, self) =>
+            index === self.findIndex((p) => p.id === product.id)
+    );
+    return productCandidates;
+};
+
+/**
  * Retrieve products to display on the home page.
  * Handle case of if user is searching.
  * Handles pagination and product recommendations.
  */
-
 router.get("/products", async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
@@ -30,23 +126,8 @@ router.get("/products", async (req, res) => {
     }
 
     let userInfo;
-    // Retrieve the user
     try {
-        userInfo = await prisma.user.findUnique({
-            where: { id: id },
-            include: {
-                loved_products: {
-                    include: {
-                        ingredients: true, // Include ingredients for loved products
-                    },
-                },
-                disliked_products: {
-                    include: {
-                        ingredients: true,
-                    },
-                },
-            },
-        });
+        userInfo = await getCurrentUser(id);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "error fetching user" });
@@ -58,68 +139,15 @@ router.get("/products", async (req, res) => {
 
     let productCandidates = [];
     if (searchTerm === "") {
-        // get all products if no search term
         try {
-            const dislikedProductIds = userInfo.disliked_products.map(
-                (p) => p.id
-            );
-            productCandidates = await prisma.productInfo.findMany({
-                where: {
-                    OR: [
-                        { skin_type: { hasSome: userInfo.skin_type } },
-                        { concerns: { hasSome: userInfo.concerns } },
-                    ],
-                    AND: [{ id: { notIn: dislikedProductIds } }],
-                },
-                include: {
-                    ingredients: true,
-                    loved_by_user: true,
-                    disliked_by_user: true,
-                },
-                take: PRODUCT_CANDIDATE_LIMIT,
-            });
+            productCandidates = await getAllProducts(userInfo);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "error fetching products" });
         }
     } else {
-        // filter products based on search term
-        const queryArray = cleanSearchQuery(searchTerm); // split search term into array of words
         try {
-            productCandidates = await prisma.productInfo.findMany({
-                where: {
-                    AND: queryArray.map((q) => ({
-                        OR: [
-                            { brand: { contains: q, mode: "insensitive" } },
-                            { name: { contains: q, mode: "insensitive" } },
-                            {
-                                product_type: {
-                                    equals: ProductTypes[q.toUpperCase()],
-                                },
-                            },
-                            { concerns: { has: q } },
-                            {
-                                skin_type: {
-                                    has: SkinTypes[q.toUpperCase()]
-                                        ? SkinTypes[q.toUpperCase()]
-                                        : null,
-                                },
-                            },
-                        ],
-                    })),
-                },
-                include: {
-                    ingredients: true,
-                    loved_by_user: true,
-                    disliked_by_user: true,
-                },
-                take: PRODUCT_CANDIDATE_LIMIT,
-            });
-            // Remove duplicates based on product ID
-            productCandidates = productCandidates.filter(
-                (product, index, self) =>
-                    index === self.findIndex((p) => p.id === product.id)
-            );
+            productCandidates = await getSearchedProducts(searchTerm);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "error fetching queried products" });
@@ -147,7 +175,6 @@ router.put("/change-product-image/:productId", async (req, res) => {
     const id = parseInt(req.params.productId);
 
     try {
-        // Retrieve the product
         const product = await prisma.productInfo.findUnique({
             where: { id: id },
         });
@@ -156,7 +183,6 @@ router.put("/change-product-image/:productId", async (req, res) => {
             return res.status(404).send({ message: "product not found" });
         }
 
-        // update the product's image
         const updatedProduct = await prisma.productInfo.update({
             where: { id: id },
             data: {
@@ -178,7 +204,6 @@ router.get("/products/:productId", async (req, res) => {
     const productId = parseInt(req.params.productId);
 
     try {
-        // Retrieve the current product
         const product = await prisma.productInfo.findUnique({
             where: { id: productId },
             include: {
@@ -211,7 +236,6 @@ router.put("/toggle-like/:productId", async (req, res) => {
     }
 
     try {
-        // Retrieve the current product
         const product = await prisma.productInfo.findUnique({
             where: { id: productId },
         });
@@ -220,17 +244,12 @@ router.put("/toggle-like/:productId", async (req, res) => {
             return res.status(404).send({ message: "product not found" });
         }
 
-        // Retrieve the current user
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { loved_products: true }, // Include loved products to check if already liked
-        });
+        const user = await getCurrentUser(userId);
 
         if (!user) {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isLiked = user.loved_products.some((p) => p.id === productId);
 
         await prisma.user.update({
@@ -265,7 +284,6 @@ router.put("/toggle-save/:productId", async (req, res) => {
     }
 
     try {
-        // Retrieve the current product
         const product = await prisma.productInfo.findUnique({
             where: { id: productId },
         });
@@ -274,17 +292,12 @@ router.put("/toggle-save/:productId", async (req, res) => {
             return res.status(404).send({ message: "product not found" });
         }
 
-        // Retrieve the current user
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { saved_products: true }, // Include loved products to check if already liked
-        });
+        const user = await getCurrentUser(userId);
 
         if (!user) {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isSaved = user.saved_products.some((p) => p.id === productId);
 
         await prisma.user.update({
@@ -319,7 +332,6 @@ router.put("/toggle-dislike/:productId", async (req, res) => {
     }
 
     try {
-        // Retrieve the current product
         const product = await prisma.productInfo.findUnique({
             where: { id: productId },
         });
@@ -328,17 +340,12 @@ router.put("/toggle-dislike/:productId", async (req, res) => {
             return res.status(404).send({ message: "product not found" });
         }
 
-        // Retrieve the current user
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { disliked_products: true }, // Include loved products to check if already liked
-        });
+        const user = await getCurrentUser(userId);
 
         if (!user) {
             return res.status(404).send({ message: "user not found" });
         }
 
-        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
         const isDisliked = user.disliked_products.some(
             (p) => p.id === productId
         );
@@ -357,50 +364,6 @@ router.put("/toggle-dislike/:productId", async (req, res) => {
         console.error(error);
         res.status(500).send({
             message: "An error occurred while toggling the dislike status.",
-        });
-    }
-});
-
-router.get("/get-liked-and-saved-status/:productId", async (req, res) => {
-    const productId = parseInt(req.params.productId); // Corrected from postId to productId
-    const userId = req.session.userId;
-
-    if (!userId) {
-        return res
-            .status(401)
-            .json({ error: "you must be logged in to perform this action" });
-    }
-
-    try {
-        // Retrieve the current product
-        const product = await prisma.productInfo.findUnique({
-            where: { id: productId },
-        });
-
-        if (!product) {
-            return res.status(404).send({ message: "product not found" });
-        }
-
-        // Retrieve the current user
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { saved_products: true, loved_products: true },
-        });
-
-        if (!user) {
-            return res.status(404).send({ message: "user not found" });
-        }
-
-        // some is used on arrays to test whether at least one elt of the array passes a specified test implemented by a provided function
-        const isSaved = user.saved_products.some((p) => p.id === productId);
-        const isLiked = user.loved_products.some((p) => p.id === productId);
-
-        res.status(200).json({ isSaved, isLiked });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({
-            message:
-                "An error occurred while fetching the liked and saved status",
         });
     }
 });
