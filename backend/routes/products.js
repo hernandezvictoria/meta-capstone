@@ -60,12 +60,16 @@ router.get("/products", async (req, res) => {
     if (searchTerm === "") {
         // get all products if no search term
         try {
+            const dislikedProductIds = userInfo.disliked_products.map(
+                (p) => p.id
+            );
             productCandidates = await prisma.productInfo.findMany({
                 where: {
                     OR: [
                         { skin_type: { hasSome: userInfo.skin_type } },
                         { concerns: { hasSome: userInfo.concerns } },
                     ],
+                    AND: [{ id: { notIn: dislikedProductIds } }],
                 },
                 include: {
                     ingredients: true,
@@ -73,11 +77,6 @@ router.get("/products", async (req, res) => {
                     disliked_by_user: true,
                 },
                 take: PRODUCT_CANDIDATE_LIMIT,
-            });
-            productCandidates = productCandidates.filter((p) => {
-                if (!userInfo.disliked_products.some((d) => d.id === p.id)) {
-                    return p; // filter out products that are disliked by the user
-                }
             });
         } catch (error) {
             console.error(error);
