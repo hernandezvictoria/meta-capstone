@@ -209,7 +209,7 @@ const computeMissingProductsMultiplier = (productTypesSet) => {
  * @returns {object} - The deduction for having any incompatible products and message.
  */
 const computeIncompatibleProductsDeduction = (productIds) => {
-    let allIncompatibleProductsSet = new Set(); // use set to avoid duplicates, efficient for O(1) lookup
+    let allIncompatibleProductsSet = new Set();
     const incompatibilityMessage =
         "your routine has too many products with harsh ingredients!";
 
