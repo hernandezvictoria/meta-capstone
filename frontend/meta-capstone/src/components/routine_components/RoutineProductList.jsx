@@ -29,6 +29,17 @@ function RoutineProductList({
         );
     };
 
+    if (displayData.length === 0) {
+        return isSuggestedProducts ? (
+            <p>
+                no suggested products to display, consider removing products
+                from your routine
+            </p>
+        ) : (
+            <p>your skincare routine will show up here</p>
+        );
+    }
+
     return (
         <>
             {modalProductId && getProductModal(displayData)}
