@@ -9,7 +9,7 @@ const {
     parseSkincareRoutine,
     computeSkincareRoutineScore,
 } = require("../helpers/skincare-routine.js");
-const { ProductTypes, SkinTypes, SkinConcerns } = require("../enums.js");
+const { ProductTypes, SkinTypes, SkinConcerns } = require('../../common-enums.js');
 
 const exfoliantIngredients = [
     {
