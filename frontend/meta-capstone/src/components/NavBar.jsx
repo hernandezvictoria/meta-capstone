@@ -9,38 +9,34 @@ import closedStar from "../assets/closed-star.png";
 import logo from "../assets/logo.png";
 import { useNav } from "../contexts/NavContext";
 import { Pages } from "../enums.js";
+import { useEffect } from "react";
 
 function NavBar() {
     const { currentPage, setCurrentPage } = useNav();
 
+    useEffect(() => {
+        for (const page of Object.values(Pages)) {
+            if (location.pathname.includes(page)) {
+                setCurrentPage(page);
+                break;
+            }
+        }
+    }, [location.pathname]);
+
     return (
         <div className="nav-bar">
-            <Link
-                to="/home"
-                aria-label="home"
-                onClick={() => setCurrentPage(Pages.HOME)}
-            >
+            <Link to="/home" aria-label="home">
                 <img className="nav-icon" src={logo}></img>
             </Link>
 
-            <Link
-                to="/home"
-                aria-label="home"
-                onClick={() => setCurrentPage(Pages.HOME)}
-            >
+            <Link to="/home" aria-label="home">
                 <img
                     className="nav-icon"
                     src={currentPage === Pages.HOME ? closedHome : openHome}
                 ></img>
             </Link>
 
-            <Link
-                to="/profile"
-                aria-label="profile"
-                onClick={() => {
-                    setCurrentPage(Pages.PROFILE);
-                }}
-            >
+            <Link to="/profile" aria-label="profile">
                 <img
                     className="nav-icon"
                     src={
@@ -51,13 +47,7 @@ function NavBar() {
                 ></img>
             </Link>
 
-            <Link
-                to="/routine"
-                aria-label="routine"
-                onClick={() => {
-                    setCurrentPage(Pages.ROUTINE);
-                }}
-            >
+            <Link to="/routine" aria-label="routine">
                 <img
                     className="nav-icon"
                     src={currentPage === Pages.ROUTINE ? closedStar : openStar}

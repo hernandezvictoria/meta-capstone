@@ -1,5 +1,6 @@
 import { createContext, useState, useContext } from "react";
 import { Pages } from "../enums";
+import { useLocation } from "react-router-dom";
 
 const NavContext = createContext();
 
