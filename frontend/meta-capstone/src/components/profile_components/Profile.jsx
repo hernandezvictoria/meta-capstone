@@ -16,7 +16,7 @@ function Profile() {
                 `${import.meta.env.VITE_BASE_URL}/logout`,
                 {
                     method: "POST",
-                    credentials: "include", // Include credentials
+                    credentials: "include", 
                 }
             );
 
