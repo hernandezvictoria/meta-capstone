@@ -98,7 +98,6 @@ router.get("/user-info", async (req, res) => {
             .json({ error: "you must be logged in to perform this action" });
     }
 
-    // Retrieve the user
     let user;
     try {
         user = await getUserAndProducts(id);
@@ -193,7 +192,6 @@ router.get("/user-liked-saved-disliked", async (req, res) => {
     }
 
     try {
-        // Retrieve the current user
         const user = await getUserAndProducts(userId);
         const users = await prisma.user.findMany();
         res.status(200).json({

@@ -15,7 +15,7 @@ function Search({ setError, setMaxPages, setPageNum, setSearchTerm }) {
 
     const handleClear = (event) => {
         event.preventDefault();
-        inputRef.current.value = ""; // clear the input field too
+        inputRef.current.value = ""; // clear the input field 
         setSearchTerm("");
         setPageNum(1);
         setMaxPages(false);

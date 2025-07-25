@@ -36,17 +36,17 @@ function Quiz() {
                         .classList.add("active");
                 }
             } else {
-                throw new Error(); // throw error to be caught
+                throw new Error();
             }
         } catch (error) {
             setCurrentPage(Pages.HOME);
-            navigate("/login"); // redirect to login page if error occurs
+            navigate("/login");
         }
     };
 
     useEffect(() => {
         loadInitialTypesAndConcerns();
-    }, []); // load initial types and concerns on page load
+    }, []);
 
     const handleSkinTypeClick = (event) => {
         event.preventDefault();
@@ -72,11 +72,9 @@ function Quiz() {
             concern.replace(/[\s_&()]+/g, "")
         );
         if (selectedConcerns.includes(concern)) {
-            // remove if already selected
             setSelectedConcerns(selectedConcerns.filter((c) => c !== concern));
             button.classList.remove("active");
         } else {
-            // add if not selected
             setSelectedConcerns([...selectedConcerns, concern]);
             button.classList.add("active");
         }
@@ -91,7 +89,6 @@ function Quiz() {
                 text: "you must select at least one of each",
             });
         } else {
-            // convert to JSON
             const skinTypesJson = JSON.stringify(selectedSkinTypes);
             const concernsJson = JSON.stringify(selectedConcerns);
             updateUserInfo(skinTypesJson, concernsJson);
@@ -99,7 +96,6 @@ function Quiz() {
     };
 
     const updateUserInfo = async (skinTypesJson, concernsJson) => {
-        //update skin type
         try {
             const response = await fetch(
                 `${import.meta.env.VITE_BASE_URL}/change-skin-type`,
@@ -128,7 +124,6 @@ function Quiz() {
             });
         }
 
-        //update skin concern
         try {
             const response = await fetch(
                 `${import.meta.env.VITE_BASE_URL}/change-skin-concerns`,

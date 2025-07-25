@@ -41,7 +41,7 @@ function LoginForm() {
                 setMessage({ type: "success", text: "login successful!" });
                 setUser(data); // Set the user in context with id and username
                 setCurrentPage(Pages.HOME);
-                navigate("/home"); // Redirect to the homepage
+                navigate("/home");
             } else {
                 setMessage({
                     type: "error",

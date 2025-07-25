@@ -16,13 +16,13 @@ function Profile() {
                 `${import.meta.env.VITE_BASE_URL}/logout`,
                 {
                     method: "POST",
-                    credentials: "include", 
+                    credentials: "include",
                 }
             );
 
             if (response.ok) {
                 setUser(null); // Clear the user in context
-                navigate("/login"); // Redirect to the login page
+                navigate("/login");
             } else {
                 console.error("failed to log out");
             }

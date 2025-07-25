@@ -29,7 +29,7 @@ const cleanSearchQuery = (searchTerm) => {
     termToEnum["dull"] = SkinConcerns.DULLNESS;
     termToEnum["dry"] = SkinConcerns.DRYNESS;
     termToEnum["lotion"] = ProductTypes.moisturizer;
-    termToEnum["eye"] = ProductTypes.eye_cream; // not a great soln for eye cream rn
+    termToEnum["eye"] = ProductTypes.eye_cream;
     termToEnum["cream"] = ProductTypes.moisturizer;
     termToEnum["wash"] = ProductTypes.cleanser;
     termToEnum["retinoid"] = ProductTypes.retinol;
@@ -42,7 +42,7 @@ const cleanSearchQuery = (searchTerm) => {
             if (!stopWords.includes(q)) {
                 return q;
             }
-        }) // remove filler words from query, can add more later
+        }) // remove filler words from query
         .map((q) => (q in termToEnum ? termToEnum[q] : q)) // map terms to enums
         .map((q) => q.toLowerCase());
 
