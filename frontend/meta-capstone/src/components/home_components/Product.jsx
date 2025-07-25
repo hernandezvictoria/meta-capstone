@@ -6,6 +6,9 @@ import closedHeart from "../../assets/closed-heart.png";
 import openHeart from "../../assets/open-heart.png";
 import closedDislike from "../../assets/closed-dislike.png";
 import openDislike from "../../assets/open-dislike.png";
+import openStar from "../../assets/open-star.png";
+import closedStar from "../../assets/closed-star.png";
+
 import { InteractionTypes } from "../../enums";
 
 function Product({
@@ -15,6 +18,8 @@ function Product({
     setSavedProducts,
     dislikedProducts,
     setDislikedProducts,
+    routineProducts,
+    setRoutineProducts,
     setModalProductId,
     setError,
     id,
@@ -24,6 +29,7 @@ function Product({
     concerns,
     skin_type,
     score,
+    skincareRoutineScore,
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const placeholderImage =
@@ -150,6 +156,29 @@ function Product({
         }
     };
 
+    const toggleInRoutine = async (event) => {
+        event.stopPropagation();
+        try {
+            // update skincare routine products in database
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/toggle-add-to-routine/${id}`,
+                { method: "PUT", credentials: "include" }
+            );
+            const res = await response.json();
+            const removedFromRoutine = res.removedAdd;
+            if (removedFromRoutine) {
+                setRoutineProducts(routineProducts.filter((p) => p.id !== id));
+            } else {
+                setRoutineProducts([
+                    ...routineProducts,
+                    { id, image, brand, name, concerns, skin_type },
+                ]);
+            }
+        } catch (error) {
+            setError("error while toggling add to routine");
+        }
+    };
+
     const getScoreClass = (score) => {
         const scoreNum = parseFloat(score);
         if (scoreNum <= 1.5) {
@@ -190,9 +219,18 @@ function Product({
             <section className="product-info">
                 <p className="product-brand">{brand}</p>
                 <p className="product-name">{name}</p>
-                <p id={getScoreClass(score)} className="product-score">
-                    score: {score}
-                </p>
+                {skincareRoutineScore ? (
+                    <p
+                        id={getScoreClass(skincareRoutineScore)}
+                        className="product-score"
+                    >
+                        skincare routine score: {skincareRoutineScore}
+                    </p>
+                ) : (
+                    <p id={getScoreClass(score)} className="product-score">
+                        score: {score}
+                    </p>
+                )}
                 <p>skin type(s): {skin_type.join(", ")}</p>
 
                 {concerns.map((concern) => {
@@ -226,6 +264,13 @@ function Product({
                         <img className="button-image" src={closedDislike}></img>
                     ) : (
                         <img className="button-image" src={openDislike}></img>
+                    )}
+                </button>
+                <button className="button-wrapper" onClick={toggleInRoutine}>
+                    {routineProducts.find((p) => p.id === id) ? (
+                        <img className="button-image" src={closedStar}></img>
+                    ) : (
+                        <img className="button-image" src={openStar}></img>
                     )}
                 </button>
             </section>

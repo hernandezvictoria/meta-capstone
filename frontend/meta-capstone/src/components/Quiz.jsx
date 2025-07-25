@@ -6,9 +6,10 @@ import "../styles/Quiz.css";
 import WithAuth from "./WithAuth";
 import logoIcon from "../assets/logo.png";
 import { useNav } from "../contexts/NavContext";
+import { Pages } from "../enums.js";
 
 function Quiz() {
-    const { isHome, setIsHome } = useNav();
+    const { currentPage, setCurrentPage } = useNav();
     const { user, setUser } = useUser();
     const navigate = useNavigate();
     const [message, setMessage] = useState({ type: "none", text: "" });
@@ -39,7 +40,7 @@ function Quiz() {
                 throw new Error(); // throw error to be caught
             }
         } catch (error) {
-            setIsHome(true);
+            setCurrentPage(Pages.HOME);
             navigate("/login"); // redirect to login page if error occurs
         }
     };
@@ -161,7 +162,7 @@ function Quiz() {
 
     useEffect(() => {
         if (formSubmitted && message.type !== "error") {
-            setIsHome(true);
+            setCurrentPage(Pages.HOME);
             navigate("/home");
         }
     }, [formSubmitted, message]);

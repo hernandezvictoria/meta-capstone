@@ -1,0 +1,59 @@
+.routine-header,
+.suggested-products-header {
+    text-align: left;
+    margin: 1% 20%;
+    font-size: 200%;
+}
+
+.score-and-message {
+    margin-top: 1%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
+    margin-right: auto;
+    margin-left: auto;
+    background-color: #ececec;
+    border-radius: 15px;
+    padding: 0.5%;
+}
+
+.message {
+    background-color: #ececec;
+    color: gray;
+}
+
+.routine-score {
+    border-radius: 15px;
+    margin-right: 1%;
+    color: white;
+    padding: 0.5%;
+}
+
+#score-1 {
+    background-color: #b60101;
+}
+
+#score-2 {
+    background-color: #fc6f33;
+}
+
+#score-3 {
+    background-color: #d59c57;
+}
+
+#score-4 {
+    background-color: #eaca12;
+}
+
+#score-5 {
+    background-color: #8bc500;
+}
+
+#score-6 {
+    background-color: #4b8a10;
+}
+
+#score-7 {
+    background-color: #006824;
+}

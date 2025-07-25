@@ -13,6 +13,7 @@ function FilterProfilePage() {
     const [likedProducts, setLikedProducts] = useState([]);
     const [savedProducts, setSavedProducts] = useState([]);
     const [dislikedProducts, setDislikedProducts] = useState([]);
+    const [routineProducts, setRoutineProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const loadUserInfo = async () => {
@@ -29,6 +30,7 @@ function FilterProfilePage() {
             setLikedProducts(res.loved_products);
             setSavedProducts(res.saved_products);
             setDislikedProducts(res.disliked_products);
+            setRoutineProducts(res.skincare_routine);
         } catch (error) {
             setError("unable to fetch user info");
         }
@@ -101,6 +103,8 @@ function FilterProfilePage() {
                         setSavedProducts={setSavedProducts}
                         dislikedProducts={dislikedProducts}
                         setDislikedProducts={setDislikedProducts}
+                        routineProducts={routineProducts}
+                        setRoutineProducts={setRoutineProducts}
                     />
                 )}
             </div>

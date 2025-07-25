@@ -2,7 +2,7 @@ const SkinTypes = Object.freeze({
     OILY: "oily",
     DRY: "dry",
     COMBINATION: "combination",
-    NORMAL: "normal"
+    NORMAL: "normal",
 });
 
 const SkinConcerns = Object.freeze({
@@ -12,8 +12,8 @@ const SkinConcerns = Object.freeze({
     REDNESS: "redness & irritation",
     ACNE: "acne & blemishes",
     DULLNESS: "dullness",
-    DRYNESS: "dryness"
-})
+    DRYNESS: "dryness",
+});
 
 const ProductTypes = Object.freeze({
     SERUM: "serum",
@@ -23,24 +23,37 @@ const ProductTypes = Object.freeze({
     RETINOL: "retinol",
     MASK: "mask",
     CLEANSER: "cleanser",
-    EYE: "eye cream"
-})
+    EYE: "eye cream",
+});
 
 const ProfileFilters = Object.freeze({
     USERINFO: "user info",
     LIKED: "liked",
     SAVED: "saved",
-    DISLIKED: "disliked"
-})
+    DISLIKED: "disliked",
+});
 
 const InteractionTypes = Object.freeze({
-  LIKE: "like",
-  DISLIKE: "dislike",
-  SAVE: "save",
-  REMOVE_LIKE: "remove_like",
-  REMOVE_DISLIKE: "remove_dislike",
-  REMOVE_SAVE: "remove_save",
-  OPEN_MODAL: "open_modal"
-})
+    LIKE: "like",
+    DISLIKE: "dislike",
+    SAVE: "save",
+    REMOVE_LIKE: "remove_like",
+    REMOVE_DISLIKE: "remove_dislike",
+    REMOVE_SAVE: "remove_save",
+    OPEN_MODAL: "open_modal",
+});
 
-export { SkinTypes, SkinConcerns, ProductTypes, ProfileFilters, InteractionTypes};
+const Pages = Object.freeze({
+    HOME: "home",
+    PROFILE: "profile",
+    ROUTINE: "routine",
+});
+
+export {
+    SkinTypes,
+    SkinConcerns,
+    ProductTypes,
+    ProfileFilters,
+    InteractionTypes,
+    Pages,
+};

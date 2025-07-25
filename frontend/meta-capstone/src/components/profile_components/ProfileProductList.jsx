@@ -11,6 +11,8 @@ function ProfileProductList({
     setSavedProducts,
     dislikedProducts,
     setDislikedProducts,
+    routineProducts,
+    setRoutineProducts,
     filter,
     setError,
 }) {
@@ -45,6 +47,8 @@ function ProfileProductList({
                                 setSavedProducts={setSavedProducts}
                                 dislikedProducts={dislikedProducts}
                                 setDislikedProducts={setDislikedProducts}
+                                routineProducts={routineProducts}
+                                setRoutineProducts={setRoutineProducts}
                                 setModalProductId={setModalProductId}
                                 setError={setError}
                                 key={prod.id}
@@ -78,6 +82,8 @@ function ProfileProductList({
                                 setSavedProducts={setSavedProducts}
                                 dislikedProducts={dislikedProducts}
                                 setDislikedProducts={setDislikedProducts}
+                                routineProducts={routineProducts}
+                                setRoutineProducts={setRoutineProducts}
                                 setModalProductId={setModalProductId}
                                 setError={setError}
                                 key={prod.id}
@@ -111,6 +117,8 @@ function ProfileProductList({
                                 setSavedProducts={setSavedProducts}
                                 dislikedProducts={dislikedProducts}
                                 setDislikedProducts={setDislikedProducts}
+                                routineProducts={routineProducts}
+                                setRoutineProducts={setRoutineProducts}
                                 setModalProductId={setModalProductId}
                                 setError={setError}
                                 key={prod.id}
