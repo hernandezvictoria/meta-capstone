@@ -15,6 +15,7 @@ const PRODUCT_CANDIDATE_LIMIT = 200; // maximum number of products to calculate 
  * Handle case of if user is searching.
  * Handles pagination and product recommendations.
  */
+
 router.get("/products", async (req, res) => {
     const page = req.query.page ? parseInt(req.query.page) : 1; // default to page 1
     const limit = req.query.limit ? parseInt(req.query.limit) : 10; //default to limit 10 products per page
@@ -84,23 +85,27 @@ router.get("/products", async (req, res) => {
         }
     } else {
         // filter products based on search term
-        //TODO: fix search
         const queryArray = cleanSearchQuery(searchTerm); // split search term into array of words
-
         try {
             productCandidates = await prisma.productInfo.findMany({
                 where: {
                     AND: queryArray.map((q) => ({
                         OR: [
-                            { brand: { contains: q } },
-                            { name: { contains: q } },
-                            { product_type: { equals: ProductTypes[q] } },
-                            { concerns: { has: q } }, // Use has for exact match in array
+                            { brand: { contains: q, mode: "insensitive" } },
+                            { name: { contains: q, mode: "insensitive" } },
+                            {
+                                product_type: {
+                                    equals: ProductTypes[q.toUpperCase()],
+                                },
+                            },
+                            { concerns: { has: q } },
                             {
                                 skin_type: {
-                                    has: SkinTypes[q] ? SkinTypes[q] : null,
+                                    has: SkinTypes[q.toUpperCase()]
+                                        ? SkinTypes[q.toUpperCase()]
+                                        : null,
                                 },
-                            }, // Use has for exact match in array
+                            },
                         ],
                     })),
                 },
@@ -111,7 +116,6 @@ router.get("/products", async (req, res) => {
                 },
                 take: PRODUCT_CANDIDATE_LIMIT,
             });
-
             // Remove duplicates based on product ID
             productCandidates = productCandidates.filter(
                 (product, index, self) =>
@@ -122,6 +126,7 @@ router.get("/products", async (req, res) => {
             res.status(500).json({ error: "error fetching queried products" });
         }
     }
+
     const users = await prisma.user.findMany();
     let scoredProducts = await updateProductsWithScore(
         productCandidates,
@@ -131,6 +136,7 @@ router.get("/products", async (req, res) => {
     scoredProducts = scoredProducts
         .sort((a, b) => b.score - a.score)
         .slice(offset, offset + limit);
+
     res.status(200).json({
         totalProducts: scoredProducts.length,
         products: scoredProducts,
