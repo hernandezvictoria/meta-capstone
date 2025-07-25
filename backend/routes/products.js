@@ -98,14 +98,14 @@ router.get("/products", async (req, res) => {
                                     equals: ProductTypes[q.toUpperCase()],
                                 },
                             },
-                            { concerns: { has: q } }, // Use has for exact match in array
+                            { concerns: { has: q } },
                             {
                                 skin_type: {
                                     has: SkinTypes[q.toUpperCase()]
                                         ? SkinTypes[q.toUpperCase()]
                                         : null,
                                 },
-                            }, // Use has for exact match in array
+                            },
                         ],
                     })),
                 },

@@ -243,35 +243,44 @@ function Product({
             </section>
             <section className="like-and-save">
                 <button className="button-wrapper" onClick={toggleLike}>
-                    {likedProducts.find((p) => p.id === id) ? (
-                        <img className="button-image" src={closedHeart}></img>
-                    ) : (
-                        <img className="button-image" src={openHeart}></img>
-                    )}
+                    <img
+                        className="button-image"
+                        src={
+                            likedProducts.find((p) => p.id === id)
+                                ? closedHeart
+                                : openHeart
+                        }
+                    ></img>
                 </button>
                 <button className="button-wrapper" onClick={toggleSave}>
-                    {savedProducts.find((p) => p.id === id) ? (
-                        <img
-                            className="button-image"
-                            src={closedBookmark}
-                        ></img>
-                    ) : (
-                        <img className="button-image" src={openBookmark}></img>
-                    )}
+                    <img
+                        className="button-image"
+                        src={
+                            savedProducts.find((p) => p.id === id)
+                                ? closedBookmark
+                                : openBookmark
+                        }
+                    ></img>
                 </button>
                 <button className="button-wrapper" onClick={toggleDislike}>
-                    {dislikedProducts.find((p) => p.id === id) ? (
-                        <img className="button-image" src={closedDislike}></img>
-                    ) : (
-                        <img className="button-image" src={openDislike}></img>
-                    )}
+                    <img
+                        className="button-image"
+                        src={
+                            dislikedProducts.find((p) => p.id === id)
+                                ? closedDislike
+                                : openDislike
+                        }
+                    ></img>
                 </button>
                 <button className="button-wrapper" onClick={toggleInRoutine}>
-                    {routineProducts.find((p) => p.id === id) ? (
-                        <img className="button-image" src={closedStar}></img>
-                    ) : (
-                        <img className="button-image" src={openStar}></img>
-                    )}
+                    <img
+                        className="button-image"
+                        src={
+                            routineProducts.find((p) => p.id === id)
+                                ? closedStar
+                                : openStar
+                        }
+                    ></img>
                 </button>
             </section>
         </div>

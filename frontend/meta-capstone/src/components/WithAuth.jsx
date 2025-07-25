@@ -16,9 +16,9 @@ function WithAuth(WrappedComponent) {
                             { credentials: "include" }
                         );
                         const data = await response.json();
+                        // Ensure the response contains the user id
                         if (data.id) {
-                            // Ensure the response contains the user id
-                            setUser(data); // Set the user in context
+                            setUser(data);
                         } else {
                             navigate("/login");
                         }
