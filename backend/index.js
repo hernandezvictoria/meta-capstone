@@ -2,15 +2,6 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const session = require("express-session");
-const { createClient } = require("redis");
-const { RedisStore } = require("connect-redis");
-
-const client = createClient({
-  url: "rediss://default:ActfAAIjcDE3MzNjNjJmNTUyMGY0NDFmODIwZWIzOWE0ZWI0MzBhNXAxMA@distinct-muskox-52063.upstash.io:6379",
-});
-
-client.on("error", (err) => console.error("Redis Client Error", err));
-client.connect().catch(console.error);
 
 const PORT = 3000;
 
@@ -26,10 +17,9 @@ const routineRoutes = require("./routes/routine");
 
 const { ValidationError } = require("./middleware/CustomErrors");
 
-// Configure CORS to allow requests from your frontend's origin and include credentials
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL, // frontend's origin
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
@@ -38,7 +28,6 @@ app.use(express.json());
 
 app.use(
   session({
-    store: new RedisStore({ client: client }),
     secret: "capstone",
     resave: false,
     saveUninitialized: false,
@@ -67,8 +56,6 @@ app.use((err, req, res, next) => {
   if (err instanceof ValidationError) {
     return res.status(err.statusCode).json({ error: err.message });
   }
-
-  // Additional Prisma error checks can be placed here
   res.status(500).json({ error: "Internal Server Error" });
 });
 
