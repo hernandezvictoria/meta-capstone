@@ -4,10 +4,10 @@ import { useUser } from "../contexts/UserContext";
 import { Link } from "react-router-dom";
 import "../styles/LoginForm.css";
 import { useNav } from "../contexts/NavContext";
-import { Pages } from "../enums.js";
+import { Pages } from "../../../../common-enums.js";
 
 function LoginForm() {
-    const { currentPage, setCurrentPage } = useNav();
+    const { setCurrentPage } = useNav();
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [message, setMessage] = useState("");
     const navigate = useNavigate();

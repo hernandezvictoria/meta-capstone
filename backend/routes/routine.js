@@ -11,7 +11,7 @@ const {
     parseSkincareRoutine,
     updateProductsWithSkincareRoutineScore,
 } = require("../helpers/skincare-routine.js");
-const { ProductTypes } = require('../../common-enums.js');
+const { ProductTypes } = require("../../common-enums.js");
 
 const SUGGESTED_PRODUCT_LIMIT = 30; // maximum number of suggested products to calculate scores for
 

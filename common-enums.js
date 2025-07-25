@@ -60,8 +60,8 @@ const HarshIngredientTypes = Object.freeze({
     ACTIVE: "active",
 });
 
-// Export for CommonJS (Node.js)
-if (typeof module !== 'undefined' && module.exports) {
+// Export for CommonJS
+if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         SkinTypes,
         SkinConcerns,

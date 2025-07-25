@@ -8,7 +8,7 @@ import openStar from "../assets/open-star.png";
 import closedStar from "../assets/closed-star.png";
 import logo from "../assets/logo.png";
 import { useNav } from "../contexts/NavContext";
-import { Pages } from "../enums.js";
+import { Pages } from "../../../../common-enums.js";
 import { useEffect } from "react";
 
 function NavBar() {

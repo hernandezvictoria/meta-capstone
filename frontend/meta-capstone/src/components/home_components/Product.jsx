@@ -9,7 +9,7 @@ import openDislike from "../../assets/open-dislike.png";
 import openStar from "../../assets/open-star.png";
 import closedStar from "../../assets/closed-star.png";
 
-import { InteractionTypes } from "../../enums";
+import { InteractionTypes } from "../../../../../common-enums.js";
 
 function Product({
     likedProducts,

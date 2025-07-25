@@ -39,12 +39,12 @@
     font-size: 70%;
     cursor: pointer;
     text-align: right;
-    width:100%;
-    margin:0;
+    width: 100%;
+    margin: 0;
 }
 
 .hide-button:hover {
-      color: #ffcccc;
+    color: #ffcccc;
 }
 
 .stats-grid {
@@ -65,14 +65,14 @@
 
 .stat-label {
     color: white;
-    background-color: var(--red2);;
+    background-color: var(--red2);
     margin-right: 10px;
 }
 
 .stat-value {
     font-weight: 600; /* bold */
     color: white;
-    background-color: var(--red2);;
+    background-color: var(--red2);
 }
 
 .refresh-button {
@@ -88,12 +88,12 @@
 }
 
 .refresh-button:hover {
-      background-color: var(--red4);
+    background-color: var(--red4);
 }
 
 .refresh-button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
+    background-color: #cccccc;
+    cursor: not-allowed;
 }
 
 .error {
@@ -108,7 +108,7 @@
     bottom: 2%;
     right: 1%;
     z-index: 1000;
-    background-color: var(--red2);;
+    background-color: var(--red2);
     color: white;
     padding: 8px 12px;
     border: none;
@@ -120,5 +120,5 @@
 }
 
 .show-stats-button:hover {
-      background-color: var(--red1);
+    background-color: var(--red1);
 }

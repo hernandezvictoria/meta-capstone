@@ -1,4 +1,3 @@
-import { SkinTypes, SkinConcerns } from "../enums";
 import { useState, useEffect } from "react";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
@@ -6,11 +5,11 @@ import "../styles/Quiz.css";
 import WithAuth from "./WithAuth";
 import logoIcon from "../assets/logo.png";
 import { useNav } from "../contexts/NavContext";
-import { Pages } from "../enums.js";
+import { SkinTypes, SkinConcerns, Pages } from "../../../../common-enums.js";
 
 function Quiz() {
-    const { currentPage, setCurrentPage } = useNav();
-    const { user, setUser } = useUser();
+    const { setCurrentPage } = useNav();
+    const { user } = useUser();
     const navigate = useNavigate();
     const [message, setMessage] = useState({ type: "none", text: "" });
     const [formSubmitted, setFormSubmitted] = useState(false);

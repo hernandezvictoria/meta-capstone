@@ -7,7 +7,8 @@
 
 .quiz-background {
     /* darken image using rgba */
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
         url("../assets/quiz-background.png");
     background-size: cover;
     background-position: center;
@@ -73,8 +74,8 @@ form {
 }
 
 .category-header {
-      font-size: 170%;
-      color: #676767;
+    font-size: 170%;
+    color: #676767;
 }
 
 .skin-type-button:active,
@@ -99,7 +100,8 @@ form {
     }
 }
 
-#oily, #hyperpigmentationdarkspots {
+#oily,
+#hyperpigmentationdarkspots {
     background-image: linear-gradient(
         to right,
         var(--red1) 100%,
@@ -107,7 +109,9 @@ form {
     );
 }
 
-#normal, #dryness, #rednessirritation {
+#normal,
+#dryness,
+#rednessirritation {
     background-image: linear-gradient(
         to right,
         var(--red2) 100%,
@@ -115,7 +119,9 @@ form {
     );
 }
 
-#dry, #acneblemishes, #texture {
+#dry,
+#acneblemishes,
+#texture {
     background-image: linear-gradient(
         to right,
         var(--red4) 100%,
@@ -123,7 +129,9 @@ form {
     );
 }
 
-#combination, #finelineswrinkles, #dullness {
+#combination,
+#finelineswrinkles,
+#dullness {
     background-image: linear-gradient(
         to right,
         var(--red3) 100%,

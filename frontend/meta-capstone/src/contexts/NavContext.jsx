@@ -1,5 +1,5 @@
 import { createContext, useState, useContext } from "react";
-import { Pages } from "../enums";
+import { Pages } from "../../../../common-enums.js";
 
 const NavContext = createContext();
 

@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("../generated/prisma/index.js");
-const { ActivityTypes } = require('../../common-enums.js');
+const { ActivityTypes } = require("../../common-enums.js");
 
 const prisma = new PrismaClient();
 const router = express.Router();
