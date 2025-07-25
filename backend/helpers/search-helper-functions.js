@@ -3,7 +3,6 @@ const { SkinTypes, SkinConcerns, ProductTypes } = require("../enums.js");
 const cleanSearchQuery = (searchTerm) => {
     const termToEnum = {}; // hm to store related terms to skin types and concerns
 
-    // Add key-value pairs
     termToEnum["combo"] = SkinTypes.COMBINATION;
     termToEnum["wrinkles"] = SkinConcerns.WRINKLES;
     termToEnum["fine"] = SkinConcerns.WRINKLES;

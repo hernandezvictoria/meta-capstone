@@ -58,8 +58,9 @@ function ProductList({
             }
         } catch (error) {
             setError("unable to fetch products");
+        } finally {
+            setTimeout(() => setIsLoading(false), 500); // 500ms so that it is on the screen for a long enough time
         }
-        setTimeout(() => setIsLoading(false), 500); // 500ms so that it is on the screen for a long enough time
     };
 
     useEffect(() => {
