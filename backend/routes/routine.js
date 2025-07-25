@@ -12,8 +12,9 @@ const {
     updateProductsWithSkincareRoutineScore,
 } = require("../helpers/skincare-routine.js");
 const { ProductTypes } = require("../enums.js");
+const { parse } = require("csv-parse/browser/esm");
 
-const SUGGESTED_PRODUCT_LIMIT = 50; // maximum number of suggested products to calculate scores for
+const SUGGESTED_PRODUCT_LIMIT = 30; // maximum number of suggested products to calculate scores for
 
 /**
  * Add/remove product to user's skincare routine.
@@ -113,22 +114,19 @@ router.get("/user-routine-and-recommendations", async (req, res) => {
             },
         });
 
-        // compute score for current skincare routine
         const computedScore = await computeSkincareRoutineScore(
             user.skincare_routine,
             user
         );
 
-        // get user's skincare routine with product scores
         const users = await prisma.user.findMany();
         const numUsers = users?.length;
-        const skincareRoutine = await updateProductsWithScore(
+        const currentSkincareRoutineWithScores = await updateProductsWithScore(
             user.skincare_routine,
             user,
             numUsers
         );
 
-        // get suggested products to fill gaps in the routine
         const suggestedProducts = await getSuggestedProducts(
             user,
             user.skincare_routine,
@@ -136,7 +134,7 @@ router.get("/user-routine-and-recommendations", async (req, res) => {
         );
 
         res.status(200).json({
-            currentSkincareRoutine: skincareRoutine,
+            currentSkincareRoutine: currentSkincareRoutineWithScores,
             currentSkincareRoutineScore: computedScore.score,
             message: computedScore.message,
             suggestedProducts: suggestedProducts,
@@ -177,11 +175,10 @@ const getSuggestedProducts = async (user, skincareRoutine, numUsers) => {
 
     let suggestedProducts = [];
 
-    // if routine is missing cleanser, moisturizer, or sunscreen
+    // if routine is missing cleanser, moisturizer, or sunscreen, only recommend those
     if (missingProductTypes.length > 0) {
         suggestedProducts = await prisma.productInfo.findMany({
             where: {
-                // filter for products types that are not already in routine
                 product_type: { in: missingProductTypes },
             },
             include: {
@@ -193,14 +190,23 @@ const getSuggestedProducts = async (user, skincareRoutine, numUsers) => {
         });
     }
 
+    const dislikedProductIds = user.disliked_products.map((p) => p.id);
+
     // if routine is complete or no products found for missing product types
     if (suggestedProducts.length === 0) {
         suggestedProducts = await prisma.productInfo.findMany({
             where: {
-                OR: [
-                    // filter for products that match at least one of the user's skin needs
-                    { skin_type: { hasSome: user.skin_type } },
-                    { concerns: { hasSome: user.concerns } },
+                AND: [
+                    // exclude products and product types already in routine or disliked by user
+                    { id: { notIn: parsedSkincareRoutine.productIds } },
+                    { id: { notIn: dislikedProductIds } },
+                    {
+                        product_type: {
+                            notIn: Array.from(
+                                parsedSkincareRoutine.productTypesSet
+                            ),
+                        },
+                    },
                 ],
             },
             include: {
@@ -212,24 +218,12 @@ const getSuggestedProducts = async (user, skincareRoutine, numUsers) => {
         });
     }
 
-    // filter out products that are already in routine or disliked by the user
-    suggestedProducts = suggestedProducts.filter((p) => {
-        if (
-            !user.disliked_products.some((d) => d.id === p.id) ||
-            !parsedSkincareRoutine.productIds.includes(p.id)
-        ) {
-            return p;
-        }
-    });
-
-    // compute scores for suggested products
     let scoredProducts = await updateProductsWithSkincareRoutineScore(
         suggestedProducts,
         user,
         numUsers
     );
 
-    // sort products by skincare routine score
     return scoredProducts.sort(
         (a, b) => b.skincareRoutineScore - a.skincareRoutineScore
     );
