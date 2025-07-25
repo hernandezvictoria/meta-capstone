@@ -12,7 +12,6 @@ const {
     updateProductsWithSkincareRoutineScore,
 } = require("../helpers/skincare-routine.js");
 const { ProductTypes } = require("../enums.js");
-const { parse } = require("csv-parse/browser/esm");
 
 const SUGGESTED_PRODUCT_LIMIT = 30; // maximum number of suggested products to calculate scores for
 
