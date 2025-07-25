@@ -1,9 +1,6 @@
 const express = require("express");
 const { PrismaClient } = require("../generated/prisma/index.js");
-const {
-    SkinTypes,
-    ProductTypes,
-} = require("../../common-enums.js");
+const { SkinTypes, ProductTypes } = require("../../common-enums.js");
 const {
     updateProductsWithScore,
 } = require("../helpers/scoring-helper-functions.js");
@@ -277,7 +274,7 @@ router.put("/toggle-like/:productId", async (req, res) => {
  * Save/unsave a product for a user.
  */
 router.put("/toggle-save/:productId", async (req, res) => {
-    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
 
     if (!userId) {
@@ -325,7 +322,7 @@ router.put("/toggle-save/:productId", async (req, res) => {
  * Dislike/remove dislike a product for a user.
  */
 router.put("/toggle-dislike/:productId", async (req, res) => {
-    const productId = parseInt(req.params.productId); // Corrected from postId to productId
+    const productId = parseInt(req.params.productId);
     const userId = req.session.userId;
 
     if (!userId) {
