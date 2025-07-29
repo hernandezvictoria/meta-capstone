@@ -5,6 +5,7 @@ import { useUser } from "../../contexts/UserContext";
 import { useState, useEffect, use } from "react";
 import Loading from "../home_components/Loading";
 import RoutineProductList from "./RoutineProductList";
+import CacheStats from "../CacheStats";
 
 function RoutinePage() {
     const { user } = useUser();
@@ -140,6 +141,7 @@ function RoutinePage() {
                     </div>
                 )}
             </div>
+            <CacheStats />
         </>
     );
 }

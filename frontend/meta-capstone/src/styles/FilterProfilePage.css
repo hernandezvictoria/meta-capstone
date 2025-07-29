@@ -1,0 +1,24 @@
+.profile-nav {
+    display: flex;
+    justify-content: left;
+    width: 95%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.filter-button {
+    height: 40px;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    margin-right: 5%;
+}
+
+.filter-button:hover {
+    background-color: #ececec;
+    cursor: pointer;
+}
+
+body.dark-mode .filter-button {
+    border: 1px solid white;
+}

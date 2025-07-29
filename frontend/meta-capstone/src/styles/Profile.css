@@ -2,3 +2,21 @@
     text-align: right;
     margin: 1%;
 }
+
+.logout-button {
+    position: absolute;
+    top: 1%;
+    left: 6%;
+    background-color: #da0000;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    height: 30px;
+    padding: 0 15px;
+    font-size: 90%;
+}
+
+.logout-button:hover {
+    background-color: #b30000;
+    cursor: pointer;
+}

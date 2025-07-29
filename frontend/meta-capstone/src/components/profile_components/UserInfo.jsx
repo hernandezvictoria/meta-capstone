@@ -1,21 +1,193 @@
-import { Link } from "react-router-dom";
+import { SkinTypes, SkinConcerns } from "../../../../../common-enums.js";
+import { useState, useEffect } from "react";
+import "../../styles/UserInfo.css";
 
 function UserInfo({ username, concerns, skinType }) {
+    const [message, setMessage] = useState({ type: "none", text: "" });
+    const [selectedSkinTypes, setSelectedSkinTypes] = useState([]);
+    const [selectedConcerns, setSelectedConcerns] = useState([]);
+
+    const loadInitialTypesAndConcerns = async () => {
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/user-skin-types-and-concerns`,
+                { credentials: "include" }
+            );
+            if (response.ok) {
+                const data = await response.json();
+                setSelectedSkinTypes(data.skinTypes);
+                setSelectedConcerns(data.concerns);
+
+                for (const skinType of data.skinTypes) {
+                    document.getElementById(skinType).classList.add("active");
+                }
+                for (const concern of data.concerns) {
+                    document
+                        .getElementById(concern.replace(/[\s_&()]+/g, ""))
+                        .classList.add("active");
+                }
+            } else {
+                throw new Error();
+            }
+        } catch (error) {
+            setCurrentPage(Pages.HOME);
+            navigate("/login");
+        }
+    };
+
+    useEffect(() => {
+        loadInitialTypesAndConcerns();
+    }, []);
+
+    const handleSkinTypeClick = (event) => {
+        event.preventDefault();
+        const skinType = event.target.name;
+        const button = document.getElementById(skinType);
+        if (selectedSkinTypes.includes(skinType)) {
+            // remove if already selected
+            setSelectedSkinTypes(
+                selectedSkinTypes.filter((type) => type !== skinType)
+            );
+            button.classList.remove("active");
+        } else {
+            // add if not selected
+            setSelectedSkinTypes([...selectedSkinTypes, skinType]);
+            button.classList.add("active");
+        }
+    };
+
+    const handleConcernClick = (event) => {
+        event.preventDefault();
+        const concern = event.target.name;
+        const button = document.getElementById(
+            concern.replace(/[\s_&()]+/g, "")
+        );
+        if (selectedConcerns.includes(concern)) {
+            setSelectedConcerns(selectedConcerns.filter((c) => c !== concern));
+            button.classList.remove("active");
+        } else {
+            setSelectedConcerns([...selectedConcerns, concern]);
+            button.classList.add("active");
+        }
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if (selectedSkinTypes.length === 0 || selectedConcerns.length === 0) {
+            setMessage({
+                type: "error",
+                text: "you must select at least one of each",
+            });
+        } else {
+            const skinTypesJson = JSON.stringify(selectedSkinTypes);
+            const concernsJson = JSON.stringify(selectedConcerns);
+            updateUserInfo(skinTypesJson, concernsJson);
+        }
+    };
+
+    const updateUserInfo = async (skinTypesJson, concernsJson) => {
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/change-skin-type`,
+                {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: skinTypesJson,
+                    credentials: "include",
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setMessage({
+                    type: "error",
+                    text: data.error || "form process failed",
+                });
+            }
+        } catch (error) {
+            setMessage({
+                type: "error",
+                text: "network error, please try again",
+            });
+        }
+
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/change-skin-concerns`,
+                {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: concernsJson,
+                    credentials: "include",
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setMessage({
+                    type: "error",
+                    text: data.error || "form process failed",
+                });
+            }
+        } catch (error) {
+            setMessage({
+                type: "error",
+                text: "network error, please try again",
+            });
+        }
+
+        setMessage({
+            type: "success",
+            text: "successfully updated skin type and concerns",
+        });
+    };
+
     return (
         <>
-            <h2>{username}</h2>
+            <h2 className="user">{username}</h2>
 
-            <p>your concern(s):</p>
-            {concerns.map((concern) => (
-                <p key={concern}>{concern}</p>
-            ))}
+            <form className="change-concerns-form" onSubmit={handleSubmit}>
+                <h3 className="category-header">skin type(s) </h3>
+                <div className="skin-type-buttons">
+                    {Object.values(SkinTypes).map((skinType) => (
+                        <button
+                            id={skinType}
+                            className="skin-type-button"
+                            onClick={handleSkinTypeClick}
+                            key={skinType}
+                            name={skinType}
+                        >
+                            {skinType}
+                        </button>
+                    ))}
+                </div>
 
-            <p>your skin type(s):</p>
-            {skinType.map((skinType) => (
-                <p key={skinType}>{skinType}</p>
-            ))}
+                <h3 className="category-header">concern(s)</h3>
+                <div className="concern-buttons">
+                    {Object.values(SkinConcerns).map((concern) => (
+                        <button
+                            id={concern.replace(/[\s_&()]+/g, "")}
+                            className="concern-button"
+                            onClick={handleConcernClick}
+                            key={concern}
+                            name={concern}
+                        >
+                            {concern}
+                        </button>
+                    ))}
+                </div>
 
-            <Link to="/quiz">✍️</Link>
+                {message && (
+                    <p className={`message-${message.type}`}>{message.text}</p>
+                )}
+
+                <button type="submit" value="Submit" className="submit-button">
+                    submit
+                </button>
+            </form>
         </>
     );
 }

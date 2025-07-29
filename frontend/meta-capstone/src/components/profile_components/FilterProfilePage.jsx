@@ -3,6 +3,7 @@ import UserInfo from "./UserInfo.jsx";
 import { ProfileFilters } from "../../../../../common-enums.js";
 import { useEffect, useState } from "react";
 import Loading from "../home_components/Loading";
+import "../../styles/FilterProfilePage.css";
 
 function FilterProfilePage() {
     const [error, setError] = useState(null);

@@ -1,4 +1,4 @@
-.background{
+.background {
     /* darken image using rgba */
     background-image:
         linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
@@ -15,59 +15,59 @@
     background-color: transparent;
 }
 
-.form-body{
-    width: 400px;
-    display:flex;
-    flex-direction:column;
-    margin-left:18.5%;
-    align-items:center;
-    padding:1% 0%;
-    border-radius:15px;
+.form-body {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1% 0%;
+    border-radius: 15px;
+    margin-right: 17%;
 }
 
-.login-message{
+.login-message {
     background-color: transparent;
-    color:white;
-    width:25%;
+    color: white;
+    width: 25%;
     text-align: left;
-    margin-left:18.5%;
-    font-size:600%;
+    margin-left: 17%;
+    font-size: 500%;
 }
 
-.input{
-    display:flex;
-    flex-direction:column;
-    text-align:left;
-    width:150%;
-    font-size:90%;
-}
-
-.text-box{
-    height:40px;
-    border-radius:15px;
-    text-align:left;
-    font-size:120%;
-    padding-left:5%;
-    margin-bottom:5%;
-    margin-top:2%;
-}
-
-.login-button{
-    background-color: #da0000;
-    color:white;
-    border:none;
-    border-radius:11px;
+.input {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
     width: 150%;
-    height:30px;
-    font-size:90%;
-    margin-bottom:5%;
+    font-size: 90%;
 }
 
-.login-button:hover{
+.text-box {
+    height: 40px;
+    border-radius: 15px;
+    text-align: left;
+    font-size: 120%;
+    padding-left: 5%;
+    margin-bottom: 5%;
+    margin-top: 2%;
+}
+
+.login-button {
+    background-color: #da0000;
+    color: white;
+    border: none;
+    border-radius: 11px;
+    width: 150%;
+    height: 30px;
+    font-size: 90%;
+    margin-bottom: 5%;
+}
+
+.login-button:hover {
     background-color: #b30000;
-    cursor:pointer;
+    cursor: pointer;
 }
 
-.link{
-    color:#b30000;
+.link {
+    color: #b30000;
 }
