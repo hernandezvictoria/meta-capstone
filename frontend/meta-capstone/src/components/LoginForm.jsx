@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import "../styles/LoginForm.css";
 import { useNav } from "../contexts/NavContext";
 import { Pages } from "../../../../common-enums.js";
+import logoIcon from "../assets/logo.png";
 
 function LoginForm() {
     const { setCurrentPage } = useNav();
@@ -57,41 +58,54 @@ function LoginForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="login-form">
-            <label>
-                username
-                <input
-                    type="text"
-                    name="username"
-                    placeholder="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                />
-            </label>
+        <div className="background">
+            <h1 className="login-message">log in to get your ideas</h1>
+            <div className="form-body">
+                <img src={logoIcon} alt="logo" className="logo" />
+                <h2 className="quiz-header">
+                    welcome to skinterest
+                </h2>
+                <form onSubmit={handleSubmit} className="login-form">
+                    <label className="input">
+                        username
+                        <input
+                            className="text-box"
+                            type="text"
+                            name="username"
+                            placeholder="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </label>
 
-            <label>
-                password
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                />
-            </label>
+                    <label className="input">
+                        password
+                        <input
+                            className="text-box"
+                            type="password"
+                            name="password"
+                            placeholder="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </label>
 
-            <button type="submit">log in</button>
+                    <button className="login-button" type="submit">log in</button>
 
-            {message && (
-                <p className={`message ${message.type}`}>{message.text}</p>
-            )}
+                    {message && (
+                        <p className={`message ${message.type}`}>
+                            {message.text}
+                        </p>
+                    )}
 
-            <p>
-                new to skinterest? <Link to="/signup">sign up</Link>
-            </p>
-        </form>
+                    <p>
+                        new to skinterest? <Link className="link" to="/signup">sign up</Link>
+                    </p>
+                </form>
+            </div>
+        </div>
     );
 }
 
