@@ -90,7 +90,12 @@
     color: green;
 }
 
-.product-type, .product-type, .product-price, .skin-types, .skin-concerns, .highlighted-ingredients {
+.product-type,
+.product-type,
+.product-price,
+.skin-types,
+.skin-concerns,
+.highlighted-ingredients {
     text-align: left;
-    margin-top:5%;
+    margin-top: 5%;
 }
