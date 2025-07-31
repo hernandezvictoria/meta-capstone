@@ -47,7 +47,7 @@ concernRelatedWords.set(SkinConcerns.DRYNESS, [
     "hydrat",
     "plump",
 ]);
-fs.createReadStream("seed.csv")
+fs.createReadStream("seed2.csv")
     .pipe(parse({ columns: true, trim: true }))
     .on("data", async (row) => {
         const getConcernsArray = (str) => {
