@@ -3,6 +3,7 @@
     margin: 0 auto;
     column-count: 4;
     font-family: arial;
+    margin-bottom:1%;
 }
 
 @media screen and (max-width: 500px) {
@@ -19,4 +20,18 @@
     .product-container {
         column-count: 3;
     }
+}
+
+.load-more-button {
+    width: 10%;
+    font-size: 120%;
+    border: none;
+    border-radius: 10px;
+    padding: 1% 0%;
+    margin:1%;
+}
+
+.load-more-button:hover {
+    background-color: #ececec;
+    cursor: pointer;
 }

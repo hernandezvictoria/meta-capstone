@@ -14,39 +14,26 @@ function ProductModal({ data, modalProductId, setError, setModalProductId }) {
     return (
         <div className="modal-overlay" onClick={closeModal}>
             <div className="modal" onClick={(event) => event.stopPropagation()}>
-                <img
-                    className="product-image"
-                    alt={product.name}
-                    aria-label={product.name}
-                    src={product.image}
-                />
-                <section className="product-info">
+                <section className="image-and-name">
+                    <img
+                        className="product-image"
+                        alt={product.name}
+                        aria-label={product.name}
+                        src={product.image}
+                    />
                     <p className="product-brand">{product.brand}</p>
                     <p className="product-name">{product.name}</p>
-                    <p className="product-type">{product.product_type}</p>
-                    <p className="product-price">${product.price}</p>
-                    <section className="skin_type">
-                        {product.skin_type.map((type) => {
-                            return (
-                                <p key={type} className="type_box">
-                                    {type}
-                                </p>
-                            );
-                        })}
-                    </section>
-
-                    <section className="concerns">
-                        {product.concerns.map((concern) => {
-                            return (
-                                <p key={concern} className="concern_box">
-                                    {concern}
-                                </p>
-                            );
-                        })}
-                    </section>
+                </section>
+                <section className="modal-product-info">
+                    <p className="product-type">
+                        <b>product type:</b> {product.product_type}
+                    </p>
+                    <p className="product-price"><b>price:</b> ${product.price}</p>
+                    <p className="skin-types"><b>targeted skin type(s):</b> {product.skin_type.join(", ")}</p>
+                    <p className="skin-concerns"><b>targeted concern(s):</b> {product.concerns.join(", ")}</p>
                     {product.ingredients?.length > 0 && ( //if there are ingredients to display
                         <p className="highlighted-ingredients">
-                            highlighted ingredients:
+                            <b>highlighted ingredients:</b>
                         </p>
                     )}
                     {product.ingredients?.map((ingredient) => {
@@ -64,6 +51,7 @@ function ProductModal({ data, modalProductId, setError, setModalProductId }) {
                             </div>
                         );
                     })}
+
                 </section>
             </div>
         </div>

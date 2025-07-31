@@ -36,11 +36,11 @@ function Profile() {
             <NavBar />
             <CacheStats />
             <div className="main-content">
-                <p className="greeting">hello, {user.username}</p>
-                <h1>skinterest</h1>
-                <button type="button" onClick={handleLogout}>
+                <button className="logout-button" type="button" onClick={handleLogout}>
                     log out
                 </button>
+                <p className="greeting">hello, {user.username}</p>
+                <h1>skinterest</h1>
                 <FilterProfilePage />
             </div>
         </>

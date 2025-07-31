@@ -138,7 +138,7 @@ function ProductList({
                             onClick={handleLoadMore}
                             className="load-more-button"
                         >
-                            Load More
+                            load more
                         </button>
                     </div>
                 )}

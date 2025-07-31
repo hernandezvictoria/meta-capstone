@@ -3,6 +3,7 @@ import UserInfo from "./UserInfo.jsx";
 import { ProfileFilters } from "../../../../../common-enums.js";
 import { useEffect, useState } from "react";
 import Loading from "../home_components/Loading";
+import "../../styles/FilterProfilePage.css";
 
 function FilterProfilePage() {
     const [error, setError] = useState(null);
@@ -52,7 +53,7 @@ function FilterProfilePage() {
                 <button
                     aria-label="show liked products"
                     id={ProfileFilters.LIKED}
-                    className="filter-button"
+                    className={`filter-button ${selectedFilter === ProfileFilters.LIKED ? "filter-button-selected" : ""}`}
                     onClick={onFilterClick}
                 >
                     loved
@@ -60,7 +61,7 @@ function FilterProfilePage() {
                 <button
                     aria-label="show saved products"
                     id={ProfileFilters.SAVED}
-                    className="filter-button"
+                    className={`filter-button ${selectedFilter === ProfileFilters.SAVED ? "filter-button-selected" : ""}`}
                     onClick={onFilterClick}
                 >
                     saved
@@ -68,7 +69,7 @@ function FilterProfilePage() {
                 <button
                     aria-label="show disliked products"
                     id={ProfileFilters.DISLIKED}
-                    className="filter-button"
+                    className={`filter-button ${selectedFilter === ProfileFilters.DISLIKED ? "filter-button-selected" : ""}`}
                     onClick={onFilterClick}
                 >
                     disliked
@@ -76,7 +77,7 @@ function FilterProfilePage() {
                 <button
                     aria-label="show user info"
                     id={ProfileFilters.USERINFO}
-                    className="filter-button"
+                    className={`filter-button ${selectedFilter === ProfileFilters.USERINFO ? "filter-button-selected" : ""}`}
                     onClick={onFilterClick}
                 >
                     view profile

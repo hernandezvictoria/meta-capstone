@@ -1,25 +1,13 @@
+.change-concerns-form{
+    width:50%;
+    margin: 0 auto;
+}
+
 :root {
     --red1: #ff0000;
     --red2: #da0000;
     --red3: #710000;
     --red4: #ae0000;
-}
-
-.quiz-background {
-    /* darken image using rgba */
-    background-image:
-        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-        url("../assets/login-background.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 100vh;
-    width: 100%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: trasparent;
 }
 
 .quiz-body {
@@ -52,7 +40,7 @@ form {
 .skin-type-button,
 .concern-button {
     position: relative;
-    font-size: 150%;
+    font-size: 120%;
     border: 0;
     border-radius: 10px;
     padding: 3% 5%;
@@ -141,7 +129,7 @@ form {
 
 .submit-button {
     width: 50%;
-    font-size: 150%;
+    font-size: 120%;
     border: none;
     border-radius: 10px;
     padding: 3% 5%;
@@ -150,4 +138,23 @@ form {
 .submit-button:hover {
     background-color: #ececec;
     cursor: pointer;
+}
+
+.user{
+    font-size:250%;
+    margin-bottom:1%;
+}
+
+.profile-icon{
+    width:10%;
+}
+
+.message-success{
+    background-color:transparent;
+    color:gray;
+}
+
+.message-error{
+    background-color:transparent;
+    color:red;
 }

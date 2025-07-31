@@ -3,6 +3,7 @@ import "../styles/SignupForm.css";
 import { Link, useParams } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import logoIcon from "../assets/logo.png";
 
 function SignupForm() {
     const [formData, setFormData] = useState({ username: "", password: "" });
@@ -85,34 +86,50 @@ function SignupForm() {
     };
 
     return (
-        <form className="signup-form" onSubmit={handleSubmit}>
-            <label htmlFor="username">Username</label>
-            <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-            />
-            <label htmlFor="password">Password</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-            />
-            <div className="form-buttons">
-                <button type="submit">Sign Up</button>
-            </div>
-            {message && (
-                <div className={`message ${message.type}`}>{message.text}</div>
-            )}
+        <div className="background">
+            <h1 className="login-message">log in to get your ideas</h1>
+            <div className="form-body">
+                <img src={logoIcon} alt="logo" className="logo" />
+                <h2 className="quiz-header">welcome to skinterest</h2>
+                <form className="signup-form" onSubmit={handleSubmit}>
+                    <label className="input">
+                        username
+                        <input
+                            className="text-box"
+                            type="text"
+                            name="username"
+                            placeholder="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </label>
 
-            <p>
-                already a member? <Link to="/login">log in</Link>
-            </p>
-        </form>
+                    <label className="input">
+                        password
+                        <input
+                            className="text-box"
+                            type="password"
+                            name="password"
+                            placeholder="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </label>
+                    <button className="signup-button" type="submit">sign up</button>
+                    {message && (
+                        <div className={`message ${message.type}`}>
+                            {message.text}
+                        </div>
+                    )}
+
+                    <p>
+                        already a member? <Link className="link" to="/login">log in</Link>
+                    </p>
+                </form>
+            </div>
+        </div>
     );
 }
 

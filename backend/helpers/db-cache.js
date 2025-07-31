@@ -18,6 +18,10 @@ const fetchImageFromDB = async (productId) => {
         where: { id: productId },
     });
 
+    // return early to not wast API calls
+    DBHits++;
+    return productInfo.image; // return the image from the DB
+
     if (!productInfo) {
         throw new Error("no product info in DB");
     } else {

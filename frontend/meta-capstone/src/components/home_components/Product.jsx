@@ -232,14 +232,7 @@ function Product({
                     </p>
                 )}
                 <p>skin type(s): {skin_type.join(", ")}</p>
-
-                {concerns.map((concern) => {
-                    return (
-                        <p key={concern} className="concern-box">
-                            {concern}
-                        </p>
-                    );
-                })}
+                <p>concern(s): {concerns.join(", ")}</p>
             </section>
             <section className="like-and-save">
                 <button className="button-wrapper" onClick={toggleLike}>
